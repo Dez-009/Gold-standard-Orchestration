@@ -10,7 +10,7 @@ from models.user import User
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
 
-@router.post("/", response_model=SessionResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=SessionResponse, status_code=status.HTTP_200_OK)
 def create_session(
     session_data: SessionCreate,
     current_user: User = Depends(get_current_user),
