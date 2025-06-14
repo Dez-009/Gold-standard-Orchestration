@@ -23,3 +23,6 @@ class User(Base):
     journal_entries = relationship(
         "JournalEntry", back_populates="user", cascade="all, delete"
     )
+    goals = relationship(
+        "Goal", back_populates="user", cascade="all, delete"
+    )
