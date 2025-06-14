@@ -1,3 +1,5 @@
+"""Integration tests for goal-related endpoints."""
+
 import os
 import sys
 from fastapi.testclient import TestClient
