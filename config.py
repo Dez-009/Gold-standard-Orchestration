@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     openai_api_key: str
     environment: str = "development"
     port: int = 8000
+    database_url: str
 
     class Config:
         env_file = ".env"
