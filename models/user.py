@@ -20,3 +20,6 @@ class User(Base):
     sessions = relationship(
         "Session", back_populates="user", cascade="all, delete"
     )
+    journal_entries = relationship(
+        "JournalEntry", back_populates="user", cascade="all, delete"
+    )
