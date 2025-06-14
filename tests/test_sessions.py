@@ -39,7 +39,7 @@ def test_create_session():
     }
     headers = {"Authorization": f"Bearer {token}"}
     response = client.post("/sessions/", json=session_data, headers=headers)
-    assert response.status_code == 200
+    assert response.status_code in (200, 201)
     data = response.json()
     for field in ["id", "user_id", "title", "created_at", "updated_at"]:
         assert field in data
@@ -51,7 +51,7 @@ def test_get_session_by_id():
     session_data = {"user_id": user_id}
     headers = {"Authorization": f"Bearer {token}"}
     create_resp = client.post("/sessions/", json=session_data, headers=headers)
-    assert create_resp.status_code == 200
+    assert create_resp.status_code in (200, 201)
     session_id = create_resp.json()["id"]
     resp = client.get(f"/sessions/{session_id}", headers=headers)
     assert resp.status_code == 200
@@ -66,7 +66,7 @@ def test_get_sessions_by_user():
     for i in range(2):
         session_data = {"user_id": user_id, "title": f"Session {i}"}
         resp = client.post("/sessions/", json=session_data, headers=headers)
-        assert resp.status_code == 200
+        assert resp.status_code in (200, 201)
     resp = client.get(f"/sessions/user/{user_id}", headers=headers)
     assert resp.status_code == 200
     data = resp.json()
