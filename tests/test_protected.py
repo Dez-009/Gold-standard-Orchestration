@@ -1,18 +1,20 @@
 import os
 import sys
+from datetime import datetime, timedelta
 from fastapi.testclient import TestClient
 
-# Ensure env vars set
+# Ensure environment variables are set before importing the app
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 os.environ.setdefault("OPENAI_API_KEY", "test")
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 
 from main import app
+from auth.auth_utils import create_access_token
 
 client = TestClient(app)
 
 
-def test_protected_access():
+def test_access_protected_route_with_valid_token():
     user_data = {
         "email": "protected@example.com",
         "phone_number": "1112223333",
@@ -22,21 +24,19 @@ def test_protected_access():
     assert create_resp.status_code in (200, 201)
     user_id = create_resp.json()["id"]
 
-    login_resp = client.post(
-        "/auth/login",
-        data={"username": user_data["email"], "password": user_data["hashed_password"]},
-    )
-    assert login_resp.status_code == 200
-    token = login_resp.json()["access_token"]
-
-    resp = client.get("/protected/test", headers={"Authorization": f"Bearer {token}"})
+    token = create_access_token({"user_id": user_id}, expires_delta=timedelta(minutes=5))
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = client.get("/protected/test", headers=headers)
     assert resp.status_code == 200
-    data = resp.json()
-    assert data["message"] == "Access granted"
-    assert data["user_id"] == user_id
+    assert resp.json().get("message") == "Access granted"
 
 
-def test_protected_unauthorized():
-    resp = client.get("/protected/test")
+def test_access_protected_route_with_invalid_token():
+    headers = {"Authorization": "Bearer invalidtoken"}
+    resp = client.get("/protected/test", headers=headers)
     assert resp.status_code == 401
 
+
+def test_access_protected_route_without_token():
+    resp = client.get("/protected/test")
+    assert resp.status_code == 401

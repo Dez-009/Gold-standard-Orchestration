@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
+from fastapi import HTTPException, status
 
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
@@ -22,5 +23,8 @@ def verify_access_token(token: str) -> dict:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
-    except JWTError as exc:
-        raise exc
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
