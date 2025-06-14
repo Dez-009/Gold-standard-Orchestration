@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.orm import relationship
 
 from database.base import Base
 
@@ -16,3 +17,6 @@ class User(Base):
     age = Column(Integer, nullable=True)
     sex = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
+    sessions = relationship(
+        "Session", back_populates="user", cascade="all, delete"
+    )
