@@ -1,17 +1,9 @@
 from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel
 
 from services.openai_service import get_vida_response
+from schemas.vida_schemas import VidaRequest, VidaResponse
 
 router = APIRouter(prefix="/vida", tags=["vida"])
-
-
-class VidaRequest(BaseModel):
-    prompt: str
-
-
-class VidaResponse(BaseModel):
-    response: str
 
 
 @router.post("/coach", response_model=VidaResponse)
