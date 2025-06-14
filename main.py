@@ -7,6 +7,7 @@ from routes.protected import router as protected_router
 from routes.session import router as session_router
 from routes.journal import router as journal_router
 from routes.notification import router as notification_router
+from routes.goal import router as goal_router
 from routes.vida import router as vida_router
 from routes.root import router as root_router
 from database.base import Base
@@ -24,6 +25,7 @@ app.include_router(protected_router)
 app.include_router(session_router)
 app.include_router(journal_router)
 app.include_router(notification_router)
+app.include_router(goal_router)
 app.include_router(vida_router)
 app.include_router(root_router)
 
