@@ -1,3 +1,5 @@
+# Tests for journal endpoints
+
 import os
 import sys
 from fastapi.testclient import TestClient
