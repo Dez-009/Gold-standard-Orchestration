@@ -61,6 +61,17 @@ export async function getGoals(token: string) {
   return response.data;
 }
 
+// Retrieve the latest weekly review for the authenticated user
+// The caller must provide a valid JWT token for authorization
+export async function getWeeklyReview(token: string) {
+  // Issue the GET request to the /review endpoint with the auth header
+  const response = await apiClient.get('/review', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the weekly review data returned by the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
