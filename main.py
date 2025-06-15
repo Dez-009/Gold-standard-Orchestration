@@ -11,12 +11,10 @@ from routes.session import router as session_router
 from routes.journal import router as journal_router
 from routes.notification import router as notification_router
 from routes.goal import router as goal_router
-# Notes: Import router handling task operations
-from routes.task import router as task_router
 from routes.daily_checkin import router as daily_checkin_router
 from routes.reporting import router as reporting_router
-# Notes: Import router exposing habit endpoints
-from routes.habit import router as habit_router
+# Notes: Import router handling task operations
+from routes.task import router as task_router
 # Notes: Import router for AI coach endpoints
 from routes.ai_coach import router as ai_coach_router
 from routes.vida import router as vida_router
@@ -49,7 +47,6 @@ app.include_router(journal_router)
 app.include_router(notification_router)
 app.include_router(goal_router)
 app.include_router(task_router)
-app.include_router(habit_router)
 app.include_router(daily_checkin_router)
 app.include_router(reporting_router)
 app.include_router(vida_router)
