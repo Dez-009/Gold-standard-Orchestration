@@ -97,6 +97,31 @@ export async function getDailyCheckins(token: string) {
   return response.data;
 }
 
+// Retrieve the current user's profile information
+// Expects a valid JWT token for authorization
+export async function getProfile(token: string) {
+  // Perform GET request to the /profile endpoint with auth header
+  const response = await apiClient.get('/profile', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the user's profile data from the backend
+  return response.data;
+}
+
+// Update the user's profile with the supplied data
+// profileData should contain the editable profile fields
+export async function updateProfile(
+  profileData: Record<string, unknown>,
+  token: string
+) {
+  // Issue PUT request to /profile including the authorization header
+  const response = await apiClient.put('/profile', profileData, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the updated profile payload from the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
