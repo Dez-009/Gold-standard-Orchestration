@@ -36,7 +36,7 @@ async def ai_coach(
     prompt = payload.get("prompt")
     if prompt is None:
         raise HTTPException(status_code=400, detail="Prompt is required")
-    # Notes: Generate response from the AI processor service
-    ai_response = ai_processor.generate_ai_response(prompt)
+    # Notes: Generate response from the AI processor service using the user's context
+    ai_response = ai_processor.generate_ai_response(prompt, db, current_user.id)
     # Notes: Return the generated response in a JSON structure
     return {"response": ai_response}

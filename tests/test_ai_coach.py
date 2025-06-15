@@ -44,7 +44,7 @@ def test_ai_coach_response(monkeypatch):
     # Notes: Patch the AI processor to avoid external API calls
     from services import ai_processor
 
-    def fake_generate(prompt: str) -> str:
+    def fake_generate(prompt: str, db, user_id: int) -> str:
         return "Mocked AI reply"
 
     monkeypatch.setattr(ai_processor, "generate_ai_response", fake_generate)
@@ -67,7 +67,7 @@ def test_ai_coach_missing_prompt(monkeypatch):
     # Notes: Patch AI generation to avoid external call even though it won't run
     from services import ai_processor
 
-    monkeypatch.setattr(ai_processor, "generate_ai_response", lambda _: "")
+    monkeypatch.setattr(ai_processor, "generate_ai_response", lambda *_: "")
 
     headers = {"Authorization": f"Bearer {token}"}
     response = client.post("/ai/coach", json={}, headers=headers)
