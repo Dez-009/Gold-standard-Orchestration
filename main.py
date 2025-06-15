@@ -9,6 +9,7 @@ from routes.journal import router as journal_router
 from routes.notification import router as notification_router
 from routes.goal import router as goal_router
 from routes.daily_checkin import router as daily_checkin_router
+from routes.reporting import router as reporting_router
 from routes.vida import router as vida_router
 from routes.root import router as root_router
 from database.base import Base
@@ -28,6 +29,7 @@ app.include_router(journal_router)
 app.include_router(notification_router)
 app.include_router(goal_router)
 app.include_router(daily_checkin_router)
+app.include_router(reporting_router)
 app.include_router(vida_router)
 app.include_router(root_router)
 
