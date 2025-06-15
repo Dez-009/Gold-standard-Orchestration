@@ -72,6 +72,31 @@ export async function getWeeklyReview(token: string) {
   return response.data;
 }
 
+// Submit a daily check-in for the authenticated user
+// Expects a reflection text and mood value along with the JWT token
+export async function postDailyCheckin(
+  data: { reflection: string; mood: string },
+  token: string
+) {
+  // Issue the POST request to the /checkin endpoint with auth header
+  const response = await apiClient.post('/checkin', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the created check-in record from the backend
+  return response.data;
+}
+
+// Retrieve the list of recent daily check-ins for the user
+// Requires a valid JWT token supplied by the caller
+export async function getDailyCheckins(token: string) {
+  // Issue the GET request to the /checkin endpoint with auth header
+  const response = await apiClient.get('/checkin', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the array of check-ins from the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
