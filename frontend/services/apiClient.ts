@@ -133,48 +133,6 @@ export async function getSessions(token: string) {
   return response.data;
 }
 
-// Create a new habit for the authenticated user
-// Expects habit data (name and frequency) and JWT token
-export async function postHabit(
-  habit: { habit_name: string; frequency: string; user_id: number },
-  token: string
-) {
-  // POST the habit payload to /habits with auth header
-  const response = await apiClient.post('/habits', habit, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  // Return the created habit from the backend
-  return response.data;
-}
-
-// Retrieve habits for the current user
-// Requires the caller to send the JWT token
-export async function getHabits(userId: number, token: string) {
-  // GET request to /habits/user/{id} with auth header
-  const response = await apiClient.get(`/habits/user/${userId}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  // Return the array of habit records
-  return response.data;
-}
-
-// Mark one completion of the given habit
-// Sends PUT request to /habits/{id}/log using the JWT token
-export async function logHabit(habitId: number, token: string) {
-  const response = await apiClient.put(`/habits/${habitId}/log`, null, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  // Return the updated habit record
-  return response.data;
-}
-
-// Delete a habit by its ID for the authenticated user
-export async function deleteHabit(habitId: number, token: string) {
-  await apiClient.delete(`/habits/${habitId}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-}
-
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
