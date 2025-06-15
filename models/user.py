@@ -29,6 +29,10 @@ class User(Base):
     goals = relationship(
         "Goal", back_populates="user", cascade="all, delete"
     )
+    # Track the tasks assigned to the user
+    tasks = relationship(
+        "Task", back_populates="user", cascade="all, delete"
+    )
     daily_checkins = relationship(
         "DailyCheckIn", back_populates="user", cascade="all, delete"
     )
