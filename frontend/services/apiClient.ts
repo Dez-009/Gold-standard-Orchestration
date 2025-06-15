@@ -25,6 +25,18 @@ export async function postAiPrompt(prompt: string, token: string) {
   return response.data;
 }
 
+// Retrieve all journal entries for the authenticated user
+// Expects the caller to supply a valid JWT token that will be sent
+// in the Authorization header of the request
+export async function getJournalEntries(token: string) {
+  // Issue the GET request to the /journal endpoint
+  const response = await apiClient.get('/journal', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the JSON payload containing the list of entries
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
