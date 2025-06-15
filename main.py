@@ -13,6 +13,8 @@ from routes.notification import router as notification_router
 from routes.goal import router as goal_router
 from routes.daily_checkin import router as daily_checkin_router
 from routes.reporting import router as reporting_router
+# Notes: Import router for AI coach endpoints
+from routes.ai_coach import router as ai_coach_router
 from routes.vida import router as vida_router
 from routes.root import router as root_router
 from routes.health import router as health_router
@@ -43,6 +45,8 @@ app.include_router(goal_router)
 app.include_router(daily_checkin_router)
 app.include_router(reporting_router)
 app.include_router(vida_router)
+# Register AI coach router to expose AI-powered coaching endpoints
+app.include_router(ai_coach_router)
 app.include_router(root_router)
 app.include_router(health_router)
 # Register routes for auditing user actions
