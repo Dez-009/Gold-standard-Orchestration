@@ -14,6 +14,7 @@ from routes.daily_checkin import router as daily_checkin_router
 from routes.reporting import router as reporting_router
 from routes.vida import router as vida_router
 from routes.root import router as root_router
+from routes.health import router as health_router
 from database.base import Base
 from database.session import engine
 
@@ -37,4 +38,5 @@ app.include_router(daily_checkin_router)
 app.include_router(reporting_router)
 app.include_router(vida_router)
 app.include_router(root_router)
+app.include_router(health_router)
 

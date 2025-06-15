@@ -10,6 +10,7 @@ from .notification import router as notification_router
 from .goal import router as goal_router
 from .daily_checkin import router as daily_checkin_router
 from .reporting import router as reporting_router
+from .health import router as health_router
 
 router = APIRouter()
 
@@ -23,4 +24,5 @@ router.include_router(notification_router)
 router.include_router(goal_router)
 router.include_router(daily_checkin_router)
 router.include_router(reporting_router)
+router.include_router(health_router)
 
