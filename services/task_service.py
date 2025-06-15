@@ -21,6 +21,12 @@ def get_tasks_by_user(db: Session, user_id: int) -> list[Task]:
     return db.query(Task).filter(Task.user_id == user_id).all()
 
 
+def get_task_by_id(db: Session, task_id: int) -> Task | None:
+    """Fetch a single task by its identifier."""
+    # Notes: Query the database for the task record
+    return db.query(Task).filter(Task.id == task_id).first()
+
+
 def mark_task_complete(db: Session, task_id: int) -> None:
     """Mark the specified task as completed."""
     # Lookup the task by its identifier

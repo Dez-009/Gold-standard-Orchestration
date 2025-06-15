@@ -8,6 +8,8 @@ from typing import Optional
 class TaskCreate(BaseModel):
     """Model for creating a task."""
 
+    # Identifier of the user that owns the task
+    user_id: int
     # Text description of the task
     description: str
     # Optional due date for the task completion
@@ -18,6 +20,8 @@ class TaskCreate(BaseModel):
 class TaskResponse(BaseModel):
     """Model for returning task information."""
 
+    # Identifier of the user that owns the task
+    user_id: int
     # Unique identifier of the task
     id: int
     # Description text of the task
