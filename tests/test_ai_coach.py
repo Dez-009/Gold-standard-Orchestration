@@ -44,7 +44,7 @@ def test_ai_coach_response(monkeypatch):
     # Notes: Patch the AI processor to avoid external API calls
     from services import ai_processor
 
-    def fake_generate(prompt: str, db, user_id: int) -> str:
+    def fake_generate(db, user_id: int, prompt: str) -> str:
         return "Mocked AI reply"
 
     monkeypatch.setattr(ai_processor, "generate_ai_response", fake_generate)
@@ -72,3 +72,32 @@ def test_ai_coach_missing_prompt(monkeypatch):
     headers = {"Authorization": f"Bearer {token}"}
     response = client.post("/ai/coach", json={}, headers=headers)
     assert response.status_code == 400
+
+
+# Notes: Verify AI coach response when user has existing memory records
+def test_ai_coach_response_with_memory(monkeypatch):
+    """Ensure AI responds even when previous context exists."""
+    # Notes: Register user and get auth token
+    user_id, token = register_and_login()
+
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Notes: Create sample journal entry to serve as user memory
+    entry_data = {"user_id": user_id, "content": "Today was productive."}
+    journal_resp = client.post("/journals/", json=entry_data, headers=headers)
+    assert journal_resp.status_code in (200, 201)
+
+    # Notes: Patch AI processor to avoid calling external API
+    from services import ai_processor
+
+    def fake_generate(db, uid: int, prompt: str) -> str:
+        return "Mocked memory based reply"
+
+    monkeypatch.setattr(ai_processor, "generate_ai_response", fake_generate)
+
+    payload = {"prompt": "How can I keep this momentum?"}
+    response = client.post("/ai/coach", json=payload, headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data.get("response"), str)
+    assert data["response"]
