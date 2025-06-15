@@ -155,6 +155,16 @@ export async function getAuditLogs(token: string) {
   return response.data;
 }
 
+// Notes: Retrieve overall system health information
+export async function getSystemHealth(token: string) {
+  // Notes: Call the backend /health endpoint including auth header
+  const response = await apiClient.get('/health', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the status payload for each service
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

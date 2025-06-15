@@ -8,11 +8,11 @@ import Link from 'next/link';
 import { getToken, parseUserFromToken } from '../../services/authUtils';
 
 export default function DashboardPage() {
-  // Local state to hold the email extracted from the token
-  const [email, setEmail] = useState<string | null>(null);
+  // Notes: Store email and role info parsed from the JWT
+  const [user, setUser] = useState<{ email: string | null; role: string | null }>({ email: null, role: null });
   const router = useRouter();
 
-  // On mount, verify token and extract user email
+  // Notes: On mount, verify token and parse user info
   useEffect(() => {
     const token = getToken();
     if (!token) {
@@ -20,8 +20,8 @@ export default function DashboardPage() {
       router.push('/login');
       return;
     }
-    // Parse email from the JWT payload
-    setEmail(parseUserFromToken(token));
+    // Notes: Store parsed email and role in state
+    setUser(parseUserFromToken(token));
   }, [router]);
 
   // Render dashboard with simple styling and user information
@@ -54,16 +54,25 @@ export default function DashboardPage() {
         <Link href="/profile" className="text-blue-600 underline">
           Profile
         </Link>
-        {/* Temporary link to the admin audit log page */}
-        <Link href="/admin/audit" className="text-blue-600 underline">
-          Audit Logs
-        </Link>
       </nav>
+
+      {/* Notes: Show admin links only when the user has admin role */}
+      {user.role === 'admin' && (
+        <nav className="self-end mr-4 mt-2 space-x-4 border-t pt-2">
+          <span className="font-semibold mr-2">Admin:</span>
+          <Link href="/admin/audit" className="text-blue-600 underline">
+            Audit Logs
+          </Link>
+          <Link href="/admin/health" className="text-blue-600 underline">
+            System Health
+          </Link>
+        </nav>
+      )}
 
       {/* Welcome header */}
       <h1 className="text-3xl font-bold">Welcome back to Vida Coach!</h1>
-      {/* Show logged-in email if available */}
-      {email && <p className="text-lg">Logged in as {email}</p>}
+      {/* Notes: Display the logged in user's email */}
+      {user.email && <p className="text-lg">Logged in as {user.email}</p>}
 
       {/* Static user profile placeholder information */}
       <div className="border rounded p-4 text-center">
