@@ -23,4 +23,6 @@ def init_rate_limiter(app: FastAPI, default_limit: str | None = None) -> None:
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _custom_rate_limit_handler)
     app.add_middleware(SlowAPIMiddleware)
-    limiter.init_app(app)
+    # ``slowapi.Limiter`` does not expose ``init_app`` in the installed version
+    # so simply attaching the middleware is sufficient
+
