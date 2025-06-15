@@ -8,6 +8,8 @@ from .daily_checkin import DailyCheckIn
 from .audit_log import AuditLog
 # Include the Task model so it can be accessed via models.Task
 from .task import Task
+# Notes: Import the Habit model to expose it through the package
+from .habit import Habit
 
 __all__ = [
     "User",
@@ -17,5 +19,6 @@ __all__ = [
     "Task",
     "DailyCheckIn",
     "AuditLog",
+    "Habit",
 ]
 

@@ -39,3 +39,7 @@ class User(Base):
     audit_logs = relationship(
         "AuditLog", back_populates="user", cascade="all, delete"
     )
+    # Notes: Track the habits associated with the user
+    habits = relationship(
+        "Habit", back_populates="user", cascade="all, delete"
+    )
