@@ -7,10 +7,16 @@ class Settings(BaseSettings):
     environment: str = "development"
     port: int = 8000
     database_url: str
+    RATE_LIMIT: str = "100/minute"
 
     class Config:
         env_file = ".env"
 
 
 settings = Settings()
+
+
+def get_settings() -> Settings:
+    """Return a new Settings instance."""
+    return Settings()
 
