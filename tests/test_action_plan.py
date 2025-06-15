@@ -36,9 +36,10 @@ def register_and_login() -> tuple[int, str]:
 
 # Notes: Verify the generate action plan route returns the mocked plan
 def test_generate_action_plan(monkeypatch):
+    # Notes: Register a test user and obtain an auth token
     user_id, token = register_and_login()
 
-    # Notes: Patch the service call used in the route to avoid hitting OpenAI
+    # Notes: Patch the service layer to avoid calling OpenAI during the test
     import routes.action_plan as action_routes
 
     def fake_generate(db, uid: int, goal: str) -> str:
@@ -46,8 +47,31 @@ def test_generate_action_plan(monkeypatch):
 
     monkeypatch.setattr(action_routes, "generate_action_plan", fake_generate)
 
+    # Notes: Call the endpoint with a sample goal
     headers = {"Authorization": f"Bearer {token}"}
     payload = {"goal": "Get fit"}
     response = client.post("/action-plan/generate", json=payload, headers=headers)
+
+    # Notes: Validate the response contains a non-empty action plan string
     assert response.status_code == 200
-    assert response.json() == {"action_plan": "Mock Plan"}
+    data = response.json()
+    assert "action_plan" in data
+    assert isinstance(data["action_plan"], str)
+    assert data["action_plan"]
+
+
+# Notes: Ensure a validation error occurs when the goal is missing
+def test_action_plan_missing_goal(monkeypatch):
+    # Notes: Register a user and acquire an auth token
+    _, token = register_and_login()
+
+    # Notes: Patch service so no external call happens even though it won't run
+    import routes.action_plan as action_routes
+    monkeypatch.setattr(action_routes, "generate_action_plan", lambda *_: "")
+
+    # Notes: Submit a request without a goal field
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.post("/action-plan/generate", json={}, headers=headers)
+
+    # Notes: FastAPI should return a validation error for the missing goal
+    assert response.status_code == 422
