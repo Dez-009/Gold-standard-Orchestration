@@ -4,6 +4,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { getToken, parseUserFromToken } from '../../services/authUtils';
 
 export default function DashboardPage() {
@@ -23,11 +24,36 @@ export default function DashboardPage() {
     setEmail(parseUserFromToken(token));
   }, [router]);
 
-  // Render dashboard with simple styling
+  // Render dashboard with simple styling and user information
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-3xl font-bold mb-4">Welcome back to Vida Coach!</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+      {/* Simple navigation link to AI Coach page */}
+      <nav className="self-end mr-4">
+        <Link href="/coach" className="text-blue-600 underline">
+          AI Coach
+        </Link>
+      </nav>
+
+      {/* Welcome header */}
+      <h1 className="text-3xl font-bold">Welcome back to Vida Coach!</h1>
+      {/* Show logged-in email if available */}
       {email && <p className="text-lg">Logged in as {email}</p>}
+
+      {/* Static user profile placeholder information */}
+      <div className="border rounded p-4 text-center">
+        <p className="font-semibold">John Doe</p>
+        <p>Age: 30</p>
+        <p>Goals: Stay active and eat healthy</p>
+      </div>
+
+      {/* Button linking to the AI coach page */}
+      <Link
+        href="/coach"
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Get AI Coaching
+      </Link>
+
     </div>
   );
 }
