@@ -144,6 +144,17 @@ export async function getAiSuggestions(token: string) {
   return response.data;
 }
 
+// Retrieve all recent audit logs from the backend
+// Sends a GET request to the /audit-logs endpoint with auth header
+export async function getAuditLogs(token: string) {
+  // Issue the request to fetch audit log entries
+  const response = await apiClient.get('/audit-logs', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the array of audit log objects
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

@@ -54,6 +54,10 @@ export default function DashboardPage() {
         <Link href="/profile" className="text-blue-600 underline">
           Profile
         </Link>
+        {/* Temporary link to the admin audit log page */}
+        <Link href="/admin/audit" className="text-blue-600 underline">
+          Audit Logs
+        </Link>
       </nav>
 
       {/* Welcome header */}
