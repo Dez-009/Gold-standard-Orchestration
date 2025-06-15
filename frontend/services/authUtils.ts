@@ -8,15 +8,25 @@ export function getToken(): string | null {
   return localStorage.getItem('token');
 }
 
-// Decode JWT payload and return the user email
-export function parseUserFromToken(token: string | null): string | null {
-  if (!token) return null;
+// Notes: Shape of the user information inside the JWT
+export interface ParsedUser {
+  email: string | null;
+  role: string | null;
+}
+
+// Notes: Decode JWT payload and extract email and role
+export function parseUserFromToken(token: string | null): ParsedUser {
+  if (!token) return { email: null, role: null };
   try {
-    // Split the token and decode the payload (second part)
     const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.email as string;
+    return { email: payload.email as string, role: payload.role as string };
   } catch {
-    // Return null if decoding fails
-    return null;
+    return { email: null, role: null };
   }
+}
+
+// Notes: Convenience helper to check if current user is an admin
+export function isAdmin(): boolean {
+  const { role } = parseUserFromToken(getToken());
+  return role === 'admin';
 }

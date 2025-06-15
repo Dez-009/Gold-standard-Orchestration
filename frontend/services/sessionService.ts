@@ -3,6 +3,7 @@
 
 import { getToken } from './authUtils';
 import { getSessions } from './apiClient';
+import { showSuccess, showError } from '../components/ToastProvider';
 
 // Fetch the list of sessions for the authenticated user
 export async function fetchSessions() {
@@ -12,8 +13,14 @@ export async function fetchSessions() {
     // Throw an error when the user is not logged in
     throw new Error('User not authenticated');
   }
-  // Delegate the HTTP request to the API client
-  const data = await getSessions(token);
-  // Specify the expected structure of the response
-  return data as Array<{ id: number; summary: string; created_at: string }>;
+  try {
+    // Notes: Fetch previous session summaries
+    const data = await getSessions(token);
+    showSuccess('Saved successfully');
+    // Notes: Return sessions in the expected format
+    return data as Array<{ id: number; summary: string; created_at: string }>;
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
 }

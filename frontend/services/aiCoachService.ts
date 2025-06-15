@@ -4,6 +4,7 @@
 
 import { getToken } from './authUtils';
 import { postAiPrompt } from './apiClient';
+import { showSuccess, showError } from '../components/ToastProvider';
 
 // Return the AI coach's reply to the given prompt
 export async function getAiResponse(prompt: string): Promise<string> {
@@ -15,9 +16,14 @@ export async function getAiResponse(prompt: string): Promise<string> {
     throw new Error('User not authenticated');
   }
 
-  // Send the prompt to the backend and extract the response text
-  const data = await postAiPrompt(prompt, token);
-  // The backend returns an object with a "response" field
-  // containing the AI-generated text.
-  return data.response as string;
+  try {
+    // Notes: Send the prompt and await the AI response
+    const data = await postAiPrompt(prompt, token);
+    showSuccess('Saved successfully');
+    // Notes: Return only the AI text from the payload
+    return data.response as string;
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
 }

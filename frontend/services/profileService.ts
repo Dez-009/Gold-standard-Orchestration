@@ -3,6 +3,7 @@
 
 import { getToken } from './authUtils';
 import { getProfile, updateProfile } from './apiClient';
+import { showSuccess, showError } from '../components/ToastProvider';
 
 // Retrieve the authenticated user's profile
 export async function fetchProfile() {
@@ -11,9 +12,15 @@ export async function fetchProfile() {
     // Throw an error when there is no token available
     throw new Error('User not authenticated');
   }
-  // Delegate the HTTP GET call to the API client
-  const data = await getProfile(token);
-  return data as Record<string, unknown>;
+  try {
+    // Notes: Fetch profile data from the backend
+    const data = await getProfile(token);
+    showSuccess('Saved successfully');
+    return data as Record<string, unknown>;
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
 }
 
 // Persist profile changes for the current user
@@ -23,7 +30,13 @@ export async function saveProfile(profileData: Record<string, unknown>) {
     // Propagate an auth error if the user is not logged in
     throw new Error('User not authenticated');
   }
-  // Send the updated profile to the backend
-  const data = await updateProfile(profileData, token);
-  return data as Record<string, unknown>;
+  try {
+    // Notes: Persist updated profile information
+    const data = await updateProfile(profileData, token);
+    showSuccess('Saved successfully');
+    return data as Record<string, unknown>;
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
 }
