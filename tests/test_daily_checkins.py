@@ -1,3 +1,5 @@
+"""Tests for daily check-in endpoints."""
+
 import os
 import sys
 import uuid
