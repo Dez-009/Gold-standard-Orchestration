@@ -37,6 +37,30 @@ export async function getJournalEntries(token: string) {
   return response.data;
 }
 
+// Save a new goal for the authenticated user
+// Expects goal content and JWT token for authorization
+export async function postGoal(content: string, token: string) {
+  // Issue the POST request to the /goals endpoint with auth header
+  const response = await apiClient.post(
+    '/goals',
+    { content },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Return the parsed JSON response from the backend
+  return response.data;
+}
+
+// Retrieve all goals belonging to the authenticated user
+// JWT token must be provided by the caller for authorization
+export async function getGoals(token: string) {
+  // Issue the GET request to the /goals endpoint with auth header
+  const response = await apiClient.get('/goals', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the array of goals from the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
