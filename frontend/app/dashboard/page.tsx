@@ -35,6 +35,9 @@ export default function DashboardPage() {
         <Link href="/goals" className="text-blue-600 underline">
           Goals
         </Link>
+        <Link href="/review" className="text-blue-600 underline">
+          Weekly Review
+        </Link>
       </nav>
 
       {/* Welcome header */}
