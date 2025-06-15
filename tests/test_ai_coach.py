@@ -101,3 +101,25 @@ def test_ai_coach_response_with_memory(monkeypatch):
     data = response.json()
     assert isinstance(data.get("response"), str)
     assert data["response"]
+
+
+# Notes: Verify goal suggestions endpoint returns a list of goals
+def test_suggest_goals_endpoint(monkeypatch):
+    """Ensure the suggest goals route responds with AI suggestions."""
+    # Notes: Register user and acquire auth token
+    _, token = register_and_login()
+
+    # Notes: Patch the suggest_goals function used by the route
+    import routes.ai_coach as ai_routes
+
+    def fake_suggest(db, uid: int) -> str:
+        return "1. Stay active\n2. Eat healthy"
+
+    monkeypatch.setattr(ai_routes, "suggest_goals", fake_suggest)
+
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.get("/ai/suggest-goals", headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert "suggestions" in data
+    assert data["suggestions"]
