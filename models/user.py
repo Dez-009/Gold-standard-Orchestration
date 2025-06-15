@@ -29,3 +29,6 @@ class User(Base):
     daily_checkins = relationship(
         "DailyCheckIn", back_populates="user", cascade="all, delete"
     )
+    audit_logs = relationship(
+        "AuditLog", back_populates="user", cascade="all, delete"
+    )
