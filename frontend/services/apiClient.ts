@@ -133,6 +133,17 @@ export async function getSessions(token: string) {
   return response.data;
 }
 
+// Retrieve AI-generated goal suggestions for the authenticated user
+// Sends a GET request to the /ai/suggestions endpoint with auth header
+export async function getAiSuggestions(token: string) {
+  // Issue the request to the backend suggestions route
+  const response = await apiClient.get('/ai/suggestions', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the suggestion data provided by the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
