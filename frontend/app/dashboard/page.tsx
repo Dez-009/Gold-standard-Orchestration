@@ -46,6 +46,10 @@ export default function DashboardPage() {
         <Link href="/sessions" className="text-blue-600 underline">
           Sessions
         </Link>
+        {/* Link to the habit tracker page */}
+        <Link href="/habits" className="text-blue-600 underline">
+          Habits
+        </Link>
         {/* Link to the profile management page */}
         <Link href="/profile" className="text-blue-600 underline">
           Profile
