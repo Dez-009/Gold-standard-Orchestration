@@ -42,6 +42,10 @@ export default function DashboardPage() {
         <Link href="/review" className="text-blue-600 underline">
           Weekly Review
         </Link>
+        {/* Link to the AI goal suggestions page */}
+        <Link href="/suggestions" className="text-blue-600 underline">
+          Suggestions
+        </Link>
         {/* Link to the coaching session history page */}
         <Link href="/sessions" className="text-blue-600 underline">
           Sessions
