@@ -1,5 +1,8 @@
 from pydantic_settings import BaseSettings
 
+# Application version placeholder
+VERSION = "1.0.0"
+
 
 class Settings(BaseSettings):
     project_name: str = "Vida Coach API"
