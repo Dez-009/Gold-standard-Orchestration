@@ -55,3 +55,33 @@ Here is user context memory:
 
     # Notes: Return only the text portion of the first choice
     return response.choices[0].message.content
+
+
+# Notes: Suggest new goals for a user based on their context memory
+
+
+def suggest_goals(db: Session, user_id: int) -> str:
+    """Return a numbered list of 3-5 suggested goals for the user."""
+
+    # Notes: Gather recent session and journal information for context
+    memory = get_user_context_memory(db, user_id)
+
+    # Notes: Define the instruction for the AI on how to craft the goal list
+    system_prompt = (
+        "You are Vida, an AI Life Coach. Based on the user's recent history, "
+        "suggest 3-5 actionable personal goals. Provide them as a simple numbered list."
+    )
+
+    # Notes: Call the OpenAI chat completion API with the context memory
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": memory},
+        ],
+        temperature=0.7,
+        max_tokens=512,
+    )
+
+    # Notes: Return the generated goals as a string
+    return response.choices[0].message.content
