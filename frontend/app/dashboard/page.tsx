@@ -27,10 +27,13 @@ export default function DashboardPage() {
   // Render dashboard with simple styling and user information
   return (
     <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
-      {/* Simple navigation link to AI Coach page */}
-      <nav className="self-end mr-4">
+      {/* Simple navigation links to feature pages */}
+      <nav className="self-end mr-4 space-x-4">
         <Link href="/coach" className="text-blue-600 underline">
           AI Coach
+        </Link>
+        <Link href="/goals" className="text-blue-600 underline">
+          Goals
         </Link>
       </nav>
 
