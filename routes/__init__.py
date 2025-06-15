@@ -8,6 +8,7 @@ from .session import router as session_router
 from .journal import router as journal_router
 from .notification import router as notification_router
 from .goal import router as goal_router
+from .task import router as task_router
 from .daily_checkin import router as daily_checkin_router
 from .reporting import router as reporting_router
 from .health import router as health_router
@@ -25,6 +26,7 @@ router.include_router(session_router)
 router.include_router(journal_router)
 router.include_router(notification_router)
 router.include_router(goal_router)
+router.include_router(task_router)
 router.include_router(daily_checkin_router)
 router.include_router(reporting_router)
 router.include_router(health_router)
