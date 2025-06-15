@@ -20,6 +20,8 @@ from routes.root import router as root_router
 from routes.health import router as health_router
 # Router to expose audit log endpoints
 from routes.audit_log import router as audit_log_router
+# Notes: Import router responsible for generating action plans
+from routes.action_plan import router as action_plan_router
 from database.base import Base
 from database.session import engine
 
@@ -47,6 +49,8 @@ app.include_router(reporting_router)
 app.include_router(vida_router)
 # Register AI coach router to expose AI-powered coaching endpoints
 app.include_router(ai_coach_router)
+# Notes: Include routes that generate action plans for user goals
+app.include_router(action_plan_router)
 app.include_router(root_router)
 app.include_router(health_router)
 # Register routes for auditing user actions

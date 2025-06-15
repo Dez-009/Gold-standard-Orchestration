@@ -12,6 +12,8 @@ from .daily_checkin import router as daily_checkin_router
 from .reporting import router as reporting_router
 from .health import router as health_router
 from .audit_log import router as audit_log_router
+# Notes: Import the new action plan router
+from .action_plan import router as action_plan_router
 
 router = APIRouter()
 
@@ -27,4 +29,6 @@ router.include_router(daily_checkin_router)
 router.include_router(reporting_router)
 router.include_router(health_router)
 router.include_router(audit_log_router)
+# Notes: Register action plan routes with the main router
+router.include_router(action_plan_router)
 
