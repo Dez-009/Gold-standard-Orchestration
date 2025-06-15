@@ -12,15 +12,16 @@ from main import app
 client = TestClient(app)
 
 
-def test_ping():
+def test_health_ping():
     resp = client.get("/health/ping")
     assert resp.status_code == 200
     assert resp.json() == {"status": "ok"}
 
 
-def test_version():
+def test_health_version():
     resp = client.get("/health/version")
     assert resp.status_code == 200
     data = resp.json()
     assert "version" in data
     assert isinstance(data["version"], str)
+    assert data["version"]
