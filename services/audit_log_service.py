@@ -5,6 +5,7 @@ from models.audit_log import AuditLog
 
 def create_audit_log(db: Session, log_data: dict) -> AuditLog:
     """Create a new audit log entry and persist it."""
+    # Initialize the ORM object and persist it to the database
     new_log = AuditLog(**log_data)
     db.add(new_log)
     db.commit()
@@ -14,9 +15,11 @@ def create_audit_log(db: Session, log_data: dict) -> AuditLog:
 
 def get_audit_logs_by_user(db: Session, user_id: int) -> list[AuditLog]:
     """Return all audit logs for a specific user."""
+    # Retrieve audit log entries filtered by user
     return db.query(AuditLog).filter(AuditLog.user_id == user_id).all()
 
 
 def get_all_audit_logs(db: Session) -> list[AuditLog]:
     """Return all audit log entries."""
+    # Fetch every audit log entry in the database
     return db.query(AuditLog).all()

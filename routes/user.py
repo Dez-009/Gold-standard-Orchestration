@@ -13,6 +13,7 @@ logger = get_logger()
 
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def create_user(user: UserCreate, db: Session = Depends(get_db)) -> UserResponse:
+    """Endpoint to register a new user."""
     logger.info("Registering new user with email: %s", user.email)
     existing_user = user_service.get_user_by_email(db, user.email)
     if existing_user:
@@ -26,6 +27,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)) -> UserResponse
 
 @router.get("/{user_id}", response_model=UserResponse)
 def read_user(user_id: int, db: Session = Depends(get_db)) -> UserResponse:
+    """Retrieve a user by ID."""
     logger.info("Fetching user with ID: %s", user_id)
     db_user = user_service.get_user(db, user_id)
     if db_user is None:

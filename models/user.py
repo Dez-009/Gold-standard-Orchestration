@@ -9,6 +9,7 @@ class User(Base):
 
     __tablename__ = "users"
 
+    # Basic user attributes
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     phone_number = Column(String, unique=True, nullable=True)
@@ -17,6 +18,8 @@ class User(Base):
     age = Column(Integer, nullable=True)
     sex = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
+
+    # Relationships to other models
     sessions = relationship(
         "Session", back_populates="user", cascade="all, delete"
     )
