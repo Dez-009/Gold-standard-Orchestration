@@ -4,8 +4,11 @@
 'use client';
 import AuthForm from '../../components/AuthForm';
 import { loginUser } from '../../services/authService';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter(); // Router instance for navigation
+
   // Handler passed to AuthForm for submission
   const handleLogin = async (values: Record<string, string>) => {
     const data = await loginUser({
@@ -14,6 +17,8 @@ export default function LoginPage() {
     });
     // Store JWT token in localStorage temporarily
     localStorage.setItem('token', data.access_token);
+    // Navigate to dashboard after successful login
+    router.push('/dashboard');
   };
 
   // Fields required for login form
