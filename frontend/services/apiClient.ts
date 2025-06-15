@@ -122,6 +122,17 @@ export async function updateProfile(
   return response.data;
 }
 
+// Retrieve all previous coaching sessions for the logged-in user
+// Sends a GET request to the /sessions endpoint with the JWT token
+export async function getSessions(token: string) {
+  // Issue the GET request to /sessions including auth header
+  const response = await apiClient.get('/sessions', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the list of sessions supplied by the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
