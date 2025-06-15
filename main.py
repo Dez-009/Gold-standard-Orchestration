@@ -1,5 +1,7 @@
 from fastapi import FastAPI, APIRouter
 
+from middleware.rate_limiter import init_rate_limiter
+
 from config import settings
 from routes.user import router as user_router
 from routes.auth import router as auth_router
@@ -20,6 +22,9 @@ Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI(title=settings.project_name, version="0.1.0")
+
+# Initialize rate limiting middleware
+init_rate_limiter(app)
 
 app.include_router(user_router)
 app.include_router(auth_router)
