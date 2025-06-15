@@ -24,7 +24,7 @@ SYSTEM_PROMPT = (
 # Notes: Generate Vida's response using optional user context memory
 
 
-def generate_ai_response(user_prompt: str, db: Session, user_id: int) -> str:
+def generate_ai_response(db: Session, user_id: int, user_prompt: str) -> str:
     """Return the AI-generated response for the given user prompt."""
 
     # Notes: Retrieve recent coaching context for this user
