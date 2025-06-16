@@ -100,6 +100,18 @@ export async function getJournalById(id: string, token: string) {
   return response.data;
 }
 
+// Export all journals to a PDF file
+// Notes: Returns the raw Blob that can be used for download
+export async function exportJournals(token: string) {
+  // Issue the GET request to the export route with responseType 'blob'
+  const response = await apiClient.get('/journals/export', {
+    headers: { Authorization: `Bearer ${token}` },
+    responseType: 'blob'
+  });
+  // Provide the binary PDF blob back to the caller
+  return response.data as Blob;
+}
+
 // Update an existing journal entry
 // Accepts the entry id, updated fields and the JWT token
 export async function updateJournal(

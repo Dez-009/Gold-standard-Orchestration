@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from database.utils import get_db
-from services import user_service, journal_service
+from services import user_service, journal_service, journal_export_service
 from schemas.journal_schemas import JournalEntryCreate, JournalEntryResponse
 from auth.dependencies import get_current_user
 from models.user import User
@@ -21,6 +22,16 @@ def create_journal_entry(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     new_entry = journal_service.create_journal_entry(db, entry_data.model_dump())
     return new_entry
+
+
+# Notes: Export all journal entries for the authenticated user as a PDF
+@router.get("/export")
+def export_journals(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> StreamingResponse:
+    """Return a PDF file containing the user's journal history."""
+    return journal_export_service.generate_journal_pdf(current_user.id, db)
 
 
 @router.get("/{entry_id}", response_model=JournalEntryResponse)
