@@ -476,6 +476,18 @@ export async function createCheckoutSession(planId: string, token: string) {
   return response.data;
 }
 
+// Create a Stripe billing portal session so the user can manage billing
+// Notes: Sends a POST request to /billing/portal with the JWT for auth
+export async function createBillingPortalSession(token: string) {
+  const response = await apiClient.post(
+    '/billing/portal',
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Response contains a redirect URL to the hosted billing portal
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

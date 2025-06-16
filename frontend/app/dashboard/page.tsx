@@ -11,6 +11,7 @@ import {
   isTokenExpired
 } from '../../services/authUtils';
 import { fetchAccountDetails } from '../../services/accountService';
+import { createBillingPortalSession } from '../../services/billingService';
 import { showError } from '../../components/ToastProvider';
 
 export default function DashboardPage() {
@@ -19,6 +20,8 @@ export default function DashboardPage() {
   const router = useRouter();
   // Notes: Track the user's current subscription tier
   const [tier, setTier] = useState<string | null>(null);
+  // Notes: Track whether we are waiting for the billing portal URL
+  const [portalLoading, setPortalLoading] = useState(false);
 
   // Notes: On mount, verify token validity and parse user info
   useEffect(() => {
@@ -43,6 +46,23 @@ export default function DashboardPage() {
     };
     loadTier();
   }, [router]);
+
+  // Launch Stripe billing portal and redirect on success
+  const handleManageSubscription = async () => {
+    setPortalLoading(true);
+    try {
+      // Notes: Request the portal session URL from the backend
+      const { url } = await createBillingPortalSession();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch {
+      // Notes: Show a toast when the portal request fails
+      showError('Failed to load billing portal');
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   // Render dashboard with simple styling and user information
   return (
@@ -166,6 +186,24 @@ export default function DashboardPage() {
       <h1 className="text-3xl font-bold">Welcome back to Vida Coach!</h1>
       {/* Notes: Display the logged in user's email */}
       {user.email && <p className="text-lg">Logged in as {user.email}</p>}
+
+      {/* Card showing current subscription status */}
+      <div className="border rounded p-4 w-full max-w-xs text-center space-y-2">
+        <p>
+          <span className="font-semibold">Subscription:</span>{' '}
+          {tier || 'Free'}
+        </p>
+        {/* Show manage button only when a paid tier is active */}
+        {tier && tier !== 'Free' && (
+          <button
+            onClick={handleManageSubscription}
+            disabled={portalLoading}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          >
+            {portalLoading ? 'Loading...' : 'Manage Subscription'}
+          </button>
+        )}
+      </div>
 
       {/* Static user profile placeholder information */}
       <div className="border rounded p-4 text-center">
