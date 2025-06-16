@@ -376,6 +376,17 @@ export async function getAllSubscriptions(token: string) {
   return response.data;
 }
 
+// Notes: Retrieve the full subscription history including past records
+// Notes: Sends a GET request to the /admin/subscriptions/history endpoint
+export async function getSubscriptionHistory(token: string) {
+  // Notes: Issue the HTTP request with the JWT for authentication
+  const response = await apiClient.get('/admin/subscriptions/history', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the array of history records from the backend
+  return response.data;
+}
+
 // Notes: Retrieve the list of all users for the admin user management page
 // Notes: Performs a GET request to the /admin/users endpoint with auth header
 export async function getAllUsers(token: string) {
