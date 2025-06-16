@@ -109,6 +109,11 @@ export default function DashboardPage() {
           <Link href="/admin/health" className="text-blue-600 underline">
             System Health
           </Link>
+
+          {/* Notes: Link to the system metrics dashboard */}
+          <Link href="/admin/metrics" className="text-blue-600 underline">
+            Metrics
+          </Link>
  codex/implement-admin-error-monitoring-page
 
           <Link href="/admin/system-logs" className="text-blue-600 underline">

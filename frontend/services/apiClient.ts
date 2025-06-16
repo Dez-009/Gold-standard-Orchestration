@@ -401,6 +401,17 @@ export async function getAllUsers(token: string) {
   return response.data;
 }
 
+// Notes: Retrieve high level system metrics for the admin dashboard
+// Notes: Sends a GET request to the /admin/metrics endpoint with auth header
+export async function getSystemMetrics(token: string) {
+  // Notes: Issue the request to the backend metrics route
+  const response = await apiClient.get('/admin/metrics', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the metrics payload supplied by the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
