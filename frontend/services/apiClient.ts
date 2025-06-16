@@ -159,6 +159,17 @@ export async function getWeeklyReview(token: string) {
   return response.data;
 }
 
+// Retrieve the list of completed goals for the authenticated user
+// Notes: Performs a GET request to the /goals/history endpoint including auth header
+export async function getCompletedGoals(token: string) {
+  // Notes: Issue the request to fetch completed goal records
+  const response = await apiClient.get('/goals/history', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the array of completed goals returned by the backend
+  return response.data;
+}
+
 // Submit a daily check-in for the authenticated user
 // Expects a reflection text and mood value along with the JWT token
 export async function postDailyCheckin(

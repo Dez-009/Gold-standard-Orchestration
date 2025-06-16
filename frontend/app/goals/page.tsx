@@ -81,6 +81,11 @@ export default function GoalsPage() {
       {/* Heading for the page */}
       <h1 className="text-2xl font-bold">Your Goals</h1>
 
+      {/* Link to view completed goals history */}
+      <Link href="/goals/history" className="text-blue-600 underline">
+        View Completed Goals
+      </Link>
+
       {/* Form for adding a new goal */}
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-2">
         <input
