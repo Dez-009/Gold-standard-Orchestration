@@ -53,6 +53,18 @@ export async function getJournalEntries(token: string) {
   return response.data;
 }
 
+// Retrieve previous journal entries for history view
+// This performs the same GET request as getJournalEntries but uses a
+// dedicated name so the caller semantics are clearer
+export async function getJournalHistory(token: string) {
+  // Issue the GET request to the /journal endpoint with auth header
+  const response = await apiClient.get('/journal', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the list of entries returned by the backend
+  return response.data;
+}
+
 // Save a new goal for the authenticated user
 // Expects goal content and JWT token for authorization
 export async function postGoal(content: string, token: string) {
