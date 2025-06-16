@@ -552,6 +552,20 @@ export async function refundPayment(chargeId: string, token: string) {
   return response.data;
 }
 
+// Submit a new support ticket on behalf of the authenticated user
+// Notes: Sends a POST request to the /support/tickets endpoint
+export async function submitSupportTicket(
+  data: { subject: string; category: string; message: string },
+  token: string
+) {
+  // Issue the request with the JWT token included in the headers
+  const response = await apiClient.post('/support/tickets', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return whatever payload the backend responds with
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
