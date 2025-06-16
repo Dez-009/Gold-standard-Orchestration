@@ -1,7 +1,7 @@
 """Endpoints for retrieving user account details."""
 
 # Notes: Import FastAPI tools for routing and dependency injection
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 
 # Notes: Import SQLAlchemy Session type for potential DB lookups
 from sqlalchemy.orm import Session
@@ -15,6 +15,7 @@ from models.user import User
 
 # Notes: Response schema describing account information
 from schemas.account_schemas import AccountResponse
+from services import user_service
 
 
 # Notes: Create the router with a URL prefix
@@ -31,3 +32,15 @@ async def read_account(
     # Notes: In this sprint we return static data; later this will query billing
     account_data = AccountResponse(tier="Free", billing="No payment method on file")
     return account_data
+
+
+@router.delete("/delete", status_code=status.HTTP_204_NO_CONTENT)
+# Notes: Permanently remove the authenticated user's account
+async def delete_account(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> None:
+    """Delete the user record and cascade related data."""
+    # Notes: Use the service layer to delete and commit
+    user_service.delete_user(db, current_user)
+    return None

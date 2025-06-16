@@ -46,3 +46,17 @@ def test_get_account_details():
     data = response.json()
     assert data["tier"] == "Free"
     assert "billing" in data
+
+
+# Notes: Ensure deleting the account removes authentication
+def test_delete_account():
+    """Account deletion should revoke access to protected endpoints."""
+    _, token = register_and_login()
+
+    headers = {"Authorization": f"Bearer {token}"}
+    resp = client.delete("/account/delete", headers=headers)
+    assert resp.status_code == 204
+
+    # Notes: Subsequent requests with the same token should fail
+    resp_check = client.get("/account", headers=headers)
+    assert resp_check.status_code == 401

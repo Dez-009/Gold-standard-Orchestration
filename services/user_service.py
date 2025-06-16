@@ -33,3 +33,11 @@ def get_user(db: Session, user_id: int) -> User | None:
 def get_all_users(db: Session) -> list[User]:
     """Return all users in the system."""
     return db.query(User).all()
+
+
+def delete_user(db: Session, user: User) -> None:
+    """Remove a user and cascade delete related records."""
+    # Notes: Issue the ORM delete operation which cascades to relationships
+    db.delete(user)
+    db.commit()
+    return None
