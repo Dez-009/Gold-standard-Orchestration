@@ -4,7 +4,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { fetchSessions } from '../../services/sessionService';
+import { getToken, isTokenExpired } from '../../services/authUtils';
+import { showError } from '../../components/ToastProvider';
 
 // Shape of a single session record returned from the backend
 interface Session {
@@ -14,14 +17,22 @@ interface Session {
 }
 
 export default function SessionsPage() {
+  const router = useRouter(); // Notes: Router used for redirects
   // Local state holding the array of sessions
   const [sessions, setSessions] = useState<Session[]>([]);
   // Flags for loading state and potential error messages
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Retrieve sessions when the component is first rendered
+  // Notes: Ensure session is valid then load sessions once
   useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
+      router.push('/login');
+      return;
+    }
     const load = async () => {
       try {
         const data = await fetchSessions();
@@ -33,7 +44,7 @@ export default function SessionsPage() {
       }
     };
     load();
-  }, []);
+  }, [router]);
 
   // Format ISO timestamps so only the date portion is shown
   const formatDate = (iso: string) => iso.split('T')[0];

@@ -4,7 +4,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { saveCheckin, fetchCheckins } from '../../services/checkinService';
+import { getToken, isTokenExpired } from '../../services/authUtils';
+import { showError } from '../../components/ToastProvider';
 
 interface Checkin {
   id: number;
@@ -14,6 +17,7 @@ interface Checkin {
 }
 
 export default function CheckinPage() {
+  const router = useRouter(); // Notes: Router used for redirects
   // Local state for the reflection text input
   const [reflection, setReflection] = useState('');
   // Track the selected mood from a short list of options
@@ -39,10 +43,18 @@ export default function CheckinPage() {
     }
   };
 
-  // Load check-ins when the component is first rendered
+  // Notes: Ensure the user session is valid before making requests
   useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
+      router.push('/login');
+      return;
+    }
+    // Notes: Load existing check-ins after verifying the session
     loadCheckins();
-  }, []);
+  }, [router]);
 
   // Submit the current reflection and mood to the backend
   const handleSubmit = async (e: React.FormEvent) => {

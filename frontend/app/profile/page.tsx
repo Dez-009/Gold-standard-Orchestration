@@ -4,7 +4,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { fetchProfile, saveProfile } from '../../services/profileService';
+import { getToken, isTokenExpired } from '../../services/authUtils';
+import { showError } from '../../components/ToastProvider';
 
 // Shape of the profile data used by this page
 interface Profile {
@@ -17,6 +20,7 @@ interface Profile {
 }
 
 export default function ProfilePage() {
+  const router = useRouter(); // Notes: Router used for redirects
   // Local state holding the profile fields
   const [profile, setProfile] = useState<Profile>({
     name: '',
@@ -52,10 +56,17 @@ export default function ProfilePage() {
     }
   };
 
-  // Load profile on initial render
+  // Notes: Validate session then load profile on first render
   useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
+      router.push('/login');
+      return;
+    }
     loadProfile();
-  }, []);
+  }, [router]);
 
   // Update local state when form inputs change
   const handleChange = (

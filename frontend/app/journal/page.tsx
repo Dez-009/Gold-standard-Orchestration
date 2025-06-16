@@ -4,7 +4,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { fetchJournalEntries } from '../../services/journalService';
+import { getToken, isTokenExpired } from '../../services/authUtils';
+import { showError } from '../../components/ToastProvider';
 
 interface Entry {
   id: number;
@@ -13,13 +16,21 @@ interface Entry {
 }
 
 export default function JournalPage() {
+  const router = useRouter(); // Notes: Router used for redirects
   // Local state for entries along with loading and error flags
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // On first render, retrieve the journal history
+  // Notes: Validate session then load journal history once
   useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
+      router.push('/login');
+      return;
+    }
     const loadEntries = async () => {
       try {
         const data = await fetchJournalEntries();
@@ -31,7 +42,7 @@ export default function JournalPage() {
       }
     };
     loadEntries();
-  }, []);
+  }, [router]);
 
   // Helper to format ISO date strings as YYYY-MM-DD
   const formatDate = (iso: string) => iso.split('T')[0];

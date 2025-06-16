@@ -3,7 +3,10 @@
 // Fetches data from the backend on mount and handles loading states
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { fetchWeeklyReview } from '../../services/reviewService';
+import { getToken, isTokenExpired } from '../../services/authUtils';
+import { showError } from '../../components/ToastProvider';
 
 interface Review {
   id: number;
@@ -12,6 +15,7 @@ interface Review {
 }
 
 export default function ReviewPage() {
+  const router = useRouter(); // Notes: Router used for redirects
   // Local state holding the fetched review object
   const [review, setReview] = useState<Review | null>(null);
   // Track whether the page is currently loading data
@@ -20,7 +24,15 @@ export default function ReviewPage() {
   const [error, setError] = useState('');
 
   // On initial render, attempt to retrieve the weekly review
+  // Notes: Validate session then load the latest review
   useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
+      router.push('/login');
+      return;
+    }
     const loadReview = async () => {
       try {
         const data = await fetchWeeklyReview();
@@ -32,7 +44,7 @@ export default function ReviewPage() {
       }
     };
     loadReview();
-  }, []);
+  }, [router]);
 
   // Helper to format the ISO timestamp returned by the backend
   const formatDate = (iso: string) => iso.split('T')[0];
