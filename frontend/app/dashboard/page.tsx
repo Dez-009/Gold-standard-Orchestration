@@ -109,15 +109,16 @@ export default function DashboardPage() {
           <Link href="/admin/health" className="text-blue-600 underline">
             System Health
           </Link>
-          codex/implement-admin-subscription-management-page
+          <Link href="/admin/system-logs" className="text-blue-600 underline">
+            System Logs
+          </Link>
           {/* Notes: Link to view all subscriptions */}
           <Link href="/admin/subscriptions" className="text-blue-600 underline">
             Subscriptions
-
+          </Link>
           {/* Link to the new user management page */}
           <Link href="/admin/users" className="text-blue-600 underline">
             Users
-        main
           </Link>
         </nav>
       )}
