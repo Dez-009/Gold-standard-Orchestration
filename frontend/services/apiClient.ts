@@ -292,14 +292,14 @@ export async function getAiSuggestions(token: string) {
   return response.data;
 }
 
-// Notes: Retrieve all recent audit logs from the backend
-// Notes: Sends a GET request to the admin audit endpoint with auth header
+// Notes: Retrieve audit log history for administrators
+// Notes: Sends a GET request to the /admin/audit/logs endpoint
 export async function getAuditLogs(token: string) {
-  // Notes: Issue the request to fetch audit log entries
-  const response = await apiClient.get('/admin/audit', {
+  // Notes: Issue the HTTP request to fetch log records
+  const response = await apiClient.get('/admin/audit/logs', {
     headers: { Authorization: `Bearer ${token}` }
   });
-  // Notes: Return the array of audit log objects
+  // Notes: Return the array of log objects from the backend
   return response.data;
 }
 
