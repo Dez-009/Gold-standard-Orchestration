@@ -1,8 +1,10 @@
 """Routes for handling billing-related webhooks."""
 
-from fastapi import APIRouter, Request, Response, status, HTTPException
+from fastapi import APIRouter, Request, Response, status, HTTPException, Depends
 
-from services.billing_service import handle_stripe_event
+from services.billing_service import handle_stripe_event, create_portal_session
+from auth.dependencies import get_current_user
+from models.user import User
 from utils.logger import get_logger
 
 
@@ -25,3 +27,13 @@ async def stripe_webhook(request: Request) -> Response:
     # Notes: Delegate event processing to the billing service
     handle_stripe_event(payload.decode(), sig_header)
     return Response(status_code=status.HTTP_200_OK)
+
+
+@router.get("/portal")
+async def get_billing_portal(
+    current_user: User = Depends(get_current_user),
+) -> dict[str, str]:
+    """Return a billing portal session URL for the authenticated user."""
+    # Notes: Use the billing service to generate the session link
+    url = create_portal_session()
+    return {"url": url}
