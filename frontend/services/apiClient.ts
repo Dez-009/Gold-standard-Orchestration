@@ -100,14 +100,14 @@ export async function getGoalProgress(token: string) {
   return response.data;
 }
 
-// Retrieve the latest weekly review for the authenticated user
-// The caller must provide a valid JWT token for authorization
+// Retrieve the weekly review summary for the authenticated user
+// Notes: Makes a GET request to the /review/weekly backend route
 export async function getWeeklyReview(token: string) {
-  // Issue the GET request to the /review endpoint with the auth header
-  const response = await apiClient.get('/review', {
+  // Notes: Include the JWT token so the backend can authenticate the user
+  const response = await apiClient.get('/review/weekly', {
     headers: { Authorization: `Bearer ${token}` }
   });
-  // Return the weekly review data returned by the backend
+  // Notes: The response data contains the AI generated summary
   return response.data;
 }
 
