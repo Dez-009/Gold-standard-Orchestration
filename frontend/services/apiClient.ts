@@ -310,13 +310,13 @@ export async function getMoodTrends(token: string) {
   return response.data;
 }
 
-// Notes: Retrieve overall system health information
+// Notes: Retrieve overall system health information for admin dashboard
 export async function getSystemHealth(token: string) {
-  // Notes: Call the backend /health endpoint including auth header
-  const response = await apiClient.get('/health', {
+  // Notes: Call the backend /admin/health endpoint including auth header
+  const response = await apiClient.get('/admin/health', {
     headers: { Authorization: `Bearer ${token}` }
   });
-  // Notes: Return the status payload for each service
+  // Notes: Return the status payload for each monitored service
   return response.data;
 }
 
