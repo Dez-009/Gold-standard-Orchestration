@@ -76,6 +76,21 @@ export async function getJournalById(id: string, token: string) {
   return response.data;
 }
 
+// Update an existing journal entry
+// Accepts the entry id, updated fields and the JWT token
+export async function updateJournal(
+  id: string,
+  data: Record<string, unknown>,
+  token: string
+) {
+  // Issue the PUT request to `/journals/${id}` including auth header
+  const response = await apiClient.put(`/journals/${id}`, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the updated entry data from the backend
+  return response.data;
+}
+
 // Save a new goal for the authenticated user
 // Expects goal content and JWT token for authorization
 export async function postGoal(content: string, token: string) {
