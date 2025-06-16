@@ -4,17 +4,16 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchSystemMetrics } from '../../../services/metricsService';
+import { getMetrics } from '../../../services/systemMetricsService';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
 
 // Shape of the metrics object returned by the backend
 interface MetricsData {
-  active_users: number;
-  total_subscriptions: number;
-  load_average: number;
-  job_queue_depth: number;
-  api_request_count: number;
+  total_users: number;
+  active_subscriptions: number;
+  total_revenue: number;
+  ai_completions: number;
 }
 
 export default function MetricsPage() {
@@ -38,7 +37,7 @@ export default function MetricsPage() {
       setError('');
       try {
         // Notes: Request real-time metrics from the backend service
-        const resp = await fetchSystemMetrics();
+        const resp = await getMetrics();
         setData(resp);
       } catch {
         // Notes: Show a friendly message when the request fails
@@ -75,12 +74,11 @@ export default function MetricsPage() {
       {!loading && !error && !data && <p>No metrics available.</p>}
       {/* Metrics grid when data is present */}
       {!loading && !error && data && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl">
-          <MetricCard label="Active Users" value={data.active_users} />
-          <MetricCard label="Subscriptions" value={data.total_subscriptions} />
-          <MetricCard label="Load Average" value={data.load_average} />
-          <MetricCard label="Job Queue Depth" value={data.job_queue_depth} />
-          <MetricCard label="API Requests" value={data.api_request_count} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-4xl">
+          <MetricCard label="Total Users" value={data.total_users} />
+          <MetricCard label="Active Subs" value={data.active_subscriptions} />
+          <MetricCard label="Total Revenue" value={data.total_revenue} />
+          <MetricCard label="AI Completions" value={data.ai_completions} />
         </div>
       )}
     </div>

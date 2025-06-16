@@ -2,11 +2,11 @@
 // Combines token retrieval with the API client call and basic error handling
 
 import { getToken } from './authUtils';
-import { getSystemMetrics } from './apiClient';
+import { fetchSystemMetrics as apiFetchSystemMetrics } from './apiClient';
 import { showError } from '../components/ToastProvider';
 
 // Fetch overall system metrics from the backend
-export async function fetchSystemMetrics() {
+export async function getMetrics() {
   // Notes: Obtain the stored JWT token to authenticate the request
   const token = getToken();
   if (!token) {
@@ -16,16 +16,13 @@ export async function fetchSystemMetrics() {
   }
   try {
     // Notes: Request the metrics object from the backend API
-    const data = await getSystemMetrics(token);
-    // Notes: Return the metrics typed to the expected structure
+    const data = await apiFetchSystemMetrics(token);
+    // Notes: Cast and return the expected metrics structure
     return data as {
       total_users: number;
-      active_users: number;
-      coaching_sessions: number;
-      journal_entries: number;
-      daily_check_ins: number;
-      api_calls: number;
-      tokens_used: number;
+      active_subscriptions: number;
+      total_revenue: number;
+      ai_completions: number;
     };
   } catch (err) {
     // Notes: Surface request errors after notifying the user

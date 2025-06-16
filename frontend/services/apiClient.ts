@@ -450,6 +450,15 @@ export async function getSystemMetrics(token: string) {
   return response.data;
 }
 
+// Notes: Alternative name mirroring the backend service
+// Performs the same GET request to retrieve system metrics
+export async function fetchSystemMetrics(token: string) {
+  const response = await apiClient.get('/admin/metrics', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Retrieve all notifications for the admin notifications page
 // Notes: Performs a GET request to the /admin/notifications endpoint
 export async function getNotifications(token: string) {
