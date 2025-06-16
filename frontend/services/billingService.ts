@@ -4,7 +4,8 @@
 import { getToken } from './authUtils';
 import {
   getPricingPlans,
-  createCheckoutSession as createCheckoutSessionApi
+  createCheckoutSession as createCheckoutSessionApi,
+  createBillingPortalSession as createBillingPortalSessionApi
 } from './apiClient';
 import { showError } from '../components/ToastProvider';
 
@@ -44,6 +45,23 @@ export async function createCheckoutSession(planId: string) {
   try {
     // Notes: API call returns { url: string } for redirect
     const data = await createCheckoutSessionApi(planId, token);
+    return data as { url: string };
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Request a billing portal session from the backend
+// Notes: Allows the authenticated user to manage their subscription
+export async function createBillingPortalSession() {
+  const token = getToken();
+  if (!token) {
+    throw new Error('User not authenticated');
+  }
+  try {
+    // Notes: API returns { url: string } for redirect to Stripe portal
+    const data = await createBillingPortalSessionApi(token);
     return data as { url: string };
   } catch (err) {
     showError('Something went wrong');
