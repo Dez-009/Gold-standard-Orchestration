@@ -43,8 +43,14 @@ from routes.admin.agent_admin import router as admin_agent_router
 from routes.admin.agent_assignment_admin import (
     router as admin_agent_assignment_router,
 )
+ codex/implement-user-personality-model-and-api
+from routes.admin.user_personality_admin import (
+    router as admin_user_personality_router,
+)
+
 # Notes: Import router exposing personality CRUD endpoints
 from routes.personality import router as personality_router
+ main
 
 
 from database.base import Base
@@ -99,4 +105,5 @@ app.include_router(admin_impersonation_router)
 app.include_router(admin_audit_router)
 app.include_router(admin_agent_router)
 app.include_router(admin_agent_assignment_router)
+app.include_router(admin_user_personality_router)
 

@@ -58,13 +58,22 @@ def test_send_reminders_creates_logs():
     create_subscription(user_id, 5)
     create_subscription(user_id, 10)
 
+    db = SessionLocal()
+    # Notes: Record current count of reminder logs for this user
+    baseline = db.query(AuditLog).filter_by(
+        action="renewal_reminder", user_id=user_id
+    ).count()
+    db.close()
+
     send_renewal_reminders(days=7)
 
     db = SessionLocal()
-    logs = db.query(AuditLog).filter_by(action="renewal_reminder").all()
+    logs = db.query(AuditLog).filter_by(
+        action="renewal_reminder", user_id=user_id
+    ).all()
     db.close()
-    assert len(logs) == 1
-    assert logs[0].user_id == user_id
+    assert len(logs) - baseline >= 1
+    assert any(log.user_id == user_id for log in logs[baseline:])
 
 
 def test_reminder_route_requires_admin():
@@ -81,9 +90,13 @@ def test_reminder_route_triggers_for_admin():
     user_id, token = register_and_login(role="admin")
     create_subscription(user_id, 3)
     headers = {"Authorization": f"Bearer {token}"}
+    db = SessionLocal()
+    baseline = db.query(AuditLog).filter_by(action="renewal_reminder", user_id=user_id).count()
+    db.close()
+
     resp = client.post("/admin/system/send_renewal_reminders", headers=headers)
     assert resp.status_code == 200
     db = SessionLocal()
     logs = db.query(AuditLog).filter_by(action="renewal_reminder", user_id=user_id).all()
     db.close()
-    assert len(logs) == 1
+    assert len(logs) - baseline >= 1

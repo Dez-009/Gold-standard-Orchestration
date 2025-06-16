@@ -31,9 +31,11 @@ def register_and_login(role: str = "user") -> tuple[int, str]:
     user_id = resp.json()["id"]
     # Notes: Mirror the new user in the SessionLocal database for join queries
     db = SessionLocal()
-    db_user = User(**user_data, id=user_id, is_active=True)
-    db.add(db_user)
-    db.commit()
+    # Notes: Insert the user only if it does not already exist in the history DB
+    if not db.query(User).filter_by(id=user_id).first():
+        db_user = User(**user_data, id=user_id, is_active=True)
+        db.add(db_user)
+        db.commit()
     db.close()
     token = create_access_token({"user_id": user_id})
     return user_id, token
