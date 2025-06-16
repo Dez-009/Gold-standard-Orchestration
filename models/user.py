@@ -49,3 +49,8 @@ class User(Base):
     subscriptions = relationship(
         "Subscription", back_populates="user", cascade="all, delete"
     )
+    # Notes: Records of AI agents assigned to the user
+    agent_assignments = relationship(
+        "AgentAssignment", back_populates="user", cascade="all, delete"
+    )
+

@@ -12,6 +12,8 @@ from .task import Task
 from .habit import Habit
 # Notes: Include subscription model for billing records
 from .subscription import Subscription
+# Notes: Include model for mapping users to assigned AI agents
+from .agent_assignment import AgentAssignment
 
 __all__ = [
     "User",
@@ -23,5 +25,6 @@ __all__ = [
     "AuditLog",
     "Habit",
     "Subscription",
+    "AgentAssignment",
 ]
 
