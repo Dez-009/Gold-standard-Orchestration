@@ -397,6 +397,16 @@ export async function getAllUsers(token: string) {
   return response.data;
 }
 
+ codex/implement-system-metrics-dashboard-for-admin
+// Notes: Retrieve high level system metrics for the admin dashboard
+// Notes: Sends a GET request to the /admin/metrics endpoint with auth header
+export async function getSystemMetrics(token: string) {
+  // Notes: Issue the request to the backend metrics route
+  const response = await apiClient.get('/admin/metrics', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the metrics payload supplied by the backend
+
 // Retrieve the current application configuration for admins
 // Sends a GET request to the /admin/config endpoint
 export async function getAppConfig(token: string) {
@@ -417,6 +427,7 @@ export async function updateAppConfig(
     headers: { Authorization: `Bearer ${token}` }
   });
   // Return the updated configuration from the backend
+ main
   return response.data;
 }
 

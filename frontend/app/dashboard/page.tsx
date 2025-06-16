@@ -109,9 +109,19 @@ export default function DashboardPage() {
           <Link href="/admin/health" className="text-blue-600 underline">
             System Health
           </Link>
+ codex/implement-system-metrics-dashboard-for-admin
+
+          {/* Notes: Link to the system metrics dashboard */}
+          <Link href="/admin/metrics" className="text-blue-600 underline">
+            Metrics
+          </Link>
+ codex/implement-admin-error-monitoring-page
+
+
           <Link href="/admin/config" className="text-blue-600 underline">
             Configuration
           </Link>
+          main
           <Link href="/admin/system-logs" className="text-blue-600 underline">
             System Logs
           </Link>
