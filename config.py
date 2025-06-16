@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     port: int = 8000
     database_url: str
     RATE_LIMIT: str = "100/minute"
+    # Notes: Secrets used for Stripe integration
+    stripe_secret_key: str
+    stripe_webhook_secret: str
 
     class Config:
         env_file = ".env"

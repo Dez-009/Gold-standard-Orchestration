@@ -43,3 +43,7 @@ class User(Base):
     habits = relationship(
         "Habit", back_populates="user", cascade="all, delete"
     )
+    # Notes: List of billing subscriptions for the user
+    subscriptions = relationship(
+        "Subscription", back_populates="user", cascade="all, delete"
+    )

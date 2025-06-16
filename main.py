@@ -26,6 +26,8 @@ from routes.health import router as health_router
 from routes.audit_log import router as audit_log_router
 # Notes: Import router responsible for generating action plans
 from routes.action_plan import router as action_plan_router
+# Notes: Import billing webhook router
+from routes.billing import router as billing_router
 from database.base import Base
 from database.session import engine
 
@@ -53,6 +55,8 @@ app.include_router(daily_checkin_router)
 app.include_router(account_router)
 app.include_router(reporting_router)
 app.include_router(vida_router)
+# Register billing routes for webhook handling
+app.include_router(billing_router)
 # Register AI coach router to expose AI-powered coaching endpoints
 app.include_router(ai_coach_router)
 # Notes: Include routes that generate action plans for user goals
