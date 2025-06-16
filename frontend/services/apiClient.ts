@@ -234,6 +234,30 @@ export async function updateProfile(
   return response.data;
 }
 
+// Retrieve the current user's profile information using a descriptive name
+// This wrapper mirrors getProfile but is named for clarity in the profile page
+export async function getUserProfile(token: string) {
+  // Perform GET request to the /profile endpoint with auth header
+  const response = await apiClient.get('/profile', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the user's profile data from the backend
+  return response.data;
+}
+
+// Update the user's profile using a similarly descriptive function name
+export async function updateUserProfile(
+  data: Record<string, unknown>,
+  token: string
+) {
+  // Issue the PUT request to the /profile endpoint with auth header
+  const response = await apiClient.put('/profile', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the updated profile information
+  return response.data;
+}
+
 // Retrieve subscription and billing info for the authenticated user
 // Sends a GET request to the /account endpoint with the JWT token
 export async function getAccountDetails(token: string) {

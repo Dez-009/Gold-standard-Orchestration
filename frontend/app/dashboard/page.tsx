@@ -85,9 +85,9 @@ export default function DashboardPage() {
         <Link href="/sessions" className="text-blue-600 underline">
           Sessions
         </Link>
-        {/* Link to the profile management page */}
+        {/* Link to the profile settings page */}
         <Link href="/profile" className="text-blue-600 underline">
-          Profile
+          Profile Settings
         </Link>
         {/* Link to the subscription and billing management page */}
         <Link href="/account" className="text-blue-600 underline">
