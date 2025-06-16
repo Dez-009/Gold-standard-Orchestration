@@ -138,6 +138,17 @@ export async function updateProfile(
   return response.data;
 }
 
+// Retrieve subscription and billing info for the authenticated user
+// Sends a GET request to the /account endpoint with the JWT token
+export async function getAccountDetails(token: string) {
+  // Issue the request to the backend account route
+  const response = await apiClient.get('/account', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the account payload returned by the backend
+  return response.data;
+}
+
 // Retrieve all previous coaching sessions for the logged-in user
 // Sends a GET request to the /sessions endpoint with the JWT token
 export async function getSessions(token: string) {
