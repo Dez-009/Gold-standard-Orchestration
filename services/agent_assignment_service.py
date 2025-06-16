@@ -3,6 +3,7 @@
 from datetime import datetime
 
 from sqlalchemy.orm import Session
+from models.user import User
 
 from models.agent_assignment import AgentAssignment
 from services.audit_log_service import create_audit_log
@@ -32,3 +33,27 @@ def assign_agent(db: Session, user_id: int, domain: str) -> AgentAssignment:
     # Notes: The orchestration logic for selecting the actual AI model will be
     # implemented in the future. For now we simply store the domain value.
     return assignment
+
+
+def list_agent_assignments(db: Session) -> list[dict]:
+    """Return all assignments joined with user email."""
+
+    # Query assignments joined with user table to fetch the email
+    rows = (
+        db.query(AgentAssignment, User.email)
+        .join(User, AgentAssignment.user_id == User.id)
+        .all()
+    )
+
+    assignments: list[dict] = []
+    # Convert ORM tuples into plain dictionaries
+    for assignment, email in rows:
+        assignments.append(
+            {
+                "user_email": email,
+                "agent_type": assignment.agent_type,
+                "assigned_at": assignment.assigned_at.isoformat(),
+            }
+        )
+
+    return assignments

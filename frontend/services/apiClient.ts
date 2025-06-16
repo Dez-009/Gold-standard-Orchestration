@@ -415,6 +415,17 @@ export async function getAllUsers(token: string) {
   return response.data;
 }
 
+// Retrieve all agent assignments for the admin panel
+// Notes: Performs a GET request to the /admin/agents endpoint with auth header
+export async function getAgentAssignments(token: string) {
+  // Notes: Request the assignment list from the backend API
+  const response = await apiClient.get('/admin/agents', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the array of assignments from the backend
+  return response.data;
+}
+
 // Notes: Retrieve high level system metrics for the admin dashboard
 // Notes: Sends a GET request to the /admin/metrics endpoint with auth header
 export async function getSystemMetrics(token: string) {
