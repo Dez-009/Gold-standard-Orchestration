@@ -136,6 +136,31 @@ export async function getDailyCheckins(token: string) {
   return response.data;
 }
 
+// Retrieve today's check-in for the current user
+// Returns null when no check-in has been submitted yet
+export async function getDailyCheckIn(token: string) {
+  // Issue the GET request to the /checkin endpoint using the auth header
+  const response = await apiClient.get('/checkin', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: The backend responds with either the check-in or null
+  return response.data;
+}
+
+// Submit today's check-in for the authenticated user
+// Accepts reflection text and mood selection
+export async function postDailyCheckIn(
+  data: { reflection: string; mood: string },
+  token: string
+) {
+  // Issue the POST request to the /checkin endpoint with auth header
+  const response = await apiClient.post('/checkin', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the created check-in record from the backend
+  return response.data;
+}
+
 // Retrieve the current user's profile information
 // Expects a valid JWT token for authorization
 export async function getProfile(token: string) {
