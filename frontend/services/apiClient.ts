@@ -89,6 +89,17 @@ export async function getGoals(token: string) {
   return response.data;
 }
 
+// Retrieve progress information for all of the user's goals
+// Sends a GET request to the /goals/progress endpoint with auth header
+export async function getGoalProgress(token: string) {
+  // Issue the GET request to the progress route including JWT token
+  const response = await apiClient.get('/goals/progress', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the progress payload returned by the backend
+  return response.data;
+}
+
 // Retrieve the latest weekly review for the authenticated user
 // The caller must provide a valid JWT token for authorization
 export async function getWeeklyReview(token: string) {
