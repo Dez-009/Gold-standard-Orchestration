@@ -313,6 +313,17 @@ export async function getAuditLogs(token: string) {
   return response.data;
 }
 
+// Notes: Retrieve captured application error logs from the backend
+// Notes: Sends GET request to the /admin/errors endpoint with auth header
+export async function getErrorLogs(token: string) {
+  // Notes: Perform the request to fetch error log entries
+  const response = await apiClient.get('/admin/errors', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the list of error records provided by the backend
+  return response.data;
+}
+
 // Retrieve the authenticated user's mood entry for the current day
 export async function getMood(token: string) {
   // Issue the GET request to the /mood endpoint with auth header
@@ -355,6 +366,8 @@ export async function getSystemHealth(token: string) {
   return response.data;
 }
 
+ codex/implement-admin-error-monitoring-page
+
 // Retrieve system log records for administrators
 // Sends a GET request to the /admin/system-logs endpoint
 export async function getSystemLogs(token: string) {
@@ -365,6 +378,7 @@ export async function getSystemLogs(token: string) {
   return response.data;
 }
 
+ main
 // Notes: Retrieve all user subscription records for admin view
 // Notes: Sends GET request to /admin/subscriptions with auth header
 export async function getAllSubscriptions(token: string) {

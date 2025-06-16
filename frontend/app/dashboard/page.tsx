@@ -109,9 +109,12 @@ export default function DashboardPage() {
           <Link href="/admin/health" className="text-blue-600 underline">
             System Health
           </Link>
+ codex/implement-admin-error-monitoring-page
+
           <Link href="/admin/system-logs" className="text-blue-600 underline">
             System Logs
           </Link>
+          main
           {/* Notes: Link to view all subscriptions */}
           <Link href="/admin/subscriptions" className="text-blue-600 underline">
             Subscriptions
@@ -119,6 +122,13 @@ export default function DashboardPage() {
           {/* Link to the new user management page */}
           <Link href="/admin/users" className="text-blue-600 underline">
             Users
+ codex/implement-admin-error-monitoring-page
+          </Link>
+          {/* Link to the admin error monitoring page */}
+          <Link href="/admin/errors" className="text-blue-600 underline">
+            Errors
+
+          main
           </Link>
         </nav>
       )}
