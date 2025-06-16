@@ -66,8 +66,11 @@ export default function JournalPage() {
       <ul className="w-full max-w-md space-y-2">
         {entries.map((entry) => (
           <li key={entry.id} className="border rounded p-4 bg-gray-100">
-            <p>{entry.content}</p>
-            <p className="text-sm text-gray-600 mt-2">{formatDate(entry.created_at)}</p>
+            {/* Link to the new journal details page */}
+            <Link href={`/journals/${entry.id}`} className="block space-y-1">
+              <p>{entry.content}</p>
+              <p className="text-sm text-gray-600">{formatDate(entry.created_at)}</p>
+            </Link>
           </li>
         ))}
       </ul>

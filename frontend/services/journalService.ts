@@ -2,7 +2,7 @@
 // Relies on authUtils to fetch the stored JWT token and delegates
 // the network request to apiClient.
 import { getToken } from './authUtils';
-import { getJournalEntries, getJournalHistory } from './apiClient';
+import { getJournalEntries, getJournalHistory, getJournalById } from './apiClient';
 import { showSuccess, showError } from '../components/ToastProvider';
 
 // Fetch all journal entries belonging to the authenticated user
@@ -36,6 +36,24 @@ export async function fetchJournalHistory() {
     // Notes: Retrieve journal history from the backend
     const data = await getJournalHistory(token);
     return data as Array<{ id: number; content: string; created_at: string }>;
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Fetch a single journal entry using its unique id
+// Throws an authentication error when no token is stored
+export async function fetchJournalById(id: string) {
+  const token = getToken();
+  if (!token) {
+    // Propagate an authentication error to the caller
+    throw new Error('User not authenticated');
+  }
+  try {
+    // Notes: Retrieve the journal entry from the backend service
+    const data = await getJournalById(id, token);
+    return data as { id: number; title: string | null; content: string; created_at: string };
   } catch (err) {
     showError('Something went wrong');
     throw err;
