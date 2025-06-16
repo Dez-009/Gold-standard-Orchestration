@@ -6,20 +6,21 @@ import { getAuditLogs } from './apiClient';
 
 // Notes: Retrieve all audit logs for admin visibility
 export async function fetchAuditLogs() {
-  // Notes: Obtain the JWT token stored in the browser
+  // Notes: Obtain the JWT token from localStorage
   const token = getToken();
   if (!token) {
-    // Notes: Fail when no authentication token is available
+    // Notes: Abort when the user is not authenticated
     throw new Error('User not authenticated');
   }
-  // Notes: Delegate the HTTP request to the API client
+  // Notes: Request the log data using the API client helper
   const data = await getAuditLogs(token);
-  // Notes: Provide the expected structure of the returned list
+  // Notes: Cast the response to the expected shape for the UI layer
   return data as Array<{
     id: number;
-    user_id: number;
+    timestamp: string;
+    user_email: string | null;
     action: string;
-    metadata: string | null;
-    created_at: string;
+    detail: string | null;
+    ip_address?: string | null;
   }>;
 }
