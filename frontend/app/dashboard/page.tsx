@@ -11,7 +11,15 @@ import {
   isTokenExpired
 } from '../../services/authUtils';
 import { fetchAccountDetails } from '../../services/accountService';
+ codex/implement-customer-self-service-billing-portal
 import { createBillingPortalSession } from '../../services/billingService';
+
+// Notes: Import helper to retrieve the user's subscription status
+import {
+  fetchSubscriptionStatus,
+  SubscriptionStatus
+} from '../../services/subscriptionService';
+ main
 import { showError } from '../../components/ToastProvider';
 
 export default function DashboardPage() {
@@ -20,8 +28,18 @@ export default function DashboardPage() {
   const router = useRouter();
   // Notes: Track the user's current subscription tier
   const [tier, setTier] = useState<string | null>(null);
+ codex/implement-customer-self-service-billing-portal
   // Notes: Track whether we are waiting for the billing portal URL
   const [portalLoading, setPortalLoading] = useState(false);
+
+  // Notes: Store subscription details retrieved from the backend
+  const [subscription, setSubscription] = useState<SubscriptionStatus | null>(
+    null
+  );
+  // Notes: Manage loading and error states for subscription fetch
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [statusError, setStatusError] = useState('');
+ main
 
   // Notes: On mount, verify token validity and parse user info
   useEffect(() => {
@@ -44,9 +62,25 @@ export default function DashboardPage() {
         // Ignore failures and keep tier null
       }
     };
+    const loadStatus = async () => {
+      setStatusLoading(true);
+      setStatusError('');
+      try {
+        // Notes: Fetch subscription status for display
+        const data = await fetchSubscriptionStatus();
+        setSubscription(data);
+      } catch {
+        // Notes: Track error state when the request fails
+        setStatusError('Unable to load subscription');
+      } finally {
+        setStatusLoading(false);
+      }
+    };
     loadTier();
+    loadStatus();
   }, [router]);
 
+ codex/implement-customer-self-service-billing-portal
   // Launch Stripe billing portal and redirect on success
   const handleManageSubscription = async () => {
     setPortalLoading(true);
@@ -62,6 +96,19 @@ export default function DashboardPage() {
     } finally {
       setPortalLoading(false);
     }
+
+  // Notes: Helper to render a colored badge for the subscription status
+  const badge = (s: string) => {
+    const color =
+      s === 'Active'
+        ? 'bg-green-600'
+        : s === 'Trialing'
+        ? 'bg-yellow-500'
+        : s === 'Past Due'
+        ? 'bg-red-600'
+        : 'bg-gray-500';
+    return <span className={`px-2 py-1 rounded text-white ${color}`}>{s}</span>;
+ main
   };
 
   // Render dashboard with simple styling and user information
@@ -126,12 +173,12 @@ export default function DashboardPage() {
         <Link href="/account" className="text-blue-600 underline">
           Account
         </Link>
-        {/* Link to subscribe page when no active subscription */}
-        {tier === 'Free' && (
+        {/* Link to subscribe page when no active plan */}
+        {!subscription || subscription.status !== 'Active' ? (
           <Link href="/subscribe" className="text-blue-600 underline">
             Subscribe
           </Link>
-        )}
+        ) : null}
         {/* Temporary link to the public landing page */}
         <Link href="/landing" className="text-blue-600 underline">
           Landing
@@ -187,6 +234,7 @@ export default function DashboardPage() {
       {/* Notes: Display the logged in user's email */}
       {user.email && <p className="text-lg">Logged in as {user.email}</p>}
 
+ codex/implement-customer-self-service-billing-portal
       {/* Card showing current subscription status */}
       <div className="border rounded p-4 w-full max-w-xs text-center space-y-2">
         <p>
@@ -202,6 +250,43 @@ export default function DashboardPage() {
           >
             {portalLoading ? 'Loading...' : 'Manage Subscription'}
           </button>
+
+      {/* Subscription status card */}
+      <div className="border rounded p-4 shadow-md text-center w-full max-w-sm">
+        <h2 className="text-xl font-semibold mb-2">Subscription</h2>
+        {/* Spinner while loading */}
+        {statusLoading && (
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto" />
+        )}
+        {/* Error message when API call fails */}
+        {statusError && <p className="text-red-600">{statusError}</p>}
+        {/* Show message if no subscription found */}
+        {!statusLoading && !statusError && !subscription && <p>No subscription found.</p>}
+        {/* Subscription details when available */}
+        {!statusLoading && !statusError && subscription && (
+          <div className="space-y-1">
+            <div>
+              <span className="font-semibold mr-2">Tier:</span>
+              <span>{subscription.tier}</span>
+            </div>
+            <div>
+              <span className="font-semibold mr-2">Status:</span>
+              {badge(subscription.status)}
+            </div>
+            <div>
+              <span className="font-semibold mr-2">Next Billing:</span>
+              <span>
+                {subscription.next_billing_date
+                  ? new Date(subscription.next_billing_date).toLocaleDateString()
+                  : 'N/A'}
+              </span>
+            </div>
+            <div>
+              <span className="font-semibold mr-2">Provider:</span>
+              <span>{subscription.provider}</span>
+            </div>
+          </div>
+ main
         )}
       </div>
 

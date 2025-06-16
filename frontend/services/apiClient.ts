@@ -476,6 +476,7 @@ export async function createCheckoutSession(planId: string, token: string) {
   return response.data;
 }
 
+ codex/implement-customer-self-service-billing-portal
 // Create a Stripe billing portal session so the user can manage billing
 // Notes: Sends a POST request to /billing/portal with the JWT for auth
 export async function createBillingPortalSession(token: string) {
@@ -485,6 +486,15 @@ export async function createBillingPortalSession(token: string) {
     { headers: { Authorization: `Bearer ${token}` } }
   );
   // Notes: Response contains a redirect URL to the hosted billing portal
+=======
+// Retrieve the current user's subscription status
+// Notes: Sends GET request to the /billing/status endpoint with auth header
+export async function getSubscriptionStatus(token: string) {
+  const response = await apiClient.get('/billing/status', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the subscription details from the backend
+ main
   return response.data;
 }
 
