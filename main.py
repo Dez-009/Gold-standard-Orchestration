@@ -12,6 +12,7 @@ from routes.journal import router as journal_router
 from routes.notification import router as notification_router
 from routes.goal import router as goal_router
 from routes.daily_checkin import router as daily_checkin_router
+from routes.checkins import router as checkins_router
 from routes.reporting import router as reporting_router
 # Notes: Import router handling task operations
 from routes.task import router as task_router
@@ -79,6 +80,7 @@ app.include_router(notification_router)
 app.include_router(goal_router)
 app.include_router(task_router)
 app.include_router(daily_checkin_router)
+app.include_router(checkins_router)
 app.include_router(account_router)
 app.include_router(reporting_router)
 app.include_router(personality_router)
