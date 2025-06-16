@@ -65,6 +65,17 @@ export async function getJournalHistory(token: string) {
   return response.data;
 }
 
+// Retrieve a single journal entry by id
+// Requires the caller to provide a valid JWT token for authorization
+export async function getJournalById(id: string, token: string) {
+  // Issue the GET request to `/journals/{id}` including auth header
+  const response = await apiClient.get(`/journals/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the entry data returned by the backend
+  return response.data;
+}
+
 // Save a new goal for the authenticated user
 // Expects goal content and JWT token for authorization
 export async function postGoal(content: string, token: string) {
