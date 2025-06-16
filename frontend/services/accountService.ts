@@ -2,8 +2,8 @@
 // Handles token management and delegates the API call to apiClient
 
 import { getToken } from './authUtils';
-import { getAccountDetails, deleteAccount } from './apiClient';
-import { showError } from '../components/ToastProvider';
+import { getAccountDetails, deleteAccount, updateProfile as updateAccountProfileRequest } from './apiClient';
+import { showError, showSuccess } from '../components/ToastProvider';
 
 // Fetch subscription status and billing info for the logged-in user
 export async function fetchAccountDetails() {
@@ -33,6 +33,24 @@ export async function requestAccountDeletion() {
   try {
     // Notes: Call the API client helper to delete the account
     await deleteAccount(token);
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Persist updates to the user's account profile
+export async function updateProfile(data: Record<string, unknown>) {
+  const token = getToken();
+  if (!token) {
+    showError('Something went wrong');
+    throw new Error('User not authenticated');
+  }
+  try {
+    // Notes: Forward the update to the API layer
+    const result = await updateAccountProfileRequest(data, token);
+    showSuccess('Saved successfully');
+    return result as Record<string, unknown>;
   } catch (err) {
     showError('Something went wrong');
     throw err;

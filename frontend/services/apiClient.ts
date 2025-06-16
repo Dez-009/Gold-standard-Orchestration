@@ -231,19 +231,6 @@ export async function getProfile(token: string) {
   return response.data;
 }
 
-// Update the user's profile with the supplied data
-// profileData should contain the editable profile fields
-export async function updateProfile(
-  profileData: Record<string, unknown>,
-  token: string
-) {
-  // Issue PUT request to /profile including the authorization header
-  const response = await apiClient.put('/profile', profileData, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  // Return the updated profile payload from the backend
-  return response.data;
-}
 
 // Retrieve the current user's profile information using a descriptive name
 // This wrapper mirrors getProfile but is named for clarity in the profile page
@@ -557,6 +544,20 @@ export async function getAccountDetails(token: string) {
     headers: { Authorization: `Bearer ${token}` }
   });
   // Notes: Return the account details from the backend
+  return response.data;
+}
+
+// Update account profile fields for the authenticated user
+// Notes: Performs a PATCH request to /account/profile
+export async function updateProfile(
+  data: Record<string, unknown>,
+  token: string
+) {
+  // Notes: Issue the PATCH request including the JWT token
+  const response = await apiClient.patch('/account/profile', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the updated profile information
   return response.data;
 }
 
