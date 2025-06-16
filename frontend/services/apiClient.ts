@@ -365,6 +365,25 @@ export async function getSystemLogs(token: string) {
   // Return the array of log entries from the backend
   return response.data;
 }
+
+// Trigger upcoming subscription renewal reminders
+// Notes: Sends a POST request to the /admin/system/send_renewal_reminders endpoint
+export async function postRenewalReminders(token: string) {
+  const response = await apiClient.post('/admin/system/send_renewal_reminders', {}, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Backend returns an empty response body on success
+  return response.data;
+}
+
+// Trigger a manual subscription synchronization job
+export async function postSubscriptionSync(token: string) {
+  const response = await apiClient.post('/admin/system/sync_subscriptions', {}, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: API responds with HTTP 200 and empty body when successful
+  return response.data;
+}
 // Notes: Retrieve all user subscription records for admin view
 // Notes: Sends GET request to /admin/subscriptions with auth header
 export async function getAllSubscriptions(token: string) {
