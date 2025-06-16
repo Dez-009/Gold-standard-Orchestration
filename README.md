@@ -6,4 +6,9 @@ This API powers the Vida Coach application. To run the backend locally:
 2. Copy `.env` and adjust environment variables as needed.
 3. Start the server with `uvicorn main:app`.
 
-Run the test suite with `pytest`.
+The new `Personality` table is created automatically at startup. No Alembic
+migrations are required; simply restart the server or run the tests to apply
+the schema changes.
+
+Run the test suite with `pytest` to verify functionality, including the new
+personality endpoints.

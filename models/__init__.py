@@ -16,10 +16,15 @@ from .subscription import Subscription
 from .agent_assignment import AgentAssignment
 # Notes: Import model capturing prior agent interactions
 from .agent_interaction_log import AgentInteractionLog
+ codex/implement-user-personality-model-and-api
 # Notes: Available coaching personalities
 from .personality import Personality
 # Notes: Import model mapping users to their preferred personalities
 from .user_personality import UserPersonality
+
+# Notes: Import model representing available AI personalities
+from .personality import Personality
+ main
 
 __all__ = [
     "User",
@@ -34,6 +39,9 @@ __all__ = [
     "AgentAssignment",
     "AgentInteractionLog",
     "Personality",
+ codex/implement-user-personality-model-and-api
     "UserPersonality",
+=======
+ main
 ]
 

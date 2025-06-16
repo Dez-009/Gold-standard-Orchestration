@@ -43,9 +43,14 @@ from routes.admin.agent_admin import router as admin_agent_router
 from routes.admin.agent_assignment_admin import (
     router as admin_agent_assignment_router,
 )
+ codex/implement-user-personality-model-and-api
 from routes.admin.user_personality_admin import (
     router as admin_user_personality_router,
 )
+
+# Notes: Import router exposing personality CRUD endpoints
+from routes.personality import router as personality_router
+ main
 
 
 from database.base import Base
@@ -77,6 +82,7 @@ app.include_router(task_router)
 app.include_router(daily_checkin_router)
 app.include_router(account_router)
 app.include_router(reporting_router)
+app.include_router(personality_router)
 app.include_router(vida_router)
 # Register billing routes for webhook handling
 app.include_router(billing_router)
