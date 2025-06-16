@@ -172,6 +172,17 @@ export async function getWeeklyReview(token: string) {
   return response.data;
 }
 
+// Retrieve the progress report for the authenticated user
+// Notes: Performs a GET request to the /ai/progress-report endpoint
+export async function getProgressReport(token: string) {
+  // Notes: Send the request including the JWT token for authentication
+  const response = await apiClient.get('/ai/progress-report', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the progress report text provided by the backend
+  return response.data;
+}
+
 // Retrieve the list of completed goals for the authenticated user
 // Notes: Performs a GET request to the /goals/history endpoint including auth header
 export async function getCompletedGoals(token: string) {
