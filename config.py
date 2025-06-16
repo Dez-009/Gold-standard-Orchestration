@@ -1,3 +1,4 @@
+from functools import lru_cache
 from pydantic_settings import BaseSettings
 
 # Application version placeholder
@@ -14,15 +15,17 @@ class Settings(BaseSettings):
     # Notes: Secrets used for Stripe integration
     stripe_secret_key: str
     stripe_webhook_secret: str
+    # Notes: Secret key for JWT token generation
+    secret_key: str
 
     class Config:
         env_file = ".env"
 
 
-settings = Settings()
-
-
+# Notes: Use lru_cache so configuration is loaded from environment only once
+@lru_cache()
 def get_settings() -> Settings:
-    """Return a new Settings instance."""
+    """Return cached settings for the application."""
     return Settings()
+
 

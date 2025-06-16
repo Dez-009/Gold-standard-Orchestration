@@ -3,7 +3,7 @@
 from typing import Any
 import stripe
 
-from config import settings
+from config import get_settings
 from database.session import SessionLocal
 from models.subscription import Subscription
 from services import audit_log_service
@@ -14,7 +14,9 @@ logger = get_logger()
 
 # Notes: Configure the Stripe client with the secret key so API calls are
 # authenticated
-stripe.api_key = settings.stripe_secret_key
+# Notes: Configure the Stripe client with the secret key so API calls are
+# authenticated using the latest settings
+stripe.api_key = get_settings().stripe_secret_key
 
 
 def get_subscription_from_stripe(subscription_id: str):

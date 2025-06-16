@@ -3,7 +3,7 @@ from fastapi import FastAPI, APIRouter
 # Import middleware configuration utilities
 from middleware import init_middlewares
 
-from config import settings
+from config import get_settings
 from routes.user import router as user_router
 from routes.auth import router as auth_router
 from routes.protected import router as protected_router
@@ -45,6 +45,9 @@ from database.session import engine
 # Automatically create database tables on startup
 # This ensures the database schema is ready when the application starts
 Base.metadata.create_all(bind=engine)
+
+# Notes: Load configuration for use when creating the FastAPI app
+settings = get_settings()
 
 
 # Initialize the FastAPI application with project metadata

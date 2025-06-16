@@ -1,9 +1,10 @@
 from openai import OpenAI, AuthenticationError
 
-from config import settings
+from config import get_settings
 
 
-client = OpenAI(api_key=settings.openai_api_key)
+# Notes: OpenAI client configured with API key from settings
+client = OpenAI(api_key=get_settings().openai_api_key)
 
 SYSTEM_MESSAGE = (
     "You are Vida, an AI Life Coach. Speak casually like a trusted coach. Help clarify goals, break tasks into micro-steps, stay accountable. Keep responses short, supportive, and give clear next steps."

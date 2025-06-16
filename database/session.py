@@ -2,10 +2,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from config import Settings
+from config import get_settings
 
-# Initialize settings instance
-settings = Settings()
+# Notes: Load configuration once using the cached settings helper
+settings = get_settings()
 
 # Create the SQLAlchemy engine with echo enabled for debugging
 engine_kwargs = {"echo": True}
