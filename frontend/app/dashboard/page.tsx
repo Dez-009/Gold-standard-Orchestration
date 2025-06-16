@@ -19,7 +19,6 @@ import {
   SubscriptionStatus
 } from '../../services/subscriptionService';
 import { showError } from '../../components/ToastProvider';
-import { showError } from '../../components/ToastProvider';
 
 export default function DashboardPage() {
   // Notes: Store email and role info parsed from the JWT
@@ -225,6 +224,10 @@ export default function DashboardPage() {
       <h1 className="text-3xl font-bold">Welcome back to Vida Coach!</h1>
       {/* Notes: Display the logged in user's email */}
       {user.email && <p className="text-lg">Logged in as {user.email}</p>}
+      {/* Notes: Show the current subscription tier using a colored badge */}
+      <p className="text-lg">
+        Subscription: {badge(tier || 'No Subscription')}
+      </p>
 
       {/* Card showing current subscription status */}
       <div className="border rounded p-4 w-full max-w-xs text-center space-y-2">
