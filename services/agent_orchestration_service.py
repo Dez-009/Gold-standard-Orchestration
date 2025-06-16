@@ -3,26 +3,27 @@
 # Notes: Import typing for SQLAlchemy session operations
 from sqlalchemy.orm import Session
 
-# Notes: Import the AgentAssignment ORM model
+# Notes: Import ORM models needed for routing and history
 from models.agent_assignment import AgentAssignment
+from models.agent_interaction_log import AgentInteractionLog
 
 
 # Notes: Stub implementation for the career coaching agent
-def call_career_agent(prompt: str) -> str:
+def call_career_agent(prompt: str, context: str) -> str:
     """Return a placeholder career coaching response."""
-    return f"Career advice for: {prompt}"
+    return f"Career advice for: {prompt}\n\nPrevious context:\n{context}"
 
 
 # Notes: Stub implementation for the health coaching agent
-def call_health_agent(prompt: str) -> str:
+def call_health_agent(prompt: str, context: str) -> str:
     """Return a placeholder health coaching response."""
-    return f"Health tips for: {prompt}"
+    return f"Health tips for: {prompt}\n\nPrevious context:\n{context}"
 
 
 # Notes: Stub implementation for the relationship coaching agent
-def call_relationship_agent(prompt: str) -> str:
+def call_relationship_agent(prompt: str, context: str) -> str:
     """Return a placeholder relationship coaching response."""
-    return f"Relationship guidance for: {prompt}"
+    return f"Relationship guidance for: {prompt}\n\nPrevious context:\n{context}"
 
 
 # Notes: Map agent types to their corresponding handler functions
@@ -55,8 +56,23 @@ def route_ai_request(db: Session, user_id: int, user_prompt: str) -> dict:
         # Notes: Default to the career agent when type is unrecognized
         handler = call_career_agent
 
-    # Notes: Generate the agent's reply using the selected handler
-    response_text = handler(user_prompt)
+    # Notes: Gather prior interactions to provide context
+    logs = (
+        db.query(AgentInteractionLog)
+        .filter(AgentInteractionLog.user_id == user_id)
+        .order_by(AgentInteractionLog.timestamp.desc())
+        .limit(5)
+        .all()
+    )
+
+    # Notes: Build a single string summarizing the conversation history
+    history_snippets: list[str] = []
+    for log in logs:
+        history_snippets.append(f"User: {log.user_prompt}\nAI: {log.ai_response}")
+    context = "\n".join(reversed(history_snippets))
+
+    # Notes: Generate the agent's reply using the selected handler and context
+    response_text = handler(user_prompt, context)
 
     # Notes: Return both the agent type and the generated text
     return {"agent": assignment.agent_type, "response": response_text}

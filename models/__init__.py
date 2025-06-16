@@ -14,6 +14,8 @@ from .habit import Habit
 from .subscription import Subscription
 # Notes: Include model for mapping users to assigned AI agents
 from .agent_assignment import AgentAssignment
+# Notes: Import model capturing prior agent interactions
+from .agent_interaction_log import AgentInteractionLog
 
 __all__ = [
     "User",
@@ -26,5 +28,6 @@ __all__ = [
     "Habit",
     "Subscription",
     "AgentAssignment",
+    "AgentInteractionLog",
 ]
 

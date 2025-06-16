@@ -55,7 +55,7 @@ def test_route_ai_request_selects_agent(monkeypatch):
     )
     assign_agent(db, user.id, "career")
 
-    def fake_career(prompt: str) -> str:
+    def fake_career(prompt: str, context: str) -> str:
         return "career reply"
 
     monkeypatch.setattr(orchestration, "call_career_agent", fake_career)
@@ -72,7 +72,7 @@ def test_route_ai_request_selects_agent(monkeypatch):
 def test_orchestrate_route(monkeypatch):
     user_id, token = register_and_login("health")
 
-    def fake_health(prompt: str) -> str:
+    def fake_health(prompt: str, context: str) -> str:
         return "stay hydrated"
 
     monkeypatch.setattr(orchestration, "call_health_agent", fake_health)
