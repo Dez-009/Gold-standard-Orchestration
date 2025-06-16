@@ -619,6 +619,17 @@ export async function updateSupportTicketStatus(
   return response.data;
 }
 
+// Request generation of a complete user data export
+// Notes: Performs a GET request to the /account/export endpoint
+export async function requestDataExport(token: string) {
+  // Notes: Include the JWT token so the backend authorizes the export
+  const response = await apiClient.get('/account/export', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the JSON payload containing the user's data snapshot
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
