@@ -1,53 +1,60 @@
 'use client';
-// Profile management page allowing the user to view and edit personal details
-// Fetches the current profile on mount and sends updates back to the backend
+// Profile settings page allowing the user to view and edit personal details
+// The page retrieves the current profile from the backend and updates it on save
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchProfile, saveProfile } from '../../services/profileService';
+import {
+  fetchUserProfile,
+  updateUserProfile
+} from '../../services/profileService';
 import { getToken, isTokenExpired } from '../../services/authUtils';
-import { showError } from '../../components/ToastProvider';
+import { showError, showSuccess } from '../../components/ToastProvider';
 
-// Shape of the profile data used by this page
-interface Profile {
-  name: string;
+// Shape of the profile data handled by this page
+interface UserProfile {
+  first_name: string;
+  last_name: string;
+  email: string;
   age: number;
-  sex: string;
+  gender: string;
   marital_status: string;
-  has_kids: boolean;
-  kids_count?: number;
+  children: number;
 }
 
 export default function ProfilePage() {
-  const router = useRouter(); // Notes: Router used for redirects
-  // Local state holding the profile fields
-  const [profile, setProfile] = useState<Profile>({
-    name: '',
+  const router = useRouter(); // Used for navigation when the session expires
+
+  // Local state storing all editable profile fields
+  const [profile, setProfile] = useState<UserProfile>({
+    first_name: '',
+    last_name: '',
+    email: '',
     age: 0,
-    sex: 'Male',
+    gender: 'Male',
     marital_status: 'Single',
-    has_kids: false,
-    kids_count: 0
+    children: 0
   });
-  // Flags for loading, error and success indicators
+
+  // Track loading and error states for UX feedback
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
 
-  // Helper to load the profile from the backend
+  // Helper to retrieve the profile data on initial page load
   const loadProfile = async () => {
     setLoading(true);
     setError('');
     try {
-      const data = (await fetchProfile()) as Profile;
+      const data = (await fetchUserProfile()) as UserProfile;
       setProfile({
-        name: data.name,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
         age: data.age,
-        sex: data.sex,
+        gender: data.gender,
         marital_status: data.marital_status,
-        has_kids: data.has_kids,
-        kids_count: data.kids_count || 0
+        children: data.children
       });
     } catch {
       setError('Failed to load profile');
@@ -56,7 +63,7 @@ export default function ProfilePage() {
     }
   };
 
-  // Notes: Validate session then load profile on first render
+  // Verify token validity and fetch profile information
   useEffect(() => {
     const token = getToken();
     if (!token || isTokenExpired(token)) {
@@ -68,7 +75,7 @@ export default function ProfilePage() {
     loadProfile();
   }, [router]);
 
-  // Update local state when form inputs change
+  // Update state when the user edits any field
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -77,26 +84,17 @@ export default function ProfilePage() {
     setProfile({ ...profile, [name]: val });
   };
 
-  // Update has_kids flag via radio buttons
-  const handleKidsChange = (value: boolean) => {
-    setProfile({
-      ...profile,
-      has_kids: value,
-      kids_count: value ? profile.kids_count : 0
-    });
-  };
-
-  // Submit updated profile to the backend
+  // Submit updated profile information to the backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess(false);
     try {
-      await saveProfile(profile as unknown as Record<string, unknown>);
-      setSuccess(true);
+      await updateUserProfile(profile as unknown as Record<string, unknown>);
+      showSuccess('Profile updated');
     } catch {
       setError('Failed to save profile');
+      showError('Failed to save profile');
     } finally {
       setLoading(false);
     }
@@ -104,25 +102,53 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
-      {/* Navigation back to the dashboard */}
+      {/* Link back to the dashboard */}
       <Link href="/dashboard" className="self-start text-blue-600 underline">
         Back to Dashboard
       </Link>
 
-      {/* Heading for the page */}
-      <h1 className="text-2xl font-bold">Edit Profile</h1>
+      {/* Page heading */}
+      <h1 className="text-2xl font-bold">Profile Settings</h1>
 
-      {/* Profile edit form */}
+      {/* Editable profile form */}
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-2">
         <div className="flex flex-col">
-          <label htmlFor="name" className="mb-1 font-medium">
-            Name
+          <label htmlFor="first_name" className="mb-1 font-medium">
+            First Name
           </label>
           <input
-            id="name"
-            name="name"
+            id="first_name"
+            name="first_name"
             type="text"
-            value={profile.name}
+            value={profile.first_name}
+            onChange={handleChange}
+            className="border rounded p-2"
+            required
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="last_name" className="mb-1 font-medium">
+            Last Name
+          </label>
+          <input
+            id="last_name"
+            name="last_name"
+            type="text"
+            value={profile.last_name}
+            onChange={handleChange}
+            className="border rounded p-2"
+            required
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="email" className="mb-1 font-medium">
+            Email
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={profile.email}
             onChange={handleChange}
             className="border rounded p-2"
             required
@@ -143,13 +169,13 @@ export default function ProfilePage() {
           />
         </div>
         <div className="flex flex-col">
-          <label htmlFor="sex" className="mb-1 font-medium">
-            Sex
+          <label htmlFor="gender" className="mb-1 font-medium">
+            Gender
           </label>
           <select
-            id="sex"
-            name="sex"
-            value={profile.sex}
+            id="gender"
+            name="gender"
+            value={profile.gender}
             onChange={handleChange}
             className="border rounded p-2"
           >
@@ -176,51 +202,24 @@ export default function ProfilePage() {
           </select>
         </div>
         <div className="flex flex-col">
-          <span className="mb-1 font-medium">Do you have children?</span>
-          <div className="flex items-center space-x-4">
-            <label className="flex items-center space-x-1">
-              <input
-                type="radio"
-                name="has_kids"
-                value="yes"
-                checked={profile.has_kids}
-                onChange={() => handleKidsChange(true)}
-              />
-              <span>Yes</span>
-            </label>
-            <label className="flex items-center space-x-1">
-              <input
-                type="radio"
-                name="has_kids"
-                value="no"
-                checked={!profile.has_kids}
-                onChange={() => handleKidsChange(false)}
-              />
-              <span>No</span>
-            </label>
-          </div>
+          <label htmlFor="children" className="mb-1 font-medium">
+            Number of Children
+          </label>
+          <input
+            id="children"
+            name="children"
+            type="number"
+            value={profile.children}
+            onChange={handleChange}
+            className="border rounded p-2"
+            required
+          />
         </div>
-        {profile.has_kids && (
-          <div className="flex flex-col">
-            <label htmlFor="kids_count" className="mb-1 font-medium">
-              Number of Kids
-            </label>
-            <input
-              id="kids_count"
-              name="kids_count"
-              type="number"
-              value={profile.kids_count}
-              onChange={handleChange}
-              className="border rounded p-2"
-              required
-            />
-          </div>
-        )}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
         >
-          Save Profile
+          Save
         </button>
       </form>
 
@@ -229,7 +228,7 @@ export default function ProfilePage() {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
       )}
       {error && <p className="text-red-600">{error}</p>}
-      {success && <p className="text-green-600">Profile updated!</p>}
     </div>
   );
 }
+

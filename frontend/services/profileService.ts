@@ -2,7 +2,12 @@
 // Provides helpers to fetch and update the user's profile
 
 import { getToken } from './authUtils';
-import { getProfile, updateProfile } from './apiClient';
+import {
+  getProfile,
+  updateProfile,
+  getUserProfile,
+  updateUserProfile as updateUserProfileRequest
+} from './apiClient';
 import { showSuccess, showError } from '../components/ToastProvider';
 
 // Retrieve the authenticated user's profile
@@ -39,4 +44,26 @@ export async function saveProfile(profileData: Record<string, unknown>) {
     showError('Something went wrong');
     throw err;
   }
+}
+
+// Fetch the currently authenticated user's profile without triggering toasts
+export async function fetchUserProfile() {
+  const token = getToken();
+  if (!token) {
+    throw new Error('User not authenticated');
+  }
+  // Return the profile data from the backend
+  const data = await getUserProfile(token);
+  return data as Record<string, unknown>;
+}
+
+// Update the user's profile and return the updated payload
+export async function updateUserProfile(data: Record<string, unknown>) {
+  const token = getToken();
+  if (!token) {
+    throw new Error('User not authenticated');
+  }
+  // Forward the update request to the API layer
+  const result = await updateUserProfileRequest(data, token);
+  return result as Record<string, unknown>;
 }
