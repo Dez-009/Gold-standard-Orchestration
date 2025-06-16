@@ -50,6 +50,10 @@ export default function DashboardPage() {
         <Link href="/checkin" className="text-blue-600 underline">
           Daily Check-In
         </Link>
+        {/* Link to the mood tracking page */}
+        <Link href="/mood" className="text-blue-600 underline">
+          Mood Tracker
+        </Link>
         <Link href="/review" className="text-blue-600 underline">
           Weekly Review
         </Link>

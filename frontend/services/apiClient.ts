@@ -194,6 +194,28 @@ export async function getAuditLogs(token: string) {
   return response.data;
 }
 
+// Retrieve the authenticated user's mood entry for the current day
+export async function getMood(token: string) {
+  // Issue the GET request to the /mood endpoint with auth header
+  const response = await apiClient.get('/mood', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the mood payload returned by the backend
+  return response.data;
+}
+
+// Submit or update today's mood for the current user
+export async function postMood(mood: string, token: string) {
+  // Issue the POST request to the /mood endpoint with auth header
+  const response = await apiClient.post(
+    '/mood',
+    { mood },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Return the updated mood payload from the backend
+  return response.data;
+}
+
 // Notes: Retrieve overall system health information
 export async function getSystemHealth(token: string) {
   // Notes: Call the backend /health endpoint including auth header
