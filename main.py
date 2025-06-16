@@ -46,6 +46,7 @@ from routes.admin.agent_assignment_admin import (
 from routes.admin.user_personality_admin import (
     router as admin_user_personality_router,
 )
+from routes.admin.notifications_admin import router as admin_notifications_router
 
 # Notes: Import router exposing personality CRUD endpoints
 from routes.personality import router as personality_router
@@ -104,4 +105,5 @@ app.include_router(admin_audit_router)
 app.include_router(admin_agent_router)
 app.include_router(admin_agent_assignment_router)
 app.include_router(admin_user_personality_router)
+app.include_router(admin_notifications_router)
 

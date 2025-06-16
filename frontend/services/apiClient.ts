@@ -450,6 +450,28 @@ export async function getSystemMetrics(token: string) {
   return response.data;
 }
 
+// Retrieve all notifications for the admin notifications page
+// Notes: Performs a GET request to the /admin/notifications endpoint
+export async function getNotifications(token: string) {
+  const response = await apiClient.get('/admin/notifications', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the array of notification objects
+  return response.data;
+}
+
+// Trigger a retry for a specific notification id
+// Notes: POSTs to /admin/notifications/{id}/retry with auth header
+export async function retryNotification(id: string, token: string) {
+  const response = await apiClient.post(
+    `/admin/notifications/${id}/retry`,
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the backend acknowledgement payload
+  return response.data;
+}
+
 // Retrieve the current application configuration for admins
 // Sends a GET request to the /admin/config endpoint
 export async function getAppConfig(token: string) {

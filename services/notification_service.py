@@ -34,6 +34,42 @@ def send_action_reminder(user: User, reminder_text: str) -> None:
     print(f"Sending action reminder to {user.email}: {reminder_text}")
 
 
+# Notes: Create a new notification record in the database
+def create_notification(
+    db: Session, user_id: int, ntype: str, message: str, channel: str | None = None
+) -> Notification:
+    """Persist a notification with pending status."""
+    notif = Notification(
+        user_id=user_id,
+        type=ntype,
+        channel=channel,
+        message=message,
+        status="pending",
+        created_at=datetime.datetime.utcnow(),
+    )
+    db.add(notif)
+    db.commit()
+    db.refresh(notif)
+    return notif
+
+
+# Notes: Send a notification using simple logging for now
+def send_notification(db: Session, notification_id: int) -> Notification | None:
+    """Deliver the specified notification and update its status."""
+    notif = db.query(Notification).get(notification_id)
+    if notif is None:
+        return None
+    # Notes: Output the message to simulate external delivery
+    print(
+        f"Delivering {notif.type} notification to user {notif.user_id}: {notif.message}"
+    )
+    notif.status = "sent"
+    notif.sent_at = datetime.datetime.utcnow()
+    db.commit()
+    db.refresh(notif)
+    return notif
+
+
 # ---------------------------------------------------------------------------
 # The following class groups additional notification behaviors. For now these
 # methods simply log messages, but they will eventually integrate with real
@@ -58,20 +94,15 @@ class NotificationService:
 
 # Notes: Process and deliver any pending notifications in the database
 def process_pending_notifications(db: Session) -> None:
-    """Fetch pending notifications and deliver them."""
-    # Notes: Query notifications that are scheduled and not yet sent
-    pending = (
-        db.query(Notification)
-        .filter(Notification.status == "pending")
-        .filter(Notification.scheduled_at <= datetime.datetime.utcnow())
-        .all()
-    )
+    """Fetch all pending notifications and mark them as sent."""
+    # Notes: Retrieve notifications that have not been delivered yet
+    pending = db.query(Notification).filter(Notification.status == "pending").all()
 
-    # Notes: Deliver each notification and update its status
+    # Notes: Simulate delivery of each notification
     for notification in pending:
         deliver_notification(notification)
         notification.status = "sent"
-        notification.delivered_at = datetime.datetime.utcnow()
+        notification.sent_at = datetime.datetime.utcnow()
 
-    # Notes: Persist status updates back to the database
+    # Notes: Commit all status updates at once
     db.commit()
