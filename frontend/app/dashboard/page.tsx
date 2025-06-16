@@ -42,6 +42,10 @@ export default function DashboardPage() {
         <Link href="/goals" className="text-blue-600 underline">
           Goals
         </Link>
+        {/* Link to the goal progress tracker */}
+        <Link href="/goals/progress" className="text-blue-600 underline">
+          Goal Progress
+        </Link>
         {/* Link to the journal history page */}
         <Link href="/journal/history" className="text-blue-600 underline">
           Journal History
