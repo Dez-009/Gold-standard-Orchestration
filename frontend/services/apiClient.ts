@@ -454,6 +454,28 @@ export async function updateBillingConfig(
   return response.data;
 }
 
+// Retrieve available subscription plans and pricing
+// Notes: Sends GET request to the /billing/plans endpoint with auth header
+export async function getPricingPlans(token: string) {
+  const response = await apiClient.get('/billing/plans', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the list of plans from the backend
+  return response.data;
+}
+
+// Create a new Stripe Checkout session for the chosen plan
+// Notes: Posts the plan identifier to /billing/checkout with JWT header
+export async function createCheckoutSession(planId: string, token: string) {
+  const response = await apiClient.post(
+    '/billing/checkout',
+    { plan_id: planId },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Backend responds with the session details including redirect URL
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

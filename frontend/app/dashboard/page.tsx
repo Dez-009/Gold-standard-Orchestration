@@ -10,12 +10,15 @@ import {
   parseUserFromToken,
   isTokenExpired
 } from '../../services/authUtils';
+import { fetchAccountDetails } from '../../services/accountService';
 import { showError } from '../../components/ToastProvider';
 
 export default function DashboardPage() {
   // Notes: Store email and role info parsed from the JWT
   const [user, setUser] = useState<{ email: string | null; role: string | null }>({ email: null, role: null });
   const router = useRouter();
+  // Notes: Track the user's current subscription tier
+  const [tier, setTier] = useState<string | null>(null);
 
   // Notes: On mount, verify token validity and parse user info
   useEffect(() => {
@@ -29,6 +32,16 @@ export default function DashboardPage() {
     }
     // Notes: Store parsed email and role in state
     setUser(parseUserFromToken(token));
+    // Notes: Retrieve account info to determine subscription tier
+    const loadTier = async () => {
+      try {
+        const data = await fetchAccountDetails();
+        setTier((data as { tier?: string }).tier ?? null);
+      } catch {
+        // Ignore failures and keep tier null
+      }
+    };
+    loadTier();
   }, [router]);
 
   // Render dashboard with simple styling and user information
@@ -93,6 +106,12 @@ export default function DashboardPage() {
         <Link href="/account" className="text-blue-600 underline">
           Account
         </Link>
+        {/* Link to subscribe page when no active subscription */}
+        {tier === 'Free' && (
+          <Link href="/subscribe" className="text-blue-600 underline">
+            Subscribe
+          </Link>
+        )}
         {/* Temporary link to the public landing page */}
         <Link href="/landing" className="text-blue-600 underline">
           Landing
