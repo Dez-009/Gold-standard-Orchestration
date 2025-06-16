@@ -58,6 +58,10 @@ export default function DashboardPage() {
         <Link href="/mood" className="text-blue-600 underline">
           Mood Tracker
         </Link>
+        {/* Link to the mood trends analytics page */}
+        <Link href="/mood/trends" className="text-blue-600 underline">
+          Mood Trends
+        </Link>
         <Link href="/review" className="text-blue-600 underline">
           Weekly Review
         </Link>

@@ -300,6 +300,16 @@ export async function postMood(mood: string, token: string) {
   return response.data;
 }
 
+// Retrieve the full mood history for charting trends
+export async function getMoodTrends(token: string) {
+  // Issue the GET request to the /mood/trends endpoint with auth header
+  const response = await apiClient.get('/mood/trends', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the array of mood records from the backend
+  return response.data;
+}
+
 // Notes: Retrieve overall system health information
 export async function getSystemHealth(token: string) {
   // Notes: Call the backend /health endpoint including auth header

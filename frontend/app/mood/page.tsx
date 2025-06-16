@@ -103,6 +103,10 @@ export default function MoodPage() {
           </button>
         ))}
       </div>
+      {/* Link to the mood trends analytics page */}
+      <Link href="/mood/trends" className="text-blue-600 underline">
+        View Trends
+      </Link>
 
       {/* Display loading spinner, errors and success messages */}
       {loading && (
