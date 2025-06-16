@@ -20,6 +20,8 @@ from .agent_interaction_log import AgentInteractionLog
 from .personality import Personality
 # Notes: Import model mapping users to their preferred personalities
 from .user_personality import UserPersonality
+# Notes: Import notification model for queued messages
+from .notification import Notification
 
 __all__ = [
     "User",
@@ -35,5 +37,6 @@ __all__ = [
     "AgentInteractionLog",
     "Personality",
     "UserPersonality",
+    "Notification",
 ]
 
