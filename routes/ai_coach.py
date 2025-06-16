@@ -13,6 +13,8 @@ from database.utils import get_db
 from services import ai_processor
 # Notes: Import function to suggest goals directly for convenience
 from services.ai_processor import suggest_goals
+# Notes: Import the orchestration service used to delegate requests
+from services.agent_orchestration_service import route_ai_request
 
 # Notes: Dependency that retrieves the authenticated user
 from auth.dependencies import get_current_user
@@ -56,3 +58,27 @@ async def suggest_goals_endpoint(
     suggestions = suggest_goals(db, current_user.id)
     # Notes: Wrap and return the suggestions in JSON format
     return {"suggestions": suggestions}
+
+
+@router.post("/orchestrate")
+# Notes: Endpoint that delegates a coaching request to the user's assigned agent
+async def orchestrate_ai_request(
+    payload: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Route the prompt to the appropriate domain agent."""
+
+    # Notes: Extract the prompt field from the request body
+    prompt = payload.get("prompt")
+    if prompt is None:
+        raise HTTPException(status_code=400, detail="Prompt is required")
+
+    # Notes: Delegate to the orchestration service to get the agent reply
+    try:
+        result = route_ai_request(db, current_user.id, prompt)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    # Notes: Return the agent type and generated response
+    return result
