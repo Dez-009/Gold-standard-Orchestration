@@ -443,6 +443,28 @@ export async function updateBillingConfig(
   return response.data;
 }
 
+// Notes: Retrieve a list of recent webhook events for administrators
+export async function getRecentWebhooks(token: string) {
+  // Notes: Issue GET request to the admin webhooks recent endpoint
+  const response = await apiClient.get('/admin/webhooks/recent', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the array of webhook event objects
+  return response.data;
+}
+
+// Notes: Trigger replay of a specific webhook event by id
+export async function replayWebhook(eventId: string, token: string) {
+  // Notes: POST the event identifier to the admin webhooks replay endpoint
+  const response = await apiClient.post(
+    '/admin/webhooks/replay',
+    { event_id: eventId },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return whatever status payload the backend provides
+  return response.data;
+}
+
 // Retrieve available subscription plans and pricing
 // Notes: Sends GET request to the /billing/plans endpoint with auth header
 export async function getPricingPlans(token: string) {
