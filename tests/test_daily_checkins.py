@@ -1,12 +1,9 @@
-"""Tests for daily check-in endpoints."""
+"""Tests for the new health check-in endpoints."""
 
 import os
 import sys
 import uuid
 from fastapi.testclient import TestClient
-
-# Notes: Import the route module so we can patch the OpenAI client during tests
-import routes.daily_checkin as daily_route
 
 # Ensure environment variables are set before importing the app
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -19,10 +16,6 @@ from auth.auth_utils import create_access_token
 client = TestClient(app)
 
 
-# Notes: Simple object mimicking the OpenAI completion response
-class DummyCompletion:
-    def __init__(self, content: str = "Test feedback") -> None:
-        self.choices = [type("c", (), {"message": type("m", (), {"content": content})})]
 
 
 def register_and_login(email: str) -> tuple[int, str]:
@@ -39,69 +32,54 @@ def register_and_login(email: str) -> tuple[int, str]:
     return user_id, token
 
 
-def test_create_daily_checkin(monkeypatch):
+def test_create_daily_checkin():
     user_id, token = register_and_login(f"checkin_create_{uuid.uuid4().hex}@example.com")
 
-    # Notes: Patch the OpenAI client to avoid external API calls during tests
-    def fake_create(**kwargs):
-        return DummyCompletion("Great job today")
-
-    monkeypatch.setattr(daily_route.client.chat.completions, "create", fake_create)
-
     checkin_data = {
-        "user_id": user_id,
-        "mood": "happy",
+        "mood": "GOOD",
         "energy_level": 8,
-        "reflections": "Feeling good",
+        "stress_level": 3,
+        "notes": "Feeling good",
     }
     headers = {"Authorization": f"Bearer {token}"}
-    resp = client.post("/daily-checkins/", json=checkin_data, headers=headers)
+    resp = client.post("/checkins", json=checkin_data, headers=headers)
     assert resp.status_code in (200, 201)
     data = resp.json()
-    assert "checkin" in data and "feedback" in data
-    checkin = data["checkin"]
-    assert checkin["user_id"] == user_id
-    for field in ["id", "user_id", "mood", "energy_level", "created_at", "updated_at"]:
-        assert field in checkin
-    assert isinstance(data["feedback"], str) and data["feedback"]
+    assert data["user_id"] == user_id
+    for field in ["id", "user_id", "mood", "energy_level", "stress_level", "created_at"]:
+        assert field in data
 
 
-def test_get_daily_checkin_by_id(monkeypatch):
+def test_get_daily_checkin_by_id():
     user_id, token = register_and_login(f"checkin_get_{uuid.uuid4().hex}@example.com")
     headers = {"Authorization": f"Bearer {token}"}
 
-    # Notes: Avoid calling OpenAI when creating the check-in
-    monkeypatch.setattr(daily_route.client.chat.completions, "create", lambda **_: DummyCompletion())
-
     create_resp = client.post(
-        "/daily-checkins/",
-        json={"user_id": user_id, "mood": "ok", "energy_level": 5},
+        "/checkins",
+        json={"mood": "OKAY", "energy_level": 5, "stress_level": 4},
         headers=headers,
     )
     assert create_resp.status_code in (200, 201)
-    checkin_id = create_resp.json()["checkin"]["id"]
-    resp = client.get(f"/daily-checkins/{checkin_id}", headers=headers)
+    checkin_id = create_resp.json()["id"]
+    resp = client.get("/checkins", headers=headers)
     assert resp.status_code == 200
-    data = resp.json()
+    data = resp.json()[0]
     assert data["id"] == checkin_id
     assert data["user_id"] == user_id
 
 
-def test_get_daily_checkins_by_user(monkeypatch):
+def test_get_daily_checkins_by_user():
     user_id, token = register_and_login(f"checkin_list_{uuid.uuid4().hex}@example.com")
     headers = {"Authorization": f"Bearer {token}"}
 
-    # Notes: Patch OpenAI client to avoid external requests for each creation
-    monkeypatch.setattr(daily_route.client.chat.completions, "create", lambda **_: DummyCompletion())
-
     for i in range(2):
         resp = client.post(
-            "/daily-checkins/",
-            json={"user_id": user_id, "mood": f"mood{i}", "energy_level": i},
+            "/checkins",
+            json={"mood": "GOOD", "energy_level": i + 1, "stress_level": 2},
             headers=headers,
         )
         assert resp.status_code in (200, 201)
-    resp = client.get(f"/daily-checkins/user/{user_id}", headers=headers)
+    resp = client.get("/checkins", headers=headers)
     assert resp.status_code == 200
     data = resp.json()
     assert isinstance(data, list)

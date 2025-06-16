@@ -233,6 +233,24 @@ export async function postDailyCheckIn(
   return response.data;
 }
 
+// Submit a health check-in using the new /checkins endpoint
+export async function submitCheckin(token: string, data: unknown) {
+  // Notes: Issue POST to /checkins with authorization header
+  const response = await apiClient.post('/checkins', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Retrieve all health check-ins for the current user
+export async function fetchCheckins(token: string) {
+  // Notes: Send GET request to /checkins with JWT token
+  const response = await apiClient.get('/checkins', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Retrieve the current user's profile information
 // Expects a valid JWT token for authorization
 export async function getProfile(token: string) {
