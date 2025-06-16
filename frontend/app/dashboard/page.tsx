@@ -61,6 +61,10 @@ export default function DashboardPage() {
         <Link href="/profile" className="text-blue-600 underline">
           Profile
         </Link>
+        {/* Temporary link to the public landing page */}
+        <Link href="/landing" className="text-blue-600 underline">
+          Landing
+        </Link>
       </nav>
 
       {/* Notes: Show admin links only when the user has admin role */}
