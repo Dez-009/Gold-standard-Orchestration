@@ -9,6 +9,13 @@ SMS or push notification integrations.
 # Import datetime for potential timestamp handling in future implementations
 import datetime
 
+# Notes: Import SQLAlchemy session type for database operations
+from sqlalchemy.orm import Session
+
+# Notes: Import queued notification model and delivery router
+from models.notification import Notification
+from services.notifications.delivery_router import deliver_notification
+
 from models.user import User
 
 
@@ -47,3 +54,24 @@ class NotificationService:
     def send_weekly_review(self, user: User) -> None:
         """Simulate prompting the user for a weekly review."""
         print(f"Weekly review reminder sent to {user.email}")
+
+
+# Notes: Process and deliver any pending notifications in the database
+def process_pending_notifications(db: Session) -> None:
+    """Fetch pending notifications and deliver them."""
+    # Notes: Query notifications that are scheduled and not yet sent
+    pending = (
+        db.query(Notification)
+        .filter(Notification.status == "pending")
+        .filter(Notification.scheduled_at <= datetime.datetime.utcnow())
+        .all()
+    )
+
+    # Notes: Deliver each notification and update its status
+    for notification in pending:
+        deliver_notification(notification)
+        notification.status = "sent"
+        notification.delivered_at = datetime.datetime.utcnow()
+
+    # Notes: Persist status updates back to the database
+    db.commit()
