@@ -552,6 +552,31 @@ export async function refundPayment(chargeId: string, token: string) {
   return response.data;
 }
 
+// Retrieve the list of users that an admin can impersonate
+// Notes: Sends GET request to the admin impersonation users endpoint
+export async function getUsersForImpersonation(token: string) {
+  const response = await apiClient.get('/admin/impersonation/users', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Backend returns an array of minimal user objects
+  return response.data;
+}
+
+// Request a short-lived token that allows acting as the specified user
+// Notes: Posts the target user_id to the admin impersonation token endpoint
+export async function createImpersonationToken(
+  userId: number,
+  token: string
+) {
+  const response = await apiClient.post(
+    '/admin/impersonation/token',
+    { user_id: userId },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Response payload contains the new JWT token string
+  return response.data;
+}
+
 // Submit a new support ticket on behalf of the authenticated user
 // Notes: Sends a POST request to the /support/tickets endpoint
 export async function submitSupportTicket(

@@ -28,3 +28,8 @@ def get_user(db: Session, user_id: int) -> User | None:
     """Return a user by their ID or None if not found."""
     # Retrieve a single user by primary key
     return db.query(User).filter(User.id == user_id).first()
+
+
+def get_all_users(db: Session) -> list[User]:
+    """Return all users in the system."""
+    return db.query(User).all()
