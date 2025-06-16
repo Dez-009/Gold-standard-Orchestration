@@ -630,6 +630,16 @@ export async function requestDataExport(token: string) {
   return response.data;
 }
 
+// Permanently delete the authenticated user's account
+export async function deleteAccount(token: string) {
+  // Notes: Send a DELETE request to the account deletion endpoint
+  const response = await apiClient.delete('/account/delete', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Backend responds with empty body when successful
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
