@@ -121,13 +121,16 @@ export default function DashboardPage() {
           <Link href="/admin/config" className="text-blue-600 underline">
             Configuration
           </Link>
-          main
           <Link href="/admin/system-logs" className="text-blue-600 underline">
             System Logs
           </Link>
           {/* Notes: Link to view all subscriptions */}
           <Link href="/admin/subscriptions" className="text-blue-600 underline">
             Subscriptions
+          </Link>
+          {/* Link to billing settings management */}
+          <Link href="/admin/billing" className="text-blue-600 underline">
+            Billing Settings
           </Link>
           {/* Link to the new user management page */}
           <Link href="/admin/users" className="text-blue-600 underline">
