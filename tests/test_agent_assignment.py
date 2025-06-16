@@ -134,3 +134,27 @@ def test_user_cannot_assign_agent_via_admin_route():
     )
     assert resp.status_code == 403
 
+
+def test_admin_assignment_creates_audit_log():
+    """Audit log should record admin agent assignments."""
+
+    # Notes: Create a regular user that will receive the assignment
+    target_id, _, _ = register_user_with_role()
+
+    # Notes: Register an admin user to perform the assignment
+    admin_id, admin_token, _ = register_user_with_role(role="admin")
+
+    # Notes: Perform the admin assignment operation via the API
+    resp = client.post(
+        "/admin/agent-assignments",
+        json={"user_id": target_id, "agent_type": "health"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert resp.status_code in (200, 201)
+
+    # Notes: Retrieve audit logs for the admin to verify the entry
+    logs_resp = client.get(f"/audit-logs/user/{admin_id}")
+    assert logs_resp.status_code == 200
+    logs = logs_resp.json()
+    assert any(log["action"] == "agent_assignment_update" for log in logs)
+
