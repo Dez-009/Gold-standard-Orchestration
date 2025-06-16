@@ -7,7 +7,7 @@ import {
   getJournalHistory,
   getAllJournals,
   getJournalById,
-  updateJournal
+  updateJournal as updateJournalApi
 } from './apiClient';
 import { showSuccess, showError } from '../components/ToastProvider';
 
@@ -82,7 +82,14 @@ export async function fetchJournalById(id: string) {
   try {
     // Notes: Retrieve the journal entry from the backend service
     const data = await getJournalById(id, token);
-    return data as { id: number; title: string | null; content: string; created_at: string };
+    // Notes: Cast the response to include the optional mood field
+    return data as {
+      id: number;
+      title: string | null;
+      content: string;
+      created_at: string;
+      mood?: string | null;
+    };
   } catch (err) {
     showError('Something went wrong');
     throw err;
@@ -91,7 +98,7 @@ export async function fetchJournalById(id: string) {
 
 // Persist updates to an existing journal entry
 // Returns the updated entry from the backend
-export async function updateJournalEntry(
+export async function updateJournal(
   id: string,
   data: Record<string, unknown>
 ) {
@@ -102,9 +109,15 @@ export async function updateJournalEntry(
   }
   try {
     // Notes: Send updated journal data to the backend
-    const updated = await updateJournal(id, data, token);
+    const updated = await updateJournalApi(id, data, token);
     showSuccess('Saved successfully');
-    return updated as { id: number; title: string | null; content: string; created_at: string };
+    return updated as {
+      id: number;
+      title: string | null;
+      content: string;
+      created_at: string;
+      mood?: string | null;
+    };
   } catch (err) {
     showError('Something went wrong');
     throw err;

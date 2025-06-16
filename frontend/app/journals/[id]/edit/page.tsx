@@ -7,8 +7,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   fetchJournalById,
-  updateJournalEntry
+  updateJournal
 } from '../../../../services/journalService';
+// Notes: Reusable component for picking a mood value
+import MoodSelector from '../../../../components/MoodSelector';
 import { getToken, isTokenExpired } from '../../../../services/authUtils';
 import { showError, showSuccess } from '../../../../components/ToastProvider';
 
@@ -18,6 +20,8 @@ interface Entry {
   title: string | null;
   content: string;
   created_at: string;
+  // Optional mood string returned by the backend
+  mood?: string | null;
 }
 
 export default function EditJournalPage({
@@ -29,6 +33,8 @@ export default function EditJournalPage({
   // Form fields for title and content
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  // Current mood associated with the journal entry
+  const [mood, setMood] = useState('Excellent');
   // Flags for loading the entry and submitting updates
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -50,6 +56,8 @@ export default function EditJournalPage({
         const data: Entry = await fetchJournalById(params.id);
         setTitle(data.title ?? '');
         setContent(data.content);
+        // Notes: Update the mood state if provided by the backend
+        if (data.mood) setMood(data.mood);
       } catch {
         setError('Failed to load journal entry');
       } finally {
@@ -62,10 +70,16 @@ export default function EditJournalPage({
   // Submit updated journal fields to the backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Notes: Do not submit if required fields are blank
+    if (!content.trim() || !mood.trim()) {
+      setError('Please fill out all fields');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
-      await updateJournalEntry(params.id, { title, content });
+      // Notes: Persist the updated fields including the mood value
+      await updateJournal(params.id, { title, content, mood });
       showSuccess('Journal updated!');
       router.push(`/journals/${params.id}`);
     } catch {
@@ -101,6 +115,8 @@ export default function EditJournalPage({
             onChange={(e) => setTitle(e.target.value)}
             className="border rounded w-full p-2"
           />
+          {/* Selector for the mood associated with this entry */}
+          <MoodSelector value={mood} onChange={setMood} />
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}

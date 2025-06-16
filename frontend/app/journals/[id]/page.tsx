@@ -14,6 +14,8 @@ interface Entry {
   title: string | null;
   content: string;
   created_at: string;
+  // Optional mood metadata associated with the entry
+  mood?: string | null;
 }
 
 // Component receives the dynamic id param from the route
@@ -79,13 +81,17 @@ export default function JournalDetailsPage({
           {entry.title && <h2 className="text-xl font-semibold">{entry.title}</h2>}
           <p>{entry.content}</p>
           <p className="text-sm text-gray-600">Created: {formatDate(entry.created_at)}</p>
+          {entry.mood && (
+            <p className="text-sm text-gray-600">Mood: {entry.mood}</p>
+          )}
           <div className="flex space-x-2 pt-2">
-            <button className="px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded cursor-default" disabled>
+            {/* Link to the edit page for this entry */}
+            <Link
+              href={`/journals/${params.id}/edit`}
+              className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
               Edit
-            </button>
-            <button className="px-4 py-2 text-sm bg-red-500 text-white rounded cursor-default" disabled>
-              Delete
-            </button>
+            </Link>
           </div>
         </div>
       )}
