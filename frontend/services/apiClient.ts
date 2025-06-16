@@ -344,6 +344,17 @@ export async function getSystemHealth(token: string) {
   return response.data;
 }
 
+// Notes: Retrieve the list of all users for the admin user management page
+// Notes: Performs a GET request to the /admin/users endpoint with auth header
+export async function getAllUsers(token: string) {
+  // Notes: Issue the request to the backend admin users route
+  const response = await apiClient.get('/admin/users', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the array of user objects provided by the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

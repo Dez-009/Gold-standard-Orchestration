@@ -109,6 +109,10 @@ export default function DashboardPage() {
           <Link href="/admin/health" className="text-blue-600 underline">
             System Health
           </Link>
+          {/* Link to the new user management page */}
+          <Link href="/admin/users" className="text-blue-600 underline">
+            Users
+          </Link>
         </nav>
       )}
 
