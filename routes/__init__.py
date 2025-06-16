@@ -15,6 +15,8 @@ from .health import router as health_router
 from .audit_log import router as audit_log_router
 # Notes: Import the new action plan router
 from .action_plan import router as action_plan_router
+# Notes: Import billing router for Stripe webhook endpoints
+from .billing import router as billing_router
 
 router = APIRouter()
 
@@ -33,4 +35,6 @@ router.include_router(health_router)
 router.include_router(audit_log_router)
 # Notes: Register action plan routes with the main router
 router.include_router(action_plan_router)
+# Notes: Register billing routes so webhooks can be received
+router.include_router(billing_router)
 

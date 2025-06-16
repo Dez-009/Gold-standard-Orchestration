@@ -10,6 +10,8 @@ from .audit_log import AuditLog
 from .task import Task
 # Notes: Import the Habit model to expose it through the package
 from .habit import Habit
+# Notes: Include subscription model for billing records
+from .subscription import Subscription
 
 __all__ = [
     "User",
@@ -20,5 +22,6 @@ __all__ = [
     "DailyCheckIn",
     "AuditLog",
     "Habit",
+    "Subscription",
 ]
 
