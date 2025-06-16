@@ -19,7 +19,7 @@ def setup_user(db: Session) -> User:
     """Helper to insert a user for testing."""
     user = User(
         email=f"notify_{uuid4().hex}@example.com",
-        phone_number="1234567890",
+        phone_number=str(int(uuid4().int % 10_000_000_000)).zfill(10),
         hashed_password="pass",
     )
     db.add(user)

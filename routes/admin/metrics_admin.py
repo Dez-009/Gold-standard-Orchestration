@@ -4,16 +4,21 @@ from fastapi import APIRouter, Depends
 
 from auth.dependencies import get_current_admin_user
 from models.user import User
-from services.metrics_service import get_system_metrics
+from sqlalchemy.orm import Session
+
+from database.utils import get_db
+from services.system_metrics_service import get_recent_metrics
 
 # Notes: Prefix groups these endpoints under /admin/metrics
 router = APIRouter(prefix="/admin/metrics", tags=["admin"])
 
 
 @router.get("/")
-def read_metrics(_: User = Depends(get_current_admin_user)) -> dict:
+def read_metrics(
+    _: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+) -> dict:
     """Return current system metrics for the dashboard."""
-    # Notes: Delegate retrieval to the service layer which currently returns
-    # placeholder values. This keeps routing code simple.
-    return get_system_metrics()
+    # Notes: Fetch the latest metrics computed from database tables
+    return get_recent_metrics(db)
 

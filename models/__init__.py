@@ -22,6 +22,7 @@ from .personality import Personality
 from .user_personality import UserPersonality
 # Notes: Import notification model for queued messages
 from .notification import Notification
+from .system_metrics import SystemMetric
 
 __all__ = [
     "User",
@@ -38,5 +39,6 @@ __all__ = [
     "Personality",
     "UserPersonality",
     "Notification",
+    "SystemMetric",
 ]
 
