@@ -17,6 +17,8 @@ from routes.reporting import router as reporting_router
 from routes.task import router as task_router
 # Notes: Import router for AI coach endpoints
 from routes.ai_coach import router as ai_coach_router
+# Notes: Import router exposing account-related endpoints
+from routes.account import router as account_router
 from routes.vida import router as vida_router
 from routes.root import router as root_router
 from routes.health import router as health_router
@@ -48,6 +50,7 @@ app.include_router(notification_router)
 app.include_router(goal_router)
 app.include_router(task_router)
 app.include_router(daily_checkin_router)
+app.include_router(account_router)
 app.include_router(reporting_router)
 app.include_router(vida_router)
 # Register AI coach router to expose AI-powered coaching endpoints
