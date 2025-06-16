@@ -5,6 +5,7 @@ import { getToken } from './authUtils';
 import {
   getJournalEntries,
   getJournalHistory,
+  getAllJournals,
   getJournalById,
   updateJournal
 } from './apiClient';
@@ -41,6 +42,29 @@ export async function fetchJournalHistory() {
     // Notes: Retrieve journal history from the backend
     const data = await getJournalHistory(token);
     return data as Array<{ id: number; content: string; created_at: string }>;
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Fetch every journal entry via the plural /journals API
+// Useful for the dedicated journal list page
+export async function fetchAllJournals() {
+  const token = getToken();
+  if (!token) {
+    // Propagate an authentication error so the caller can handle it
+    throw new Error('User not authenticated');
+  }
+  try {
+    // Notes: Request all journal entries from the backend service
+    const data = await getAllJournals(token);
+    return data as Array<{
+      id: number;
+      title: string | null;
+      content: string;
+      created_at: string;
+    }>;
   } catch (err) {
     showError('Something went wrong');
     throw err;

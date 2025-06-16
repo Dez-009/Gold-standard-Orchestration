@@ -65,6 +65,17 @@ export async function getJournalHistory(token: string) {
   return response.data;
 }
 
+// Retrieve all journals using the plural /journals route
+// Notes: This mirrors getJournalHistory but targets the new endpoint
+export async function getAllJournals(token: string) {
+  // Issue the GET request to the /journals endpoint including auth header
+  const response = await apiClient.get('/journals', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the payload containing all journal entries
+  return response.data;
+}
+
 // Retrieve a single journal entry by id
 // Requires the caller to provide a valid JWT token for authorization
 export async function getJournalById(id: string, token: string) {
