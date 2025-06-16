@@ -355,7 +355,16 @@ export async function getSystemHealth(token: string) {
   return response.data;
 }
 
- codex/implement-admin-subscription-management-page
+// Retrieve system log records for administrators
+// Sends a GET request to the /admin/system-logs endpoint
+export async function getSystemLogs(token: string) {
+  const response = await apiClient.get('/admin/system-logs', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the array of log entries from the backend
+  return response.data;
+}
+
 // Notes: Retrieve all user subscription records for admin view
 // Notes: Sends GET request to /admin/subscriptions with auth header
 export async function getAllSubscriptions(token: string) {
@@ -364,6 +373,8 @@ export async function getAllSubscriptions(token: string) {
     headers: { Authorization: `Bearer ${token}` }
   });
   // Notes: Return the list of subscriptions from the backend
+  return response.data;
+}
 
 // Notes: Retrieve the list of all users for the admin user management page
 // Notes: Performs a GET request to the /admin/users endpoint with auth header
@@ -373,7 +384,6 @@ export async function getAllUsers(token: string) {
     headers: { Authorization: `Bearer ${token}` }
   });
   // Notes: Return the array of user objects provided by the backend
- main
   return response.data;
 }
 
