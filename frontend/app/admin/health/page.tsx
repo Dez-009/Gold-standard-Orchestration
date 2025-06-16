@@ -2,7 +2,10 @@
 // Notes: Display system health status information for administrators
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { fetchSystemHealth } from '../../../services/systemService';
+import { getToken, isTokenExpired } from '../../../services/authUtils';
+import { showError } from '../../../components/ToastProvider';
 
 interface HealthData {
   api: string;
@@ -11,13 +14,21 @@ interface HealthData {
 }
 
 export default function HealthPage() {
+  const router = useRouter(); // Notes: Router used for redirects
   // Notes: Local state for the health payload and loading indicators
   const [data, setData] = useState<HealthData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Notes: Fetch health info once when the page loads
+  // Notes: Verify session and fetch health info on mount
   useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
+      router.push('/login');
+      return;
+    }
     const load = async () => {
       setLoading(true);
       setError('');
@@ -31,7 +42,7 @@ export default function HealthPage() {
       }
     };
     load();
-  }, []);
+  }, [router]);
 
   // Notes: Helper to render a colored badge based on service status
   const badge = (ok: boolean, text: string) => (

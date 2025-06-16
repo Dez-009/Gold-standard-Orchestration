@@ -4,9 +4,13 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { fetchAiSuggestions } from '../../services/aiSuggestionService';
+import { getToken, isTokenExpired } from '../../services/authUtils';
+import { showError } from '../../components/ToastProvider';
 
 export default function SuggestionsPage() {
+  const router = useRouter(); // Notes: Router used for redirects
   // Store the suggestion strings returned by the API
   const [suggestions, setSuggestions] = useState<string[]>([]);
   // Track loading state while waiting for the network request
@@ -14,8 +18,15 @@ export default function SuggestionsPage() {
   // Hold any error message encountered during fetch
   const [error, setError] = useState('');
 
-  // Retrieve suggestions once on component mount
+  // Notes: Validate the session then load suggestions
   useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
+      router.push('/login');
+      return;
+    }
     const load = async () => {
       try {
         // Fetch raw suggestion text from the service
@@ -34,7 +45,7 @@ export default function SuggestionsPage() {
       }
     };
     load();
-  }, []);
+  }, [router]);
 
   // Placeholder handler for accepting a suggestion
   const handleAccept = (suggestion: string) => {

@@ -5,18 +5,25 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getToken, parseUserFromToken } from '../../services/authUtils';
+import {
+  getToken,
+  parseUserFromToken,
+  isTokenExpired
+} from '../../services/authUtils';
+import { showError } from '../../components/ToastProvider';
 
 export default function DashboardPage() {
   // Notes: Store email and role info parsed from the JWT
   const [user, setUser] = useState<{ email: string | null; role: string | null }>({ email: null, role: null });
   const router = useRouter();
 
-  // Notes: On mount, verify token and parse user info
+  // Notes: On mount, verify token validity and parse user info
   useEffect(() => {
     const token = getToken();
-    if (!token) {
-      // Redirect unauthenticated users to login
+    if (!token || isTokenExpired(token)) {
+      // Notes: Clear stale token and force user to re-authenticate
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
       router.push('/login');
       return;
     }

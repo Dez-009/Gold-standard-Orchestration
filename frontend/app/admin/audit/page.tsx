@@ -3,7 +3,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { fetchAuditLogs } from '../../../services/auditService';
+import { getToken, isTokenExpired } from '../../../services/authUtils';
+import { showError } from '../../../components/ToastProvider';
 
 // Define the expected shape of an audit log record
 interface AuditLog {
@@ -15,6 +18,7 @@ interface AuditLog {
 }
 
 export default function AuditLogsPage() {
+  const router = useRouter(); // Notes: Router used for redirects
   // Hold the list of logs returned from the backend
   const [logs, setLogs] = useState<AuditLog[]>([]);
   // Track loading, error and sort state
@@ -22,8 +26,15 @@ export default function AuditLogsPage() {
   const [error, setError] = useState('');
   const [sortAsc, setSortAsc] = useState(false);
 
-  // Fetch audit logs once when the page mounts
+  // Notes: Verify session then fetch audit logs once when the page mounts
   useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
+      router.push('/login');
+      return;
+    }
     const loadLogs = async () => {
       setLoading(true);
       setError('');
@@ -37,7 +48,7 @@ export default function AuditLogsPage() {
       }
     };
     loadLogs();
-  }, []);
+  }, [router]);
 
   // Toggle the timestamp sort order between ascending and descending
   const toggleSort = () => setSortAsc((prev) => !prev);

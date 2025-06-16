@@ -4,7 +4,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { saveGoal, fetchGoals } from '../../services/goalService';
+import { getToken, isTokenExpired } from '../../services/authUtils';
+import { showError } from '../../components/ToastProvider';
 
 interface Goal {
   id: number;
@@ -13,6 +16,7 @@ interface Goal {
 }
 
 export default function GoalsPage() {
+  const router = useRouter(); // Notes: Router used for redirects
   // Local state for list of goals retrieved from the backend
   const [goals, setGoals] = useState<Goal[]>([]);
   // Holds the text input for a new goal
@@ -36,10 +40,17 @@ export default function GoalsPage() {
     }
   };
 
-  // Fetch goals on initial render
+  // Notes: Ensure valid session then fetch goals on initial render
   useEffect(() => {
+    const token = getToken();
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
+      router.push('/login');
+      return;
+    }
     loadGoals();
-  }, []);
+  }, [router]);
 
   // Handler for submitting a new goal to the backend
   const handleSubmit = async (e: React.FormEvent) => {

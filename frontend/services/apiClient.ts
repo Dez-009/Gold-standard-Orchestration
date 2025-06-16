@@ -2,6 +2,8 @@
 // This wrapper centralizes all HTTP requests to the FastAPI backend
 // so other services only need to import this file.
 import axios from 'axios';
+// Notes: Toast helper used to notify when the session has expired
+import { showError } from '../components/ToastProvider';
 
 // Create the Axios instance with baseURL from env variable or default
 // This ensures we can point the frontend at different backend URLs
@@ -9,6 +11,20 @@ import axios from 'axios';
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 });
+
+// Notes: Intercept responses to detect authentication issues
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Notes: Trigger logout when backend reports unauthorized access
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      showError('Session expired. Please login again.');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Send a prompt to the AI coach endpoint
 // Includes the user's JWT token in the Authorization header
