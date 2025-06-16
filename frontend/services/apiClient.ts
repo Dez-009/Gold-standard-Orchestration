@@ -476,6 +476,16 @@ export async function createCheckoutSession(planId: string, token: string) {
   return response.data;
 }
 
+// Retrieve the current user's subscription status
+// Notes: Sends GET request to the /billing/status endpoint with auth header
+export async function getSubscriptionStatus(token: string) {
+  const response = await apiClient.get('/billing/status', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the subscription details from the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
