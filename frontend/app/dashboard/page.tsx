@@ -11,7 +11,6 @@ import {
   isTokenExpired
 } from '../../services/authUtils';
 import { fetchAccountDetails } from '../../services/accountService';
- codex/implement-customer-self-service-billing-portal
 import { createBillingPortalSession } from '../../services/billingService';
 
 // Notes: Import helper to retrieve the user's subscription status
@@ -19,7 +18,7 @@ import {
   fetchSubscriptionStatus,
   SubscriptionStatus
 } from '../../services/subscriptionService';
- main
+import { showError } from '../../components/ToastProvider';
 import { showError } from '../../components/ToastProvider';
 
 export default function DashboardPage() {
@@ -28,7 +27,6 @@ export default function DashboardPage() {
   const router = useRouter();
   // Notes: Track the user's current subscription tier
   const [tier, setTier] = useState<string | null>(null);
- codex/implement-customer-self-service-billing-portal
   // Notes: Track whether we are waiting for the billing portal URL
   const [portalLoading, setPortalLoading] = useState(false);
 
@@ -39,7 +37,6 @@ export default function DashboardPage() {
   // Notes: Manage loading and error states for subscription fetch
   const [statusLoading, setStatusLoading] = useState(true);
   const [statusError, setStatusError] = useState('');
- main
 
   // Notes: On mount, verify token validity and parse user info
   useEffect(() => {
@@ -80,7 +77,6 @@ export default function DashboardPage() {
     loadStatus();
   }, [router]);
 
- codex/implement-customer-self-service-billing-portal
   // Launch Stripe billing portal and redirect on success
   const handleManageSubscription = async () => {
     setPortalLoading(true);
@@ -108,7 +104,6 @@ export default function DashboardPage() {
         ? 'bg-red-600'
         : 'bg-gray-500';
     return <span className={`px-2 py-1 rounded text-white ${color}`}>{s}</span>;
- main
   };
 
   // Render dashboard with simple styling and user information
@@ -195,13 +190,10 @@ export default function DashboardPage() {
           <Link href="/admin/health" className="text-blue-600 underline">
             System Health
           </Link>
- codex/implement-system-metrics-dashboard-for-admin
-
           {/* Notes: Link to the system metrics dashboard */}
           <Link href="/admin/metrics" className="text-blue-600 underline">
             Metrics
           </Link>
- codex/implement-admin-error-monitoring-page
 
 
           <Link href="/admin/config" className="text-blue-600 underline">
@@ -234,7 +226,6 @@ export default function DashboardPage() {
       {/* Notes: Display the logged in user's email */}
       {user.email && <p className="text-lg">Logged in as {user.email}</p>}
 
- codex/implement-customer-self-service-billing-portal
       {/* Card showing current subscription status */}
       <div className="border rounded p-4 w-full max-w-xs text-center space-y-2">
         <p>
@@ -250,6 +241,8 @@ export default function DashboardPage() {
           >
             {portalLoading ? 'Loading...' : 'Manage Subscription'}
           </button>
+        )}
+      </div>
 
       {/* Subscription status card */}
       <div className="border rounded p-4 shadow-md text-center w-full max-w-sm">
@@ -286,7 +279,6 @@ export default function DashboardPage() {
               <span>{subscription.provider}</span>
             </div>
           </div>
- main
         )}
       </div>
 

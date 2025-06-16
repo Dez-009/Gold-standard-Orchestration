@@ -397,7 +397,6 @@ export async function getAllUsers(token: string) {
   return response.data;
 }
 
- codex/implement-system-metrics-dashboard-for-admin
 // Notes: Retrieve high level system metrics for the admin dashboard
 // Notes: Sends a GET request to the /admin/metrics endpoint with auth header
 export async function getSystemMetrics(token: string) {
@@ -476,17 +475,17 @@ export async function createCheckoutSession(planId: string, token: string) {
   return response.data;
 }
 
- codex/implement-customer-self-service-billing-portal
 // Create a Stripe billing portal session so the user can manage billing
-// Notes: Sends a POST request to /billing/portal with the JWT for auth
+// Notes: Sends a GET request to /billing/portal with the JWT for auth
 export async function createBillingPortalSession(token: string) {
-  const response = await apiClient.post(
-    '/billing/portal',
-    {},
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-  // Notes: Response contains a redirect URL to the hosted billing portal
-=======
+  // Notes: Issue the GET request to the backend billing portal endpoint
+  const response = await apiClient.get('/billing/portal', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the redirect URL to the hosted billing portal
+  return response.data;
+}
+
 // Retrieve the current user's subscription status
 // Notes: Sends GET request to the /billing/status endpoint with auth header
 export async function getSubscriptionStatus(token: string) {
@@ -494,7 +493,6 @@ export async function getSubscriptionStatus(token: string) {
     headers: { Authorization: `Bearer ${token}` }
   });
   // Notes: Return the subscription details from the backend
- main
   return response.data;
 }
 

@@ -90,3 +90,11 @@ def handle_stripe_event(payload: str, sig_header: str) -> None:
         },
     )
     db.close()
+
+
+def create_portal_session() -> str:
+    """Return a placeholder billing portal URL for the user."""
+    # Notes: In a full implementation this would call Stripe's API
+    # to create a portal session tied to the current customer.
+    logger.debug("Returning static billing portal URL")
+    return "https://example.com/billing-portal"
