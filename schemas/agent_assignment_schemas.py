@@ -11,6 +11,15 @@ class AgentAssignmentRequest(BaseModel):
     domain: str
 
 
+class AdminAgentAssignmentRequest(BaseModel):
+    """Request payload for admin agent assignment."""
+
+    # Notes: Target user identifier for the assignment
+    user_id: int
+    # Notes: Domain-specific agent type to assign
+    agent_type: str
+
+
 class AgentAssignmentResponse(BaseModel):
     """Response model representing an assignment."""
 

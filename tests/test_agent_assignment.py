@@ -107,3 +107,30 @@ def test_admin_can_list_assignments():
     assert isinstance(data, list)
     assert any(a["user_email"] == email for a in data)
 
+
+def test_admin_can_assign_agent_to_user():
+    """Admin endpoint should create an assignment for any user."""
+    user_id, _, _ = register_user_with_role()
+    _, admin_token, _ = register_user_with_role(role="admin")
+    resp = client.post(
+        "/admin/agent-assignments",
+        json={"user_id": user_id, "agent_type": "finance"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert resp.status_code in (200, 201)
+    data = resp.json()
+    assert data["user_id"] == user_id
+    assert data["agent_type"] == "finance"
+
+
+def test_user_cannot_assign_agent_via_admin_route():
+    """Non-admin users should receive 403 when hitting admin endpoint."""
+    target_id, _, _ = register_user_with_role()
+    _, token, _ = register_user_with_role()
+    resp = client.post(
+        "/admin/agent-assignments",
+        json={"user_id": target_id, "agent_type": "career"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert resp.status_code == 403
+
