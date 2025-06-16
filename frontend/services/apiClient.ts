@@ -41,6 +41,19 @@ export async function postAiPrompt(prompt: string, token: string) {
   return response.data;
 }
 
+// Send a prompt to the agent orchestration route
+// Notes: Includes the user's JWT token for authentication
+export async function orchestrateAiRequest(prompt: string, token: string) {
+  // Notes: Issue the POST request to the new orchestration endpoint
+  const response = await apiClient.post(
+    '/ai/orchestrate',
+    { prompt },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the backend payload containing agent and response
+  return response.data;
+}
+
 // Retrieve all journal entries for the authenticated user
 // Expects the caller to supply a valid JWT token that will be sent
 // in the Authorization header of the request
