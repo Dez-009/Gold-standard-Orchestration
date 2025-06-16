@@ -4,7 +4,6 @@
 import { getToken } from './authUtils';
 import {
   getProfile,
-  updateProfile,
   getUserProfile,
   updateUserProfile as updateUserProfileRequest
 } from './apiClient';
@@ -37,7 +36,7 @@ export async function saveProfile(profileData: Record<string, unknown>) {
   }
   try {
     // Notes: Persist updated profile information
-    const data = await updateProfile(profileData, token);
+    const data = await updateUserProfileRequest(profileData, token);
     showSuccess('Saved successfully');
     return data as Record<string, unknown>;
   } catch (err) {
