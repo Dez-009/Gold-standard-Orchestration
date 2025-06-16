@@ -591,6 +591,34 @@ export async function submitSupportTicket(
   return response.data;
 }
 
+// Retrieve all submitted support tickets for administrators
+// Notes: Sends a GET request to the /admin/support/tickets endpoint with auth
+export async function getSupportTickets(token: string) {
+  // Notes: Issue the request including the Authorization header
+  const response = await apiClient.get('/admin/support/tickets', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the array of ticket objects from the backend
+  return response.data;
+}
+
+// Update the status of a specific support ticket
+// Notes: Performs a PATCH request to /admin/support/tickets/{id}
+export async function updateSupportTicketStatus(
+  ticketId: number,
+  status: string,
+  token: string
+) {
+  // Notes: Send the new status in the request body with auth header
+  const response = await apiClient.patch(
+    `/admin/support/tickets/${ticketId}`,
+    { status },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the updated ticket payload from the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
