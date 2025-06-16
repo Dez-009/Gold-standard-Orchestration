@@ -54,3 +54,8 @@ class User(Base):
         "AgentAssignment", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: Keep history of agent interactions for context injection
+    interaction_logs = relationship(
+        "AgentInteractionLog", back_populates="user", cascade="all, delete"
+    )
+
