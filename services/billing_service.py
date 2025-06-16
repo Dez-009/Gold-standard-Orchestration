@@ -109,3 +109,40 @@ def create_portal_session() -> str:
     # to create a portal session tied to the current customer.
     logger.debug("Returning static billing portal URL")
     return "https://example.com/billing-portal"
+
+
+# Notes: Retrieve a list of recent successful charges from Stripe
+def list_recent_payments(limit: int = 10) -> list[dict]:
+    """Return simplified charge objects for the admin refund page."""
+    try:
+        # Notes: Request the most recent charges sorted by creation date
+        charges = stripe.Charge.list(limit=limit)
+    except Exception as exc:  # pylint: disable=broad-except
+        # Notes: Log and return an empty list when Stripe is unreachable
+        logger.exception("Failed to list charges: %s", exc)
+        return []
+
+    payments: list[dict] = []
+    for ch in charges.data:
+        # Notes: Extract relevant fields for display in the admin UI
+        payments.append(
+            {
+                "charge_id": ch.id,
+                "email": getattr(ch.billing_details, "email", None),
+                "amount": ch.amount / 100,
+                "created": ch.created,
+            }
+        )
+    return payments
+
+
+# Notes: Issue a refund using the Stripe API
+def refund_charge(charge_id: str) -> bool:
+    """Return True when the refund request succeeds."""
+    try:
+        stripe.Refund.create(charge=charge_id)
+        return True
+    except Exception as exc:  # pylint: disable=broad-except
+        # Notes: Capture and log any errors during the refund attempt
+        logger.exception("Failed to refund charge %s: %s", charge_id, exc)
+        return False

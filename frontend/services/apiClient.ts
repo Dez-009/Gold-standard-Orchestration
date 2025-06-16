@@ -497,6 +497,28 @@ export async function getAccountDetails(token: string) {
   return response.data;
 }
 
+// Retrieve recent successful payments for admin refunds
+export async function getRecentPayments(token: string) {
+  // Notes: Issue a GET request to the admin payments endpoint
+  const response = await apiClient.get('/admin/billing/payments', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: The backend returns an array of payment objects
+  return response.data;
+}
+
+// Submit a refund request for a specific charge id
+export async function refundPayment(chargeId: string, token: string) {
+  // Notes: POST the charge identifier to the refund endpoint
+  const response = await apiClient.post(
+    '/admin/billing/refund',
+    { charge_id: chargeId },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the status payload from the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
