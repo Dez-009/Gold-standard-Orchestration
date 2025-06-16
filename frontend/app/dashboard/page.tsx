@@ -65,6 +65,10 @@ export default function DashboardPage() {
         <Link href="/review/weekly" className="text-blue-600 underline">
           Review Summary
         </Link>
+        {/* Link to the new weekly review overview page */}
+        <Link href="/weekly-review" className="text-blue-600 underline">
+          Weekly Overview
+        </Link>
         {/* Link to the AI goal suggestions page */}
         <Link href="/suggestions" className="text-blue-600 underline">
           Suggestions
