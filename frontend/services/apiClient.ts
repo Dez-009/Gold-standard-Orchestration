@@ -406,6 +406,8 @@ export async function getSystemMetrics(token: string) {
     headers: { Authorization: `Bearer ${token}` }
   });
   // Notes: Return the metrics payload supplied by the backend
+  return response.data;
+}
 
 // Retrieve the current application configuration for admins
 // Sends a GET request to the /admin/config endpoint
@@ -427,7 +429,28 @@ export async function updateAppConfig(
     headers: { Authorization: `Bearer ${token}` }
   });
   // Return the updated configuration from the backend
- main
+  return response.data;
+}
+
+// Retrieve the current billing configuration for the admin billing page
+export async function getBillingConfig(token: string) {
+  // Notes: Issue GET request to the /admin/billing endpoint
+  const response = await apiClient.get('/admin/billing', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the configuration payload from the backend
+  return response.data;
+}
+
+// Update billing configuration values via PUT request
+export async function updateBillingConfig(
+  data: Record<string, unknown>,
+  token: string
+) {
+  const response = await apiClient.put('/admin/billing', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the updated configuration from the backend
   return response.data;
 }
 
