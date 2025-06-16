@@ -31,6 +31,21 @@ def register_and_login() -> tuple[int, str]:
     token = create_access_token({"user_id": user_id})
     return user_id, token
 
+# Helper used in admin tests to create user with specific role
+def register_user_with_role(role: str = "user") -> tuple[int, str, str]:
+    email = f"assign_{uuid.uuid4().hex}@example.com"
+    user_data = {
+        "email": email,
+        "phone_number": str(int(uuid.uuid4().int % 10_000_000_000)).zfill(10),
+        "hashed_password": "password123",
+        "role": role,
+    }
+    resp = client.post("/users/", json=user_data)
+    assert resp.status_code in (200, 201)
+    user_id = resp.json()["id"]
+    token = create_access_token({"user_id": user_id})
+    return user_id, token, email
+
 
 # Verify the service layer stores an assignment record
 def test_assign_agent_service():
@@ -60,4 +75,35 @@ def test_assign_agent_endpoint():
     assert data["user_id"] == user_id
     assert data["agent_type"] == "health"
     assert "assigned_at" in data
+
+
+def test_list_assignments_requires_admin():
+    """Regular users should not access the assignment list."""
+    user_id, token, _ = register_user_with_role()
+    client.post(
+        "/account/assign_agent",
+        json={"domain": "career"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    resp = client.get("/admin/agents", headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == 403
+
+
+def test_admin_can_list_assignments():
+    """Admin users should receive assignment records."""
+    _, user_token, email = register_user_with_role()
+    client.post(
+        "/account/assign_agent",
+        json={"domain": "health"},
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+    _, admin_token, _ = register_user_with_role(role="admin")
+    resp = client.get(
+        "/admin/agents",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert isinstance(data, list)
+    assert any(a["user_email"] == email for a in data)
 
