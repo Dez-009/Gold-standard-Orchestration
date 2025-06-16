@@ -201,6 +201,10 @@ export default function DashboardPage() {
           <Link href="/admin/system-logs" className="text-blue-600 underline">
             System Logs
           </Link>
+          {/* Link to system maintenance tasks */}
+          <Link href="/admin/system" className="text-blue-600 underline">
+            System Tasks
+          </Link>
           {/* Notes: Link to view all subscriptions */}
           <Link href="/admin/subscriptions" className="text-blue-600 underline">
             Subscriptions
