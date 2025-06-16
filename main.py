@@ -28,6 +28,7 @@ from routes.audit_log import router as audit_log_router
 from routes.action_plan import router as action_plan_router
 # Notes: Import billing webhook router
 from routes.billing import router as billing_router
+from routes.admin.system_tasks import router as admin_system_router
 from database.base import Base
 from database.session import engine
 
@@ -65,4 +66,5 @@ app.include_router(root_router)
 app.include_router(health_router)
 # Register routes for auditing user actions
 app.include_router(audit_log_router)
+app.include_router(admin_system_router)
 

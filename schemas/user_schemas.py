@@ -10,6 +10,8 @@ class UserCreate(BaseModel):
     full_name: str | None = None
     age: int | None = None
     sex: str | None = None
+    # Notes: Optional role allows creation of admin users for testing
+    role: str | None = None
 
 
 class UserResponse(BaseModel):
@@ -22,6 +24,8 @@ class UserResponse(BaseModel):
     age: int | None = None
     sex: str | None = None
     is_active: bool
+    # Notes: Include the role field in responses for completeness
+    role: str | None = None
 
     class Config:
         orm_mode = True

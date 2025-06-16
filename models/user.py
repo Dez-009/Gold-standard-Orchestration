@@ -18,6 +18,8 @@ class User(Base):
     age = Column(Integer, nullable=True)
     sex = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
+    # Notes: Role value used for simple role-based access control
+    role = Column(String, default="user")
 
     # Relationships to other models
     sessions = relationship(

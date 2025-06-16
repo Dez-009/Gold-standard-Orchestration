@@ -29,3 +29,19 @@ def get_current_user(
             detail="Could not validate credentials",
         )
     return user
+
+
+def get_current_admin_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    """Return the authenticated user only if they have admin role."""
+    # Notes: Reuse the standard user retrieval logic
+    user = get_current_user(token, db)
+    # Notes: Reject the request if the user is not marked as an admin
+    if getattr(user, "role", "user") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return user

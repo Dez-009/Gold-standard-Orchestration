@@ -17,6 +17,17 @@ logger = get_logger()
 stripe.api_key = settings.stripe_secret_key
 
 
+def get_subscription_from_stripe(subscription_id: str):
+    """Return the Stripe subscription object for the given id."""
+    try:
+        # Notes: Retrieve the subscription information from Stripe
+        return stripe.Subscription.retrieve(subscription_id)
+    except Exception as exc:  # pylint: disable=broad-except
+        # Notes: Log failures and return None so callers can handle gracefully
+        logger.exception("Failed to retrieve subscription %s: %s", subscription_id, exc)
+        return None
+
+
 def _update_subscription_status(db, sub_id: str, status: str, user_id: int | None) -> None:
     """Create or update a subscription record with the given status."""
     # Notes: Look for an existing subscription by the Stripe identifier
