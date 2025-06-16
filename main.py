@@ -40,6 +40,9 @@ from routes.admin.impersonation import router as admin_impersonation_router
 from routes.admin.audit_admin import router as admin_audit_router
 from routes.admin.metrics_admin import router as admin_metrics_router
 from routes.admin.agent_admin import router as admin_agent_router
+from routes.admin.agent_assignment_admin import (
+    router as admin_agent_assignment_router,
+)
 
 
 from database.base import Base
@@ -92,4 +95,5 @@ app.include_router(admin_subscription_history_router)
 app.include_router(admin_impersonation_router)
 app.include_router(admin_audit_router)
 app.include_router(admin_agent_router)
+app.include_router(admin_agent_assignment_router)
 
