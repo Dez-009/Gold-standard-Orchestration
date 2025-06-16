@@ -3,10 +3,13 @@ from jose import jwt, JWTError
 from fastapi import HTTPException, status
 
 from utils.logger import get_logger
+from config import get_settings
 
 logger = get_logger()
 
-SECRET_KEY = "your_secret_key"
+# Notes: Load application configuration, including the JWT secret key
+settings = get_settings()
+SECRET_KEY = settings.secret_key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
