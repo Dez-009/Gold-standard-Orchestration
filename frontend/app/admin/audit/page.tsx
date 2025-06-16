@@ -4,7 +4,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchAuditLogs } from '../../../services/auditService';
+// Notes: Use the dedicated audit log service
+import { fetchAuditLogs } from '../../../services/auditLogService';
 import { getToken, isTokenExpired } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
 
@@ -19,9 +20,9 @@ interface AuditLog {
 
 export default function AuditLogsPage() {
   const router = useRouter(); // Notes: Router used for redirects
-  // Hold the list of logs returned from the backend
+  // Notes: Hold the list of logs returned from the backend
   const [logs, setLogs] = useState<AuditLog[]>([]);
-  // Track loading, error and sort state
+  // Notes: Track loading, error and sort state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sortAsc, setSortAsc] = useState(false);
@@ -50,17 +51,17 @@ export default function AuditLogsPage() {
     loadLogs();
   }, [router]);
 
-  // Toggle the timestamp sort order between ascending and descending
+  // Notes: Toggle the timestamp sort order between ascending and descending
   const toggleSort = () => setSortAsc((prev) => !prev);
 
-  // Sort the logs based on the timestamp field
+  // Notes: Sort the logs based on the timestamp field
   const sortedLogs = [...logs].sort((a, b) =>
     sortAsc
       ? new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       : new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
-  // Format ISO timestamps into a readable date string
+  // Notes: Format ISO timestamps into a readable date string
   const formatDate = (iso: string) => new Date(iso).toLocaleString();
 
   return (
@@ -80,30 +81,32 @@ export default function AuditLogsPage() {
       {error && <p className="text-red-600">{error}</p>}
       {!loading && !error && logs.length === 0 && <p>No audit logs found.</p>}
 
-      {/* Render the table when logs are available */}
+      {/* Notes: Render the table when logs are available */}
       {!loading && !error && logs.length > 0 && (
-        <table className="min-w-full border divide-y divide-gray-200">
-          <thead>
-            <tr>
-              <th className="px-4 py-2 cursor-pointer" onClick={toggleSort}>
-                Timestamp {sortAsc ? '▲' : '▼'}
-              </th>
-              <th className="px-4 py-2">User ID</th>
-              <th className="px-4 py-2">Action</th>
-              <th className="px-4 py-2">Metadata</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedLogs.map((log) => (
-              <tr key={log.id} className="odd:bg-gray-100">
-                <td className="border px-4 py-2">{formatDate(log.created_at)}</td>
-                <td className="border px-4 py-2">{log.user_id}</td>
-                <td className="border px-4 py-2">{log.action}</td>
-                <td className="border px-4 py-2">{log.metadata ?? ''}</td>
+        <div className="overflow-y-auto max-h-[70vh]">
+          <table className="min-w-full border divide-y divide-gray-200">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 cursor-pointer" onClick={toggleSort}>
+                  Timestamp {sortAsc ? '▲' : '▼'}
+                </th>
+                <th className="px-4 py-2">User ID</th>
+                <th className="px-4 py-2">Action</th>
+                <th className="px-4 py-2">Metadata</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {sortedLogs.map((log) => (
+                <tr key={log.id} className="odd:bg-gray-100">
+                  <td className="border px-4 py-2">{formatDate(log.created_at)}</td>
+                  <td className="border px-4 py-2">{log.user_id}</td>
+                  <td className="border px-4 py-2">{log.action}</td>
+                  <td className="border px-4 py-2">{log.metadata ?? ''}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
