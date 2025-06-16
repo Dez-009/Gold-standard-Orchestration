@@ -4,19 +4,17 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchSystemMetrics } from '../../../services/systemMetricsService';
+import { fetchSystemMetrics } from '../../../services/metricsService';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
 
 // Shape of the metrics object returned by the backend
 interface MetricsData {
-  total_users: number;
   active_users: number;
-  coaching_sessions: number;
-  journal_entries: number;
-  daily_check_ins: number;
-  api_calls: number;
-  tokens_used: number;
+  total_subscriptions: number;
+  load_average: number;
+  job_queue_depth: number;
+  api_request_count: number;
 }
 
 export default function MetricsPage() {
@@ -78,13 +76,11 @@ export default function MetricsPage() {
       {/* Metrics grid when data is present */}
       {!loading && !error && data && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl">
-          <MetricCard label="Total Users" value={data.total_users} />
           <MetricCard label="Active Users" value={data.active_users} />
-          <MetricCard label="AI Sessions" value={data.coaching_sessions} />
-          <MetricCard label="Journal Entries" value={data.journal_entries} />
-          <MetricCard label="Daily Check-Ins" value={data.daily_check_ins} />
-          <MetricCard label="API Calls" value={data.api_calls} />
-          <MetricCard label="Tokens Used" value={data.tokens_used} />
+          <MetricCard label="Subscriptions" value={data.total_subscriptions} />
+          <MetricCard label="Load Average" value={data.load_average} />
+          <MetricCard label="Job Queue Depth" value={data.job_queue_depth} />
+          <MetricCard label="API Requests" value={data.api_request_count} />
         </div>
       )}
     </div>
