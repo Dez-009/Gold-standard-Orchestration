@@ -366,8 +366,6 @@ export async function getSystemHealth(token: string) {
   return response.data;
 }
 
- codex/implement-admin-error-monitoring-page
-
 // Retrieve system log records for administrators
 // Sends a GET request to the /admin/system-logs endpoint
 export async function getSystemLogs(token: string) {
@@ -377,8 +375,6 @@ export async function getSystemLogs(token: string) {
   // Return the array of log entries from the backend
   return response.data;
 }
-
- main
 // Notes: Retrieve all user subscription records for admin view
 // Notes: Sends GET request to /admin/subscriptions with auth header
 export async function getAllSubscriptions(token: string) {
@@ -398,6 +394,29 @@ export async function getAllUsers(token: string) {
     headers: { Authorization: `Bearer ${token}` }
   });
   // Notes: Return the array of user objects provided by the backend
+  return response.data;
+}
+
+// Retrieve the current application configuration for admins
+// Sends a GET request to the /admin/config endpoint
+export async function getAppConfig(token: string) {
+  const response = await apiClient.get('/admin/config', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the configuration object from the backend
+  return response.data;
+}
+
+// Update the application configuration
+// Expects the new values and a valid JWT token
+export async function updateAppConfig(
+  data: Record<string, unknown>,
+  token: string
+) {
+  const response = await apiClient.put('/admin/config', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the updated configuration from the backend
   return response.data;
 }
 
