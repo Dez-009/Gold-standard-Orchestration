@@ -661,6 +661,18 @@ export async function requestDataExport(token: string) {
   return response.data;
 }
 
+// Assign a domain-specific AI agent to the authenticated user
+export async function assignAgent(domain: string, token: string) {
+  // Notes: POST the desired domain to the assignment endpoint
+  const response = await apiClient.post(
+    '/account/assign_agent',
+    { domain },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the created assignment record from the backend
+  return response.data;
+}
+
 // Permanently delete the authenticated user's account
 export async function deleteAccount(token: string) {
   // Notes: Send a DELETE request to the account deletion endpoint

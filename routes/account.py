@@ -15,7 +15,12 @@ from models.user import User
 
 # Notes: Response schema describing account information
 from schemas.account_schemas import AccountResponse
+from schemas.agent_assignment_schemas import (
+    AgentAssignmentRequest,
+    AgentAssignmentResponse,
+)
 from services import user_service
+from services import agent_assignment_service
 
 
 # Notes: Create the router with a URL prefix
@@ -44,3 +49,23 @@ async def delete_account(
     # Notes: Use the service layer to delete and commit
     user_service.delete_user(db, current_user)
     return None
+
+
+@router.post(
+    "/assign_agent",
+    status_code=status.HTTP_201_CREATED,
+    response_model=AgentAssignmentResponse,
+)
+# Notes: Assign a domain-specific AI agent to the authenticated user
+async def assign_agent_route(
+    payload: AgentAssignmentRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> AgentAssignmentResponse:
+    """Create a new agent assignment record and audit the action."""
+
+    # Notes: Delegate to the service which persists the assignment
+    assignment = agent_assignment_service.assign_agent(
+        db, current_user.id, payload.domain
+    )
+    return assignment
