@@ -355,6 +355,16 @@ export async function getSystemHealth(token: string) {
   return response.data;
 }
 
+ codex/implement-admin-subscription-management-page
+// Notes: Retrieve all user subscription records for admin view
+// Notes: Sends GET request to /admin/subscriptions with auth header
+export async function getAllSubscriptions(token: string) {
+  // Notes: Perform the request to fetch every subscription entry
+  const response = await apiClient.get('/admin/subscriptions', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the list of subscriptions from the backend
+
 // Notes: Retrieve the list of all users for the admin user management page
 // Notes: Performs a GET request to the /admin/users endpoint with auth header
 export async function getAllUsers(token: string) {
@@ -363,6 +373,7 @@ export async function getAllUsers(token: string) {
     headers: { Authorization: `Bearer ${token}` }
   });
   // Notes: Return the array of user objects provided by the backend
+ main
   return response.data;
 }
 
