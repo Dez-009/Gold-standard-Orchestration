@@ -205,6 +205,13 @@ export default function DashboardPage() {
           <Link href="/admin/subscriptions" className="text-blue-600 underline">
             Subscriptions
           </Link>
+          {/* Link to audit subscription history */}
+          <Link
+            href="/admin/subscriptions/history"
+            className="text-blue-600 underline"
+          >
+            Subscription History
+          </Link>
           {/* Link to billing settings management */}
           <Link href="/admin/billing" className="text-blue-600 underline">
             Billing Settings

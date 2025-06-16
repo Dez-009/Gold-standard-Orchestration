@@ -30,8 +30,13 @@ from routes.action_plan import router as action_plan_router
 from routes.billing import router as billing_router
 from routes.admin.system_tasks import router as admin_system_router
 from routes.admin.billing_admin import router as admin_billing_router
-
 from routes.admin.webhooks import router as admin_webhook_router
+ codex/implement-user-support-ticket-submission-flow
+
+from routes.admin.subscription_history import (
+    router as admin_subscription_history_router,
+)
+ main
 from database.base import Base
 from database.session import engine
 
@@ -72,4 +77,5 @@ app.include_router(audit_log_router)
 app.include_router(admin_billing_router)
 app.include_router(admin_system_router)
 app.include_router(admin_webhook_router)
+app.include_router(admin_subscription_history_router)
 
