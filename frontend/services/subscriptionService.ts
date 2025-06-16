@@ -2,7 +2,7 @@
 // Notes: Combines token retrieval, API client and error handling in one place
 
 import { getToken } from './authUtils';
-import { getAllSubscriptions } from './apiClient';
+import { getAllSubscriptions, getSubscriptionStatus } from './apiClient';
 import { showError } from '../components/ToastProvider';
 
 // Shape of subscription data expected from the backend
@@ -31,6 +31,33 @@ export async function fetchAllSubscriptions() {
     return data as SubscriptionRecord[];
   } catch (err) {
     // Notes: Surface a friendly error toast then rethrow
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Shape describing a single user's subscription status
+export interface SubscriptionStatus {
+  tier: string;
+  status: string;
+  next_billing_date: string | null;
+  provider: string;
+}
+
+// Retrieve the logged-in user's subscription status
+export async function fetchSubscriptionStatus() {
+  const token = getToken();
+  if (!token) {
+    // Notes: Authentication is required to request subscription data
+    showError('Something went wrong');
+    throw new Error('User not authenticated');
+  }
+  try {
+    // Notes: Delegate API call to apiClient
+    const data = await getSubscriptionStatus(token);
+    return data as SubscriptionStatus;
+  } catch (err) {
+    // Notes: Display an error toast when the call fails
     showError('Something went wrong');
     throw err;
   }
