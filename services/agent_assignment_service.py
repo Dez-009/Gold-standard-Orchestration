@@ -35,6 +35,51 @@ def assign_agent(db: Session, user_id: int, domain: str) -> AgentAssignment:
     return assignment
 
 
+def create_or_update_assignment(
+    db: Session,
+    admin_user_id: int,
+    user_id: int,
+    agent_type: str,
+) -> AgentAssignment:
+    """Create or update an assignment and audit the admin action."""
+
+    # Notes: Retrieve any existing assignment for the user
+    assignment = (
+        db.query(AgentAssignment)
+        .filter(AgentAssignment.user_id == user_id)
+        .first()
+    )
+
+    if assignment:
+        # Notes: Update the existing agent type and timestamp
+        assignment.agent_type = agent_type
+        assignment.assigned_at = datetime.utcnow()
+    else:
+        # Notes: No record exists so create a new assignment instance
+        assignment = AgentAssignment(
+            user_id=user_id,
+            agent_type=agent_type,
+            assigned_at=datetime.utcnow(),
+        )
+        db.add(assignment)
+
+    # Notes: Persist changes regardless of create or update operation
+    db.commit()
+    db.refresh(assignment)
+
+    # Notes: Capture the admin action in the audit trail
+    create_audit_log(
+        db,
+        {
+            "user_id": admin_user_id,
+            "action": "agent_assignment_update",
+            "detail": str({"assigned_user": user_id, "agent_type": agent_type}),
+        },
+    )
+
+    return assignment
+
+
 def list_agent_assignments(db: Session) -> list[dict]:
     """Return all assignments joined with user email."""
 

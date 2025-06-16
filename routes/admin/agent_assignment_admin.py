@@ -20,7 +20,7 @@ router = APIRouter(prefix="/admin/agent-assignments", tags=["admin"])
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=AgentAssignmentResponse)
 def assign_agent_to_user(
     payload: AdminAgentAssignmentRequest,
-    _: User = Depends(get_current_admin_user),
+    admin_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db),
 ) -> AgentAssignmentResponse:
     """Assign a domain agent to the given user."""
@@ -29,6 +29,11 @@ def assign_agent_to_user(
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    # Notes: Delegate creation of the assignment to the service layer
-    assignment = agent_assignment_service.assign_agent(db, payload.user_id, payload.agent_type)
+    # Notes: Delegate creation or update to the service layer with auditing
+    assignment = agent_assignment_service.create_or_update_assignment(
+        db,
+        admin_user.id,
+        payload.user_id,
+        payload.agent_type,
+    )
     return assignment
