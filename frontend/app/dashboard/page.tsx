@@ -73,6 +73,10 @@ export default function DashboardPage() {
         <Link href="/suggestions" className="text-blue-600 underline">
           Suggestions
         </Link>
+        {/* Link to the new goal suggestions page */}
+        <Link href="/goals/suggestions" className="text-blue-600 underline">
+          Goal Suggestions
+        </Link>
         {/* Link to the coaching session history page */}
         <Link href="/sessions" className="text-blue-600 underline">
           Sessions
