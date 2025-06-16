@@ -355,6 +355,17 @@ export async function getSystemHealth(token: string) {
   return response.data;
 }
 
+// Notes: Retrieve all user subscription records for admin view
+// Notes: Sends GET request to /admin/subscriptions with auth header
+export async function getAllSubscriptions(token: string) {
+  // Notes: Perform the request to fetch every subscription entry
+  const response = await apiClient.get('/admin/subscriptions', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the list of subscriptions from the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
