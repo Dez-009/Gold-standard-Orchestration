@@ -19,8 +19,15 @@ from schemas.agent_assignment_schemas import (
     AgentAssignmentRequest,
     AgentAssignmentResponse,
 )
+# Notes: Schemas for assigning personalities to the authenticated user
+from schemas.user_personality_schemas import (
+    UserPersonalityRequest,
+    UserPersonalityResponse,
+)
 from services import user_service
 from services import agent_assignment_service
+# Notes: Import service managing personality assignments
+from services import user_personality_service
 
 
 # Notes: Create the router with a URL prefix
@@ -67,5 +74,28 @@ async def assign_agent_route(
     # Notes: Delegate to the service which persists the assignment
     assignment = agent_assignment_service.assign_agent(
         db, current_user.id, payload.domain
+    )
+    return assignment
+
+
+@router.post(
+    "/assign_personality",
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserPersonalityResponse,
+)
+# Notes: Assign a personality preference for a specific coaching domain
+async def assign_personality_route(
+    payload: UserPersonalityRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> UserPersonalityResponse:
+    """Create a personality assignment for the logged in user."""
+
+    # Notes: Delegate creation to the service layer
+    assignment = user_personality_service.assign_personality(
+        db,
+        current_user.id,
+        payload.personality_id,
+        payload.domain,
     )
     return assignment

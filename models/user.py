@@ -58,4 +58,8 @@ class User(Base):
     interaction_logs = relationship(
         "AgentInteractionLog", back_populates="user", cascade="all, delete"
     )
+    # Notes: Personality preferences selected per coaching domain
+    personality_assignments = relationship(
+        "UserPersonality", back_populates="user", cascade="all, delete"
+    )
 

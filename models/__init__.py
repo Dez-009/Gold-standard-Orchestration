@@ -16,6 +16,10 @@ from .subscription import Subscription
 from .agent_assignment import AgentAssignment
 # Notes: Import model capturing prior agent interactions
 from .agent_interaction_log import AgentInteractionLog
+# Notes: Available coaching personalities
+from .personality import Personality
+# Notes: Import model mapping users to their preferred personalities
+from .user_personality import UserPersonality
 
 __all__ = [
     "User",
@@ -29,5 +33,7 @@ __all__ = [
     "Subscription",
     "AgentAssignment",
     "AgentInteractionLog",
+    "Personality",
+    "UserPersonality",
 ]
 
