@@ -1,5 +1,5 @@
 'use client';
-// Admin page listing all user subscriptions in a simple table
+// Notes: Admin page listing all user subscriptions in a simple table
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -56,13 +56,13 @@ export default function SubscriptionsPage() {
 
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
-      {/* Navigation back to dashboard */}
+      {/* Notes: Navigation back to dashboard */}
       <Link href="/dashboard" className="self-start text-blue-600 underline">
         Back to Dashboard
       </Link>
-      {/* Page heading */}
+      {/* Notes: Page heading */}
       <h1 className="text-2xl font-bold">Subscriptions</h1>
-      {/* Search input field for filtering */}
+      {/* Notes: Search input field for filtering */}
       <input
         type="text"
         placeholder="Search by email"
@@ -70,13 +70,13 @@ export default function SubscriptionsPage() {
         onChange={(e) => setSearch(e.target.value)}
         className="border p-2 rounded w-full max-w-sm"
       />
-      {/* Loading spinner, error message and empty state handling */}
+      {/* Notes: Loading spinner, error message and empty state handling */}
       {loading && (
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
       )}
       {error && <p className="text-red-600">{error}</p>}
       {!loading && !error && filtered.length === 0 && <p>No subscriptions found.</p>}
-      {/* Table of subscription records when data is available */}
+      {/* Notes: Table of subscription records when data is available */}
       {!loading && !error && filtered.length > 0 && (
         <div className="overflow-x-auto w-full">
           <table className="min-w-full divide-y divide-gray-200">

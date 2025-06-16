@@ -109,7 +109,7 @@ export default function DashboardPage() {
           <Link href="/admin/health" className="text-blue-600 underline">
             System Health
           </Link>
-          {/* Link to view all subscriptions */}
+          {/* Notes: Link to view all subscriptions */}
           <Link href="/admin/subscriptions" className="text-blue-600 underline">
             Subscriptions
           </Link>
