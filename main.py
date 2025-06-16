@@ -36,6 +36,7 @@ from routes.admin.subscription_history import (
 )
 from routes.admin.impersonation import router as admin_impersonation_router
 from routes.admin.audit_admin import router as admin_audit_router
+from routes.admin.metrics_admin import router as admin_metrics_router
 
 
 from database.base import Base
@@ -75,6 +76,7 @@ app.include_router(root_router)
 app.include_router(health_router)
 # Register routes for auditing user actions
 app.include_router(audit_log_router)
+app.include_router(admin_metrics_router)
 app.include_router(admin_billing_router)
 app.include_router(admin_system_router)
 app.include_router(admin_webhook_router)
