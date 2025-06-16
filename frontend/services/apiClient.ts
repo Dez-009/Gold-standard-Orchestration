@@ -137,6 +137,17 @@ export async function getGoalProgress(token: string) {
   return response.data;
 }
 
+// Retrieve AI-powered goal suggestions from the backend
+// Notes: Performs a GET request to /goals/suggestions including the JWT token
+export async function getGoalSuggestions(token: string) {
+  // Notes: Request the list of suggestions for the current user
+  const response = await apiClient.get('/goals/suggestions', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the array of suggested goals returned by the backend
+  return response.data;
+}
+
 // Retrieve the weekly review summary for the authenticated user
 // Notes: Performs a GET request to the new /weekly-review endpoint
 export async function getWeeklyReview(token: string) {
