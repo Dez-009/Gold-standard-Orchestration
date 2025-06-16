@@ -7,7 +7,8 @@ import {
   getJournalHistory,
   getAllJournals,
   getJournalById,
-  updateJournal as updateJournalApi
+  updateJournal as updateJournalApi,
+  exportJournals as exportJournalsApi
 } from './apiClient';
 import { showSuccess, showError } from '../components/ToastProvider';
 
@@ -118,6 +119,23 @@ export async function updateJournal(
       created_at: string;
       mood?: string | null;
     };
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Request a PDF export of all journals for the current user
+export async function exportJournals() {
+  const token = getToken();
+  if (!token) {
+    // Propagate an authentication error so the caller can handle it
+    throw new Error('User not authenticated');
+  }
+  try {
+    // Notes: Use the API client to fetch the PDF blob
+    const blob = await exportJournalsApi(token);
+    return blob;
   } catch (err) {
     showError('Something went wrong');
     throw err;
