@@ -8,7 +8,8 @@ import {
   getAllJournals,
   getJournalById,
   updateJournal as updateJournalApi,
-  exportJournals as exportJournalsApi
+  exportJournals as exportJournalsApi,
+  getJournalTags
 } from './apiClient';
 import { showSuccess, showError } from '../components/ToastProvider';
 
@@ -136,6 +137,23 @@ export async function exportJournals() {
     // Notes: Use the API client to fetch the PDF blob
     const blob = await exportJournalsApi(token);
     return blob;
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Retrieve AI-generated tags summarizing the user's journals
+export async function fetchJournalTags() {
+  const token = getToken();
+  if (!token) {
+    // Propagate an authentication error so the caller can handle it
+    throw new Error('User not authenticated');
+  }
+  try {
+    // Notes: Request the tag list from the backend
+    const data = await getJournalTags(token);
+    return data.tags as string[];
   } catch (err) {
     showError('Something went wrong');
     throw err;

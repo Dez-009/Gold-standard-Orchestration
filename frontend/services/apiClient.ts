@@ -112,6 +112,17 @@ export async function exportJournals(token: string) {
   return response.data as Blob;
 }
 
+// Retrieve AI-generated tags summarizing the user's journal themes
+// Notes: Performs a GET request to /journals/analyze-tags with JWT token
+export async function getJournalTags(token: string) {
+  // Issue the request to analyze journal tags
+  const response = await apiClient.get('/journals/analyze-tags', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the JSON payload containing the list of tags
+  return response.data as { tags: string[] };
+}
+
 // Update an existing journal entry
 // Accepts the entry id, updated fields and the JWT token
 export async function updateJournal(
