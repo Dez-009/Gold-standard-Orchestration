@@ -36,6 +36,8 @@ from .analytics import router as analytics_router
 from .admin_analytics import router as admin_analytics_router
 # Notes: Import router providing referral endpoints
 from .referral import router as referral_router
+from .admin_segments import router as admin_segments_router
+from .admin_recommendations import router as admin_recommendations_router
 
 router = APIRouter()
 
@@ -71,4 +73,6 @@ router.include_router(admin_audit_router)
 router.include_router(analytics_router)
 router.include_router(admin_analytics_router)
 router.include_router(referral_router)
+router.include_router(admin_segments_router)
+router.include_router(admin_recommendations_router)
 

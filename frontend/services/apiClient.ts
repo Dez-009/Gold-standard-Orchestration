@@ -1178,6 +1178,21 @@ export async function evaluateSegment(segmentId: string, token: string) {
   return response.data;
 }
 
+// Trigger goal recommendations for a user segment
+export async function triggerGoalRecommendations(
+  token: string,
+  segmentId: string
+) {
+  // Notes: POST to the admin endpoint initiating recommendation generation
+  const response = await apiClient.post(
+    '/admin/recommendations/trigger',
+    { segment_id: segmentId },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Response contains a count of goals that were created
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
