@@ -54,6 +54,23 @@ export async function orchestrateAiRequest(prompt: string, token: string) {
   return response.data;
 }
 
+// Send a prompt to the multi-agent orchestration endpoint
+// Notes: Includes user_id so the backend can validate ownership
+export async function postOrchestrationPrompt(
+  token: string,
+  user_id: number,
+  user_prompt: string
+) {
+  // Notes: Issue POST request carrying user_id and prompt
+  const response = await apiClient.post(
+    '/ai/orchestration',
+    { user_id, user_prompt },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the aggregated agent responses
+  return response.data;
+}
+
 // Retrieve all journal entries for the authenticated user
 // Expects the caller to supply a valid JWT token that will be sent
 // in the Authorization header of the request
