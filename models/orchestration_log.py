@@ -1,12 +1,28 @@
 from __future__ import annotations
 
-"""SQLAlchemy model for storing orchestration audit events."""
+"""SQLAlchemy models for capturing orchestration history and performance.
+
+These tables allow the system to audit multi-agent runs and measure
+latency as well as token usage.  Capturing this telemetry helps
+developers tune prompts and identify bottlenecks in the orchestration
+pipeline."""
 
 # Notes: Import standard datetime helper
 from datetime import datetime
 
 # Notes: SQLAlchemy column types and relationship utilities
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from uuid import uuid4
+
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    DateTime,
+    Boolean,
+    ForeignKey,
+)
+from sqlalchemy.dialects.postgresql import UUID
 
 # Notes: Base class for all declarative models
 from database.base import Base
@@ -29,3 +45,28 @@ class OrchestrationLog(Base):
     agents_invoked = Column(Text, nullable=False)
     # Notes: JSON string capturing each agent's full response
     full_response = Column(Text, nullable=False)
+
+
+class OrchestrationPerformanceLog(Base):
+    """Track performance metrics for each orchestration run."""
+
+    __tablename__ = "orchestration_performance_logs"
+
+    # Notes: Unique identifier for the performance entry
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    # Notes: Name of the agent orchestrated (e.g. JournalSummarizationAgent)
+    agent_name = Column(String, nullable=False)
+    # Notes: Reference to the user who triggered the orchestration
+    user_id = Column(Integer, ForeignKey("users.id"))
+    # Notes: Total time taken for the orchestration in milliseconds
+    execution_time_ms = Column(Integer)
+    # Notes: Count of tokens sent to the language model
+    input_tokens = Column(Integer)
+    # Notes: Count of tokens received from the language model
+    output_tokens = Column(Integer)
+    # Notes: Result status such as 'success', 'failed', or 'timeout'
+    status = Column(String)
+    # Notes: True if fallback logic had to be executed
+    fallback_triggered = Column(Boolean, default=False)
+    # Notes: When the orchestration completed
+    timestamp = Column(DateTime, default=datetime.utcnow)
