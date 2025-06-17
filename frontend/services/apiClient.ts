@@ -547,6 +547,43 @@ export async function setAgentOverride(
   return response.data;
 }
 
+// Notes: Retrieve admin list of agent assignments with optional pagination
+export async function listAgentAssignments(
+  token: string,
+  limit?: number,
+  offset?: number
+) {
+  // Notes: Build query parameters only when provided
+  const params: Record<string, number> = {};
+  if (limit !== undefined) params.limit = limit;
+  if (offset !== undefined) params.offset = offset;
+
+  // Notes: Issue GET request to the new admin assignment endpoint
+  const response = await apiClient.get('/admin/agent-assignments', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
+  });
+  // Notes: Return the array of assignment objects
+  return response.data;
+}
+
+// Notes: Persist a manual agent assignment for a specific user
+export async function assignAgentToUser(
+  token: string,
+  user_id: number,
+  domain: string,
+  assigned_agent: string
+) {
+  // Notes: POST the assignment details to the backend
+  const response = await apiClient.post(
+    '/admin/agent-assignments',
+    { user_id, domain, assigned_agent },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the created assignment record
+  return response.data;
+}
+
 // Notes: Retrieve high level system metrics for the admin dashboard
 // Notes: Sends a GET request to the /admin/metrics endpoint with auth header
 export async function getSystemMetrics(token: string) {
