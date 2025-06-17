@@ -20,6 +20,8 @@ from .agent_interaction_log import AgentInteractionLog
 from .personality import Personality
 # Notes: Import model mapping users to their preferred personalities
 from .user_personality import UserPersonality
+# Notes: Import override mapping allowing admins to force agent selection
+from .agent_assignment_override import AgentAssignmentOverride
 # Notes: Import notification model for queued messages
 from .notification import Notification
 from .system_metrics import SystemMetric
@@ -36,6 +38,7 @@ __all__ = [
     "Subscription",
     "AgentAssignment",
     "AgentInteractionLog",
+    "AgentAssignmentOverride",
     "Personality",
     "UserPersonality",
     "Notification",
