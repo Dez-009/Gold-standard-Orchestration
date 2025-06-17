@@ -31,6 +31,7 @@ from .admin_insights import router as admin_insights_router
 from .admin_agent import router as admin_agent_query_router
 # Notes: Import router providing admin agent assignment endpoints
 from .admin_agent_assignment import router as admin_agent_assignment_router
+from .admin_agent_lifecycle import router as admin_agent_lifecycle_router
 from .analytics import router as analytics_router
 # Notes: Import router serving analytics summaries for admins
 from .admin_analytics import router as admin_analytics_router
@@ -68,6 +69,7 @@ router.include_router(admin_insights_router)
 router.include_router(admin_agent_query_router)
 # Notes: Register the admin agent assignment routes
 router.include_router(admin_agent_assignment_router)
+router.include_router(admin_agent_lifecycle_router)
 # Notes: Register the admin audit log routes
 router.include_router(admin_audit_router)
 router.include_router(analytics_router)

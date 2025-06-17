@@ -88,3 +88,8 @@ class User(Base):
         "UserSession", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: Lifecycle logs produced by agent orchestration events
+    agent_lifecycle_logs = relationship(
+        "AgentLifecycleLog", back_populates="user", cascade="all, delete"
+    )
+

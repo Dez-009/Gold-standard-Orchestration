@@ -440,6 +440,27 @@ export async function getOrchestrationLogs(
   return response.data;
 }
 
+// Notes: Retrieve agent lifecycle logs with optional filters
+export async function getAgentLifecycleLogs(
+  token: string,
+  filters: {
+    agent_name?: string;
+    event_type?: string;
+    start_date?: string;
+    end_date?: string;
+    limit?: number;
+    offset?: number;
+  }
+) {
+  // Notes: Issue GET request with query params for filtering
+  const response = await apiClient.get('/admin/agent-lifecycle-logs', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters
+  });
+  // Notes: Return the array of lifecycle log objects
+  return response.data;
+}
+
 // Notes: Retrieve recent user login sessions for admins
 export async function getUserSessions(token: string) {
   // Notes: Perform GET request to the /admin/user-sessions endpoint

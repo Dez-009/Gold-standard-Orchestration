@@ -27,6 +27,7 @@ from .notification import Notification
 from .system_metrics import SystemMetric
 from .behavioral_insights import BehavioralInsight
 from .orchestration_log import OrchestrationLog
+from .agent_lifecycle_log import AgentLifecycleLog
 from .journal_summary import JournalSummary
 from .journal_trends import JournalTrend
 from .analytics_event import AnalyticsEvent
@@ -58,6 +59,7 @@ __all__ = [
     "SystemMetric",
     "BehavioralInsight",
     "OrchestrationLog",
+    "AgentLifecycleLog",
     "JournalSummary",
     "JournalTrend",
     "AnalyticsEvent",
