@@ -1023,6 +1023,16 @@ export async function deleteAccount(token: string) {
   return response.data;
 }
 
+// Retrieve aggregated analytics information for admin dashboards
+export async function getAdminAnalyticsSummary(token: string) {
+  // Notes: Perform GET request to the /admin/analytics/summary endpoint
+  const response = await apiClient.get('/admin/analytics/summary', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the summary data structure
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
