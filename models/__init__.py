@@ -32,6 +32,8 @@ from .journal_trends import JournalTrend
 from .analytics_event import AnalyticsEvent
 from .user_session import UserSession
 from .churn_risk import ChurnRisk, RiskCategory
+# Notes: Include the user feedback model for collecting suggestions
+from .user_feedback import UserFeedback, FeedbackType
 
 __all__ = [
     "User",
@@ -58,5 +60,7 @@ __all__ = [
     "UserSession",
     "ChurnRisk",
     "RiskCategory",
+    "UserFeedback",
+    "FeedbackType",
 ]
 

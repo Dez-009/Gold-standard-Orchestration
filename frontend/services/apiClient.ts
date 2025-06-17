@@ -1073,6 +1073,31 @@ export async function getRevenueSummary(token: string) {
   return response.data;
 }
 
+// Submit feedback on behalf of an authenticated or anonymous user
+export async function submitFeedback(
+  data: { feedback_type: string; message: string },
+  token?: string
+) {
+  // Notes: Include auth header only when a token is supplied
+  const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+  const response = await apiClient.post('/feedback/', data, { headers });
+  // Notes: Return the stored feedback record
+  return response.data;
+}
+
+// Retrieve submitted feedback records for admin dashboards
+export async function getAdminFeedback(
+  token: string,
+  params?: { feedback_type?: string; limit?: number; offset?: number }
+) {
+  // Notes: Perform GET request with query params and auth header
+  const response = await apiClient.get('/admin/feedback', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
+  });
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

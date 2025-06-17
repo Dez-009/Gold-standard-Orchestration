@@ -74,6 +74,9 @@ from routes.admin_insights import router as admin_insights_router
 from routes.admin_analytics import router as admin_analytics_router
 from routes.admin_sessions import router as admin_sessions_router
 from routes.admin_churn import router as admin_churn_router
+# Notes: Import routers handling user feedback
+from routes.feedback import router as feedback_router
+from routes.admin_feedback import router as admin_feedback_router
 
 # Notes: Import router exposing personality CRUD endpoints
 from routes.personality import router as personality_router
@@ -112,6 +115,8 @@ app.include_router(reporting_router)
 app.include_router(personality_router)
 app.include_router(agent_personality_router)
 app.include_router(vida_router)
+# Register feedback submission route for users
+app.include_router(feedback_router)
 # Register billing routes for webhook handling
 app.include_router(billing_router)
 # Register AI coach router to expose AI-powered coaching endpoints
@@ -154,4 +159,6 @@ app.include_router(admin_insights_router)
 app.include_router(admin_analytics_router)
 app.include_router(admin_sessions_router)
 app.include_router(admin_churn_router)
+# Register admin route for reviewing user feedback
+app.include_router(admin_feedback_router)
 
