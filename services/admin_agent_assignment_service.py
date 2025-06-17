@@ -3,6 +3,7 @@
 # Notes: Standard library imports
 from datetime import datetime
 from uuid import UUID
+import json
 
 # Notes: SQLAlchemy session class
 from sqlalchemy.orm import Session
@@ -14,6 +15,7 @@ from models.user_personality import UserPersonality
 
 # Notes: Audit log service records admin actions
 from services.audit_log_service import create_audit_log
+from models.audit_log import AuditEventType
 
 
 def list_agent_assignments(db: Session, limit: int = 100, offset: int = 0) -> list[dict]:
@@ -80,13 +82,19 @@ def assign_agent(db: Session, user_id: int, domain: str, assigned_agent: str) ->
     db.commit()
     db.refresh(assignment)
 
-    # Notes: Record the admin operation in the audit log
+    # Notes: Record the admin operation in the audit log using structured detail
     create_audit_log(
         db,
         {
             "user_id": user_id,
-            "action": "admin_agent_assign",
-            "detail": str({"domain": domain, "agent": assigned_agent}),
+            "action": AuditEventType.AGENT_ASSIGNMENT.value,
+            "detail": json.dumps(
+                {
+                    "user_id": user_id,
+                    "domain": domain,
+                    "assigned_agent": assigned_agent,
+                }
+            ),
         },
     )
 

@@ -4,8 +4,16 @@ from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
+from enum import Enum
 
 from database.base import Base
+
+
+class AuditEventType(str, Enum):
+    """Enum of valid audit log event types."""
+
+    # Notes: Agent assignment created or updated by an admin
+    AGENT_ASSIGNMENT = "AGENT_ASSIGNMENT"
 
 
 class AuditLog(Base):

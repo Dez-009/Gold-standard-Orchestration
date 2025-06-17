@@ -11,6 +11,7 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 from main import app
 from auth.auth_utils import create_access_token
 from services.agent_assignment_service import assign_agent
+from models.audit_log import AuditEventType
 from services.user_service import create_user
 from services import personality_service
 from tests.conftest import TestingSessionLocal
@@ -180,5 +181,8 @@ def test_admin_assignment_creates_audit_log():
     logs_resp = client.get(f"/audit-logs/user/{target_id}")
     assert logs_resp.status_code == 200
     logs = logs_resp.json()
-    assert any(log["action"] == "admin_agent_assign" for log in logs)
+    # Notes: Ensure the AGENT_ASSIGNMENT event was recorded
+    assert any(
+        log["action"] == AuditEventType.AGENT_ASSIGNMENT.value for log in logs
+    )
 
