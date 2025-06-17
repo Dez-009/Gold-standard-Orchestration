@@ -557,6 +557,16 @@ export async function fetchSystemMetrics(token: string) {
   return response.data;
 }
 
+// Notes: Retrieve behavioral insights for a specific user
+export async function getBehavioralInsights(userId: number, token: string) {
+  const response = await apiClient.get(
+    `/admin/behavioral-insights/${userId}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the list of insight objects from the backend
+  return response.data;
+}
+
 // Retrieve all notifications for the admin notifications page
 // Notes: Performs a GET request to the /admin/notifications endpoint
 export async function getNotifications(token: string) {
