@@ -9,11 +9,22 @@ from uuid import uuid4
 from datetime import datetime
 
 # Notes: SQLAlchemy column types used for the model
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, Enum as PgEnum, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
+from enum import Enum
 
 from database.base import Base
+
+
+class AgentStateStatus(str, Enum):
+    """Enumeration of allowed agent states."""
+
+    ACTIVE = "active"
+    PAUSED = "paused"
+    SUSPENDED = "suspended"
+    ERROR = "error"
+    RETIRED = "retired"
 
 
 class AgentState(Base):
@@ -27,8 +38,10 @@ class AgentState(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     # Notes: Agent name such as 'career' or 'health'
     agent_name = Column(String, nullable=False)
-    # Notes: Current state string, e.g. 'idle', 'active'
-    state = Column(String, nullable=False)
+    # Notes: Current lifecycle state for the agent
+    state = Column(PgEnum(AgentStateStatus), nullable=False)
+    # Notes: Timestamp when the state was created
+    created_at = Column(DateTime, default=datetime.utcnow)
     # Notes: Timestamp when the state was last updated
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
