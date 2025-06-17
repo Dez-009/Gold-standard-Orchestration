@@ -19,6 +19,8 @@ from services.agents import (
 
 # Notes: Service used to record execution details
 from services.agent_execution_log_service import log_agent_execution
+# Notes: Utility to check if an agent is currently active
+from services.agent_context_loader import is_agent_active
 
 # Notes: Timing utility for measuring execution latency
 import time
@@ -49,6 +51,10 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
 
     # Notes: Execute each agent processor and log execution details
     for assignment in assignments:
+        # Notes: Skip this agent when the state record marks it inactive
+        if not is_agent_active(db, user_id, assignment.domain):
+            continue
+
         processor = AGENT_PROCESSORS.get(assignment.domain)
         if processor is None:
             # Notes: Skip domains without a matching processor
