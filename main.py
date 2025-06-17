@@ -58,6 +58,10 @@ from routes.admin.model_logging_admin import router as admin_model_logging_route
 from routes.admin_behavioral_insights import (
     router as admin_behavioral_insight_router,
 )
+# Notes: Import router exposing orchestration logs to admins
+from routes.admin_orchestration_monitor import (
+    router as admin_orchestration_monitor_router,
+)
 # Notes: Import router providing aggregated behavioral insights
 from routes.admin_insights import router as admin_insights_router
 
@@ -127,6 +131,7 @@ app.include_router(admin_agent_query_router)
 app.include_router(admin_user_personality_router)
 app.include_router(admin_notifications_router)
 app.include_router(admin_model_logging_router)
+app.include_router(admin_orchestration_monitor_router)
 app.include_router(admin_behavioral_insight_router)
 # Notes: Register the aggregated behavioral insights endpoint
 app.include_router(admin_insights_router)

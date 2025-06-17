@@ -26,6 +26,7 @@ from .agent_assignment_override import AgentAssignmentOverride
 from .notification import Notification
 from .system_metrics import SystemMetric
 from .behavioral_insights import BehavioralInsight
+from .orchestration_log import OrchestrationLog
 
 __all__ = [
     "User",
@@ -45,5 +46,6 @@ __all__ = [
     "Notification",
     "SystemMetric",
     "BehavioralInsight",
+    "OrchestrationLog",
 ]
 

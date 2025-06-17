@@ -395,6 +395,27 @@ export async function getAuditLogs(
   return response.data;
 }
 
+// Notes: Retrieve orchestration history for administrator view
+// Notes: Sends GET request to the /admin/orchestration-log endpoint
+export async function getOrchestrationLogs(
+  token: string,
+  limit?: number,
+  offset?: number
+) {
+  // Notes: Build query params conditionally
+  const params: Record<string, number> = {};
+  if (limit !== undefined) params.limit = limit;
+  if (offset !== undefined) params.offset = offset;
+
+  // Notes: Issue the HTTP request to fetch orchestration records
+  const response = await apiClient.get('/admin/orchestration-log', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
+  });
+  // Notes: Return the resulting log array
+  return response.data;
+}
+
 // Notes: Retrieve captured application error logs from the backend
 // Notes: Sends GET request to the /admin/errors endpoint with auth header
 export async function getErrorLogs(token: string) {
