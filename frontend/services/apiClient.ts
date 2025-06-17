@@ -57,7 +57,8 @@ export async function orchestrateAiRequest(prompt: string, token: string) {
 
 // Send a prompt to the multi-agent orchestration endpoint
 // Notes: Includes user_id so the backend can validate ownership
-export async function postOrchestrationPrompt(
+// Notes: Legacy helper used by the older multi-agent endpoint
+export async function postLegacyOrchestrationPrompt(
   token: string,
   user_id: number,
   user_prompt: string
@@ -70,6 +71,18 @@ export async function postOrchestrationPrompt(
   );
   // Notes: Return the aggregated agent responses
   return response.data;
+}
+
+// Notes: New helper posting directly to the orchestration processor
+export async function postOrchestrationPrompt(token: string, prompt: string) {
+  // Notes: Issue the POST request with the user's prompt
+  const response = await apiClient.post(
+    '/orchestration/ask',
+    { prompt },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the unified response text from the backend
+  return response.data as { response: string };
 }
 
 // Retrieve all journal entries for the authenticated user
