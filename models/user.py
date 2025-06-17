@@ -93,3 +93,8 @@ class User(Base):
         "AgentLifecycleLog", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: Latest recorded state for each assigned agent
+    agent_states = relationship(
+        "AgentState", back_populates="user", cascade="all, delete"
+    )
+

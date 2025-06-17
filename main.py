@@ -75,6 +75,8 @@ from routes.admin_insights import router as admin_insights_router
 from routes.admin_analytics import router as admin_analytics_router
 from routes.admin_sessions import router as admin_sessions_router
 from routes.admin_churn import router as admin_churn_router
+# Notes: Import router exposing agent state admin endpoints
+from routes.admin_agent_state import router as admin_agent_state_router
 # Notes: Import routers handling user feedback
 from routes.feedback import router as feedback_router
 from routes.admin_feedback import router as admin_feedback_router
@@ -151,6 +153,7 @@ app.include_router(admin_agent_assignment_router)
 app.include_router(admin_agent_override_router)
 app.include_router(admin_agent_query_router)
 app.include_router(admin_agent_lifecycle_router)
+app.include_router(admin_agent_state_router)
 app.include_router(admin_user_personality_router)
 app.include_router(admin_notifications_router)
 app.include_router(admin_model_logging_router)

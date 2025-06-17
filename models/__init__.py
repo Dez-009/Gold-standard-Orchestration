@@ -34,6 +34,8 @@ from .analytics_event import AnalyticsEvent
 from .user_session import UserSession
 from .churn_risk import ChurnRisk, RiskCategory
 from .churn_score import ChurnScore
+# Notes: Import model tracking the latest state for each agent
+from .agent_state import AgentState
 # Notes: Include the user feedback model for collecting suggestions
 from .user_feedback import UserFeedback, FeedbackType
 # Notes: Import the referral model for viral sharing features
@@ -71,5 +73,6 @@ __all__ = [
     "FeedbackType",
     "Referral",
     "UserSegment",
+    "AgentState",
 ]
 

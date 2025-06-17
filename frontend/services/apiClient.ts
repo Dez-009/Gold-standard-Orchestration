@@ -461,6 +461,32 @@ export async function getAgentLifecycleLogs(
   return response.data;
 }
 
+// Notes: Retrieve current agent states for all users
+export async function getAgentStates(token: string) {
+  // Notes: Perform GET request to the admin agent-states endpoint
+  const response = await apiClient.get('/admin/agent-states', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the array of agent state objects
+  return response.data;
+}
+
+// Notes: Update the state of a specific agent record
+export async function updateAgentState(
+  token: string,
+  id: string,
+  state: string
+) {
+  // Notes: Issue PATCH request with new state value
+  const response = await apiClient.patch(
+    `/admin/agent-states/${id}`,
+    null,
+    { params: { state }, headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the updated state record from the backend
+  return response.data;
+}
+
 // Notes: Retrieve recent user login sessions for admins
 export async function getUserSessions(token: string) {
   // Notes: Perform GET request to the /admin/user-sessions endpoint
