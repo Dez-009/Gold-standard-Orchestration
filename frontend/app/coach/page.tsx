@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { routeAiRequest } from '../../services/aiOrchestrationService';
 import { getToken, isTokenExpired } from '../../services/authUtils';
 import { showError } from '../../components/ToastProvider';
+import { trackEvent } from '../../services/analyticsService';
 
 // Notes: Type describing each chat message in the history
 interface Message {
@@ -34,11 +35,15 @@ export default function CoachPage() {
       showError('Session expired. Please login again.');
       router.push('/login');
     }
+    // Notes: Record a page view for the coaching chat
+    trackEvent('page_view', { page: 'coach' });
   }, [router]);
 
   // Notes: Handler for submitting the user's message
   const handleSend = async () => {
     if (!prompt.trim()) return;
+    // Notes: Log the start of an AI coaching session
+    trackEvent('ai_session_start', { prompt });
     // Notes: Optimistically add the user's message to the history
     setMessages((msgs) => [...msgs, { sender: 'user', text: prompt }]);
     setPrompt('');

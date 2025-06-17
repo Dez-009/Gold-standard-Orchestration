@@ -12,6 +12,7 @@ import {
 import { getToken, isTokenExpired } from '../../services/authUtils';
 import { fetchAccountDetails } from '../../services/accountService';
 import { showError } from '../../components/ToastProvider';
+import { trackEvent } from '../../services/analyticsService';
 
 // Shape describing each pricing option
 interface Plan {
@@ -39,6 +40,8 @@ export default function SubscribePage() {
       router.push('/login');
       return;
     }
+    // Notes: Record that the subscribe page was viewed
+    trackEvent('page_view', { page: 'subscribe' });
     const init = async () => {
       try {
         // Notes: Redirect subscribers away from this page
@@ -69,6 +72,8 @@ export default function SubscribePage() {
     try {
       const { url } = await createCheckoutSession(planId);
       if (url) {
+        // Notes: Emit an event when checkout session is started
+        trackEvent('subscription_upgrade', { plan_id: planId });
         window.location.href = url;
       }
     } catch {

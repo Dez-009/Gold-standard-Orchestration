@@ -54,6 +54,8 @@ from routes.admin_agent import router as admin_agent_query_router
 from routes.admin.user_personality_admin import (
     router as admin_user_personality_router,
 )
+# Notes: Import router handling analytics event submissions
+from routes.analytics import router as analytics_router
 # Notes: Import router exposing agent personality assignment endpoints
 from routes.agent_personality import router as agent_personality_router
 from routes.admin.notifications_admin import router as admin_notifications_router
@@ -120,6 +122,8 @@ app.include_router(ai_orchestration_router)
 app.include_router(action_plan_router)
 app.include_router(root_router)
 app.include_router(health_router)
+# Register analytics event submission route
+app.include_router(analytics_router)
 # Register routes for auditing user actions
 app.include_router(audit_log_router)
 app.include_router(admin_metrics_router)
