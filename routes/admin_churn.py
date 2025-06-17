@@ -6,28 +6,39 @@ from sqlalchemy.orm import Session
 from auth.dependencies import get_current_admin_user
 from database.utils import get_db
 from models.user import User
-from services import churn_risk_service
+from services import churn_prediction_service
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
-@router.get("/churn")
-def list_churn_risk(
+@router.get("/churn/scores")
+def list_churn_scores(
     limit: int = 100,
     offset: int = 0,
     _: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db),
 ) -> list[dict]:
-    """Return recent churn risk calculations for admins."""
+    """Return recent churn scores for admins."""
 
-    risks = churn_risk_service.list_churn_risks(db, limit, offset)
+    risks = churn_prediction_service.list_churn_scores(db, limit, offset)
     return [
         {
             "id": str(r.id),
             "user_id": r.user_id,
-            "risk_score": float(r.risk_score),
-            "risk_category": r.risk_category,
+            "churn_risk": float(r.churn_risk),
             "calculated_at": r.calculated_at.isoformat(),
+            "reasons": r.reasons,
         }
         for r in risks
     ]
+
+
+@router.post("/churn/recalculate")
+def recalculate_churn_scores(
+    _: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Trigger recalculation of churn scores for all active users."""
+
+    churn_prediction_service.calculate_churn_scores(db)
+    return {"status": "ok"}

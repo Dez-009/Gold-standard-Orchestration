@@ -604,6 +604,31 @@ export async function getChurnRisks(
   return response.data;
 }
 
+// Notes: Trigger recalculation of churn scores via admin endpoint
+export async function recalculateChurnScores(token: string) {
+  const response = await apiClient.post('/admin/churn/recalculate', null, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Backend returns simple status payload
+  return response.data;
+}
+
+// Notes: Retrieve churn score records for admin display
+export async function getChurnScores(
+  token: string,
+  limit?: number,
+  offset?: number
+) {
+  const params: Record<string, number> = {};
+  if (limit !== undefined) params.limit = limit;
+  if (offset !== undefined) params.offset = offset;
+  const response = await apiClient.get('/admin/churn/scores', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
+  });
+  return response.data;
+}
+
 // Notes: Retrieve the list of all users for the admin user management page
 // Notes: Performs a GET request to the /admin/users endpoint with auth header
 export async function getAllUsers(token: string) {
