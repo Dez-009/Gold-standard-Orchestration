@@ -14,3 +14,4 @@ python-multipart==0.0.9
 slowapi==0.1.5  # pinned to stable version
 stripe==9.7.0
 reportlab==4.1.0
+watchfiles==1.1.0  # provides auto-reload capability
