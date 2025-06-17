@@ -69,6 +69,8 @@ from routes.admin_orchestration_monitor import (
 )
 # Notes: Import router providing aggregated behavioral insights
 from routes.admin_insights import router as admin_insights_router
+# Notes: Import router serving aggregated analytics summaries
+from routes.admin_analytics import router as admin_analytics_router
 
 # Notes: Import router exposing personality CRUD endpoints
 from routes.personality import router as personality_router
@@ -145,4 +147,5 @@ app.include_router(admin_orchestration_monitor_router)
 app.include_router(admin_behavioral_insight_router)
 # Notes: Register the aggregated behavioral insights endpoint
 app.include_router(admin_insights_router)
+app.include_router(admin_analytics_router)
 
