@@ -2,7 +2,10 @@
 // Handles token retrieval and calls the apiClient helper
 
 import { getToken } from './authUtils';
-import { orchestrateAiRequest, postOrchestrationPrompt } from './apiClient';
+import {
+  orchestrateAiRequest,
+  postLegacyOrchestrationPrompt
+} from './apiClient';
 import { showSuccess, showError } from '../components/ToastProvider';
 
 // Route a prompt to the user's assigned agent and return the response
@@ -38,7 +41,7 @@ export async function sendOrchestrationPrompt(user_prompt: string) {
     const payload = JSON.parse(atob(token.split('.')[1]));
     const userId = payload.user_id as number;
     // Notes: Delegate network request to the apiClient helper
-    const data = await postOrchestrationPrompt(token, userId, user_prompt);
+    const data = await postLegacyOrchestrationPrompt(token, userId, user_prompt);
     showSuccess('Saved successfully');
     // Notes: Typed return value containing array of agent responses
     return data as { responses: { agent: string; response: string }[] };

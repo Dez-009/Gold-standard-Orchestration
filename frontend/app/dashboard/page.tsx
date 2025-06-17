@@ -116,6 +116,10 @@ export default function DashboardPage() {
         <Link href="/coach" className="text-blue-600 underline">
           AI Coach
         </Link>
+        {/* Link to the multi-agent orchestration demo */}
+        <Link href="/orchestration" className="text-blue-600 underline">
+          Vida Coach (Orchestration Demo)
+        </Link>
         <Link href="/goals" className="text-blue-600 underline">
           Goals
         </Link>
