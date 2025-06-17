@@ -1,6 +1,7 @@
-// Axios instance configured for the backend API
-// This wrapper centralizes all HTTP requests to the FastAPI backend
-// so other services only need to import this file.
+/**
+ * Axios client wrapper for communicating with the FastAPI backend.
+ * All other frontend services rely on these helpers for network calls.
+ */
 import axios from 'axios';
 // Notes: Toast helper used to notify when the session has expired
 import { showError } from '../components/ToastProvider';
@@ -462,27 +463,26 @@ export async function getAgentLifecycleLogs(
 }
 
 // Notes: Retrieve current agent states for all users
-export async function getAgentStates(token: string) {
-  // Notes: Perform GET request to the admin agent-states endpoint
+export async function getAgentStates(
+  token: string,
+  limit?: number,
+  offset?: number
+) {
+  // Notes: Perform GET request with optional pagination
   const response = await apiClient.get('/admin/agent-states', {
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
+    params: { limit, offset }
   });
   // Notes: Return the array of agent state objects
   return response.data;
 }
 
 // Notes: Update the state of a specific agent record
-export async function updateAgentState(
-  token: string,
-  id: string,
-  state: string
-) {
-  // Notes: Issue PATCH request with new state value
-  const response = await apiClient.patch(
-    `/admin/agent-states/${id}`,
-    null,
-    { params: { state }, headers: { Authorization: `Bearer ${token}` } }
-  );
+export async function updateAgentState(token: string, payload: object) {
+  // Notes: Send POST request with payload containing user_id, agent_name and state
+  const response = await apiClient.post('/admin/agent-states/update', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   // Notes: Return the updated state record from the backend
   return response.data;
 }

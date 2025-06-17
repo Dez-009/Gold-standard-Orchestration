@@ -13,48 +13,54 @@ router = APIRouter(prefix="/admin/agent-states", tags=["admin"])
 
 @router.get("/")
 def list_agent_states(
+    limit: int = 100,
+    offset: int = 0,
     db: Session = Depends(get_db),
     _: User = Depends(get_current_admin_user),
 ) -> list[dict]:
-    """Return the most recent state row for all agents."""
+    """Return a paginated list of all agent states."""
 
-    # Notes: Query latest state entries ordered by timestamp
-    rows = db.query(agent_state_service.AgentState).order_by(
-        agent_state_service.AgentState.updated_at.desc()
-    ).all()
-    # Notes: Convert ORM objects into simple dictionaries
+    # Notes: Delegate query logic to the service layer
+    rows = agent_state_service.list_all_states(db, limit=limit, offset=offset)
+
+    # Notes: Convert ORM models into primitives for JSON response
     return [
         {
             "id": row.id,
             "user_id": row.user_id,
             "agent_name": row.agent_name,
             "state": row.state,
+            "created_at": row.created_at.isoformat(),
             "updated_at": row.updated_at.isoformat(),
         }
         for row in rows
     ]
 
 
-@router.patch("/{state_id}")
+@router.post("/update")
 def update_agent_state(
-    state_id: str,
-    state: str,
+    payload: dict,
     db: Session = Depends(get_db),
     _: User = Depends(get_current_admin_user),
 ) -> dict:
-    """Manually override an agent state."""
+    """Allow an admin to modify an agent state."""
 
-    # Notes: Retrieve the record by its UUID
-    record = db.query(agent_state_service.AgentState).filter_by(id=state_id).one_or_none()
-    if not record:
-        raise HTTPException(status_code=404, detail="State not found")
+    # Notes: Extract required fields from request payload
+    user_id = payload.get("user_id")
+    agent_name = payload.get("agent_name")
+    state = payload.get("state")
+    if not all([user_id, agent_name, state]):
+        raise HTTPException(status_code=400, detail="Missing parameters")
 
-    # Notes: Use the service function to validate and update
-    updated = agent_state_service.set_agent_state(db, record.user_id, record.agent_name, state)
+    # Notes: Perform the update through the service to validate transitions
+    updated = agent_state_service.set_agent_state(db, user_id, agent_name, state)
     return {
         "id": updated.id,
         "user_id": updated.user_id,
         "agent_name": updated.agent_name,
         "state": updated.state,
+        "created_at": updated.created_at.isoformat(),
         "updated_at": updated.updated_at.isoformat(),
     }
+
+# Footnote: This router allows administrators to manage persistent agent states

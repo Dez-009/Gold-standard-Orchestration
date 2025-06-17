@@ -1,5 +1,7 @@
 'use client';
-// Admin page displaying current agent states and allowing updates
+/**
+ * Admin page displaying current agent states and allowing updates.
+ */
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -46,10 +48,18 @@ export default function AgentStatePage() {
 
   // Save new state for a row
   const handleSave = async (id: string) => {
+    const record = states.find((s) => s.id === id);
+    if (!record) return;
     try {
-      const updated = await modifyAgentState(id, editing[id]);
+      const updated = await modifyAgentState({
+        user_id: record.user_id,
+        agent_name: record.agent_name,
+        state: editing[id]
+      });
       setStates((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, state: updated.state, updated_at: updated.updated_at } : s))
+        prev.map((s) =>
+          s.id === id ? { ...s, state: updated.state, updated_at: updated.updated_at } : s
+        )
       );
       showSuccess('State updated');
     } catch {
@@ -59,7 +69,7 @@ export default function AgentStatePage() {
 
   const fmt = (iso: string) => new Date(iso).toLocaleString();
 
-  const options = ['idle', 'active', 'waiting', 'error', 'paused'];
+  const options = ['active', 'paused', 'suspended', 'error', 'retired'];
 
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
@@ -82,6 +92,7 @@ export default function AgentStatePage() {
                 <th className="px-4 py-2">User ID</th>
                 <th className="px-4 py-2">Agent</th>
                 <th className="px-4 py-2">State</th>
+                <th className="px-4 py-2">Created</th>
                 <th className="px-4 py-2">Updated</th>
                 <th className="px-4 py-2">Actions</th>
               </tr>
@@ -92,6 +103,7 @@ export default function AgentStatePage() {
                   <td className="border px-4 py-2">{s.user_id}</td>
                   <td className="border px-4 py-2">{s.agent_name}</td>
                   <td className="border px-4 py-2 capitalize">{s.state}</td>
+                  <td className="border px-4 py-2">{fmt(s.created_at)}</td>
                   <td className="border px-4 py-2">{fmt(s.updated_at)}</td>
                   <td className="border px-4 py-2">
                     <select

@@ -35,14 +35,14 @@ def test_set_and_get_agent_state():
     user_id = create_test_user(db)
 
     # Notes: Create a new state record
-    state = agent_state_service.set_agent_state(db, user_id, "career", "idle")
-    assert state.state == "idle"
+    state = agent_state_service.set_agent_state(db, user_id, "career", "active")
+    assert state.state == "active"
 
     # Notes: Update the state and fetch again
-    agent_state_service.set_agent_state(db, user_id, "career", "active")
+    agent_state_service.set_agent_state(db, user_id, "career", "paused")
     fetched = agent_state_service.get_agent_state(db, user_id, "career")
     assert fetched is not None
-    assert fetched.state == "active"
+    assert fetched.state == "paused"
 
     db.close()
 
