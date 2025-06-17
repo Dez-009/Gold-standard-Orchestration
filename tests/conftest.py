@@ -7,6 +7,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
 from database.base import Base
+# Notes: Ensure rate limiter uses a very high threshold during tests
+os.environ.setdefault("RATE_LIMIT", "100000/minute")
 from main import app
 from database.utils import get_db
 from fastapi.testclient import TestClient

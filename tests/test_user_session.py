@@ -7,6 +7,8 @@ from fastapi.testclient import TestClient
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 os.environ.setdefault("OPENAI_API_KEY", "test")
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
+# Notes: increase rate limit during tests to avoid hitting global 100/minute cap
+os.environ.setdefault("RATE_LIMIT", "100000/minute")
 
 from main import app
 from auth.auth_utils import create_access_token
