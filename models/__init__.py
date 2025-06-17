@@ -29,6 +29,7 @@ from .behavioral_insights import BehavioralInsight
 from .orchestration_log import OrchestrationLog
 from .journal_summary import JournalSummary
 from .journal_trends import JournalTrend
+from .analytics_event import AnalyticsEvent
 
 __all__ = [
     "User",
@@ -51,5 +52,6 @@ __all__ = [
     "OrchestrationLog",
     "JournalSummary",
     "JournalTrend",
+    "AnalyticsEvent",
 ]
 

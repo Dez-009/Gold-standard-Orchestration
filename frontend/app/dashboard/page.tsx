@@ -19,6 +19,7 @@ import {
   SubscriptionStatus
 } from '../../services/subscriptionService';
 import { showError } from '../../components/ToastProvider';
+import { trackEvent } from '../../services/analyticsService';
 
 export default function DashboardPage() {
   // Notes: Store email and role info parsed from the JWT
@@ -49,6 +50,8 @@ export default function DashboardPage() {
     }
     // Notes: Store parsed email and role in state
     setUser(parseUserFromToken(token));
+    // Notes: Log a page view analytics event
+    trackEvent('page_view', { page: 'dashboard' });
     // Notes: Retrieve account info to determine subscription tier
     const loadTier = async () => {
       try {

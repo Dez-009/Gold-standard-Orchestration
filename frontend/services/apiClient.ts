@@ -993,6 +993,26 @@ export async function getPersonalityAssignment(token: string, domain: string) {
   return response.data;
 }
 
+// Submit an analytics event to the backend
+export async function postAnalyticsEvent(
+  token: string | null,
+  eventType: string,
+  payload: Record<string, unknown>
+) {
+  // Notes: Build headers only when a token is provided
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const response = await apiClient.post(
+    '/analytics/event',
+    {
+      event_type: eventType,
+      event_payload: payload
+    },
+    { headers }
+  );
+  // Notes: Return the stored event record
+  return response.data;
+}
+
 // Permanently delete the authenticated user's account
 export async function deleteAccount(token: string) {
   // Notes: Send a DELETE request to the account deletion endpoint

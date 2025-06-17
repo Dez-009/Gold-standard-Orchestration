@@ -5,9 +5,16 @@
 import AuthForm from '../../components/AuthForm';
 import { loginUser } from '../../services/authService';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { trackEvent } from '../../services/analyticsService';
 
 export default function LoginPage() {
   const router = useRouter(); // Router instance for navigation
+
+  // Notes: Track that the login page was viewed
+  useEffect(() => {
+    trackEvent('page_view', { page: 'login' });
+  }, []);
 
   // Handler passed to AuthForm for submission
   const handleLogin = async (values: Record<string, string>) => {
@@ -15,6 +22,8 @@ export default function LoginPage() {
       email: values.email,
       password: values.password
     });
+    // Notes: Log successful login event
+    trackEvent('login', { email: values.email });
     // Store JWT token in localStorage temporarily
     localStorage.setItem('token', data.access_token);
     // Navigate to dashboard after successful login
