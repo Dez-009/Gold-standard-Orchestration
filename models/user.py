@@ -103,4 +103,9 @@ class User(Base):
         "AgentExecutionLog", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: Scoring results produced for each agent response
+    agent_scores = relationship(
+        "AgentScore", back_populates="user", cascade="all, delete"
+    )
+
 # Footnote: Defines the User ORM model and relationships.

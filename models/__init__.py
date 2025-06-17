@@ -42,6 +42,8 @@ from .agent_failure_queue import AgentFailureQueue
 from .agent_execution_log import AgentExecutionLog
 # Notes: Import model storing per-user agent personalization
 from .agent_personalization import AgentPersonalization
+# Notes: Import model capturing scoring metrics for agent outputs
+from .agent_score import AgentScore
 # Notes: Include the user feedback model for collecting suggestions
 from .user_feedback import UserFeedback, FeedbackType
 # Notes: Import the referral model for viral sharing features
@@ -83,6 +85,7 @@ __all__ = [
     "AgentFailureQueue",
     "AgentExecutionLog",
     "AgentPersonalization",
+    "AgentScore",
 ]
 
 # Footnote: Model package exposes all ORM models for import.

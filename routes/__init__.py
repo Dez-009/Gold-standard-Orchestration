@@ -44,6 +44,8 @@ from .admin_agent_state import router as admin_agent_state_router
 from .admin_agent_logs import router as admin_agent_logs_router
 # Notes: Import router handling admin agent personalization endpoints
 from .admin_agent_personalization import router as admin_agent_personalization_router
+# Notes: Import router providing access to agent scoring logs
+from .admin_agent_scores import router as admin_agent_scores_router
 # Notes: Import router providing user personalization endpoints
 from .account_personalization import router as account_personalization_router
 
@@ -87,6 +89,7 @@ router.include_router(admin_recommendations_router)
 router.include_router(admin_agent_state_router)
 router.include_router(admin_agent_logs_router)
 router.include_router(admin_agent_personalization_router)
+router.include_router(admin_agent_scores_router)
 router.include_router(account_personalization_router)
 
 # Footnote: Aggregates and registers all route modules.
