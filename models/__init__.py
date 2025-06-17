@@ -38,6 +38,8 @@ from .churn_score import ChurnScore
 from .agent_state import AgentState
 # Notes: Import model for queued agent failures
 from .agent_failure_queue import AgentFailureQueue
+# Notes: Import model capturing metrics for each agent execution
+from .agent_execution_log import AgentExecutionLog
 # Notes: Include the user feedback model for collecting suggestions
 from .user_feedback import UserFeedback, FeedbackType
 # Notes: Import the referral model for viral sharing features
@@ -77,5 +79,7 @@ __all__ = [
     "UserSegment",
     "AgentState",
     "AgentFailureQueue",
+    "AgentExecutionLog",
 ]
 
+# Footnote: Model package exposes all ORM models for import.

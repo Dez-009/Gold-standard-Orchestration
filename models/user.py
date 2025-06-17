@@ -98,3 +98,9 @@ class User(Base):
         "AgentState", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: Execution logs capturing each agent run
+    agent_execution_logs = relationship(
+        "AgentExecutionLog", back_populates="user", cascade="all, delete"
+    )
+
+# Footnote: Defines the User ORM model and relationships.

@@ -17,6 +17,12 @@ from services.agents import (
     mindset_agent,
 )
 
+# Notes: Service used to record execution details
+from services.agent_execution_log_service import log_agent_execution
+
+# Notes: Timing utility for measuring execution latency
+import time
+
 # Notes: Map domain names to their processor functions
 AGENT_PROCESSORS = {
     "career": career_agent.process,
@@ -41,14 +47,36 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
 
     responses: list[dict] = []
 
-    # Notes: Execute each agent processor and collect outputs
+    # Notes: Execute each agent processor and log execution details
     for assignment in assignments:
         processor = AGENT_PROCESSORS.get(assignment.domain)
         if processor is None:
             # Notes: Skip domains without a matching processor
             continue
-        result_text = processor(user_prompt)
-        responses.append({"agent": assignment.domain, "response": result_text})
+        start = time.perf_counter()
+        try:
+            result_text = processor(user_prompt)
+            success = True
+            error_message = None
+        except Exception as exc:  # pragma: no cover - generic failure capture
+            result_text = ""
+            success = False
+            error_message = str(exc)
+        elapsed_ms = int((time.perf_counter() - start) * 1000)
+        # Notes: Persist execution metrics regardless of success
+        log_agent_execution(
+            db,
+            user_id,
+            assignment.domain,
+            user_prompt,
+            result_text,
+            success,
+            elapsed_ms,
+            error_message,
+        )
+        if success:
+            responses.append({"agent": assignment.domain, "response": result_text})
 
     # Notes: Aggregated list of agent responses is returned to the caller
     return responses
+# Footnote: Coordinates calling each domain agent for a prompt.

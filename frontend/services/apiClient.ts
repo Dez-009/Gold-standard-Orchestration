@@ -461,6 +461,28 @@ export async function getAgentLifecycleLogs(
   return response.data;
 }
 
+// Notes: Retrieve agent execution logs with optional filters
+export async function getAgentExecutionLogs(
+  token: string,
+  filters: {
+    user_id?: number;
+    agent_name?: string;
+    success?: boolean;
+    start_date?: string;
+    end_date?: string;
+    limit?: number;
+    offset?: number;
+  }
+) {
+  // Notes: Issue GET request to the admin endpoint
+  const response = await apiClient.get('/admin/agent-logs', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters
+  });
+  // Notes: Return the resulting log list
+  return response.data;
+}
+
 // Notes: Retrieve current agent states for all users
 export async function getAgentStates(token: string) {
   // Notes: Perform GET request to the admin agent-states endpoint
@@ -1290,3 +1312,4 @@ export async function triggerGoalRecommendations(
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
+// Footnote: Consolidates all direct HTTP calls to the backend.
