@@ -55,6 +55,7 @@ from .user_segment import UserSegment
 # Notes: Import model capturing wearable device sync events
 from .device_sync import DeviceSyncLog
 # Notes: Import model storing follow-up reflection prompts
+from .habit_sync import HabitSyncData, HabitDataSource
 from .reflection_prompt import ReflectionPrompt
 from .conflict_flag import ConflictFlag, ConflictType
 
@@ -98,6 +99,8 @@ __all__ = [
     "AgentScore",
     "AgentFeedback",
     "DeviceSyncLog",
+    "HabitSyncData",
+    "HabitDataSource",
     "ReflectionPrompt",
     "ConflictFlag",
     "ConflictType",

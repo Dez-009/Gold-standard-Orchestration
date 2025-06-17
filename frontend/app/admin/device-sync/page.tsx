@@ -15,6 +15,8 @@ export default function DeviceSyncLogPage() {
   const [logs, setLogs] = useState<DeviceSyncRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [sourceFilter, setSourceFilter] = useState('all');
+  const [activityFilter, setActivityFilter] = useState('all');
   const [offset, setOffset] = useState(0);
   const limit = 20;
 
@@ -44,6 +46,23 @@ export default function DeviceSyncLogPage() {
 
   const fmt = (iso: string) => new Date(iso).toLocaleString();
 
+  // Notes: Determine whether the entry represents low activity or sleep debt
+  const flags = (log: DeviceSyncRecord) => {
+    const data: any = log.raw_data_preview || {};
+    const lowMove = data.steps && data.steps < 5000;
+    const lowSleep = data.sleep_hours && data.sleep_hours < 6;
+    return { lowMove, lowSleep };
+  };
+
+  // Notes: Apply client side filtering based on selected options
+  const filtered = logs.filter((log) => {
+    const { lowMove } = flags(log);
+    if (sourceFilter !== 'all' && log.source !== sourceFilter) return false;
+    if (activityFilter === 'low' && !lowMove) return false;
+    if (activityFilter === 'high' && lowMove) return false;
+    return true;
+  });
+
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
       {/* Back link */}
@@ -52,14 +71,35 @@ export default function DeviceSyncLogPage() {
       </Link>
       {/* Heading */}
       <h1 className="text-2xl font-bold">Device Sync Logs</h1>
+      {/* Filter controls */}
+      <div className="flex space-x-4">
+        <select
+          value={sourceFilter}
+          onChange={(e) => setSourceFilter(e.target.value)}
+          className="border px-2 py-1 rounded"
+        >
+          <option value="all">All Sources</option>
+          <option value="Fitbit">Fitbit</option>
+          <option value="AppleHealth">AppleHealth</option>
+        </select>
+        <select
+          value={activityFilter}
+          onChange={(e) => setActivityFilter(e.target.value)}
+          className="border px-2 py-1 rounded"
+        >
+          <option value="all">All Activity</option>
+          <option value="low">Low Movement</option>
+          <option value="high">Normal</option>
+        </select>
+      </div>
       {/* Loading and error states */}
       {loading && (
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
       )}
       {error && <p className="text-red-600">{error}</p>}
-      {!loading && !error && logs.length === 0 && <p>No sync logs found.</p>}
+      {!loading && !error && filtered.length === 0 && <p>No sync logs found.</p>}
       {/* Table */}
-      {!loading && !error && logs.length > 0 && (
+      {!loading && !error && filtered.length > 0 && (
         <div className="overflow-x-auto w-full">
           <table className="min-w-full border divide-y divide-gray-200">
             <thead>
@@ -68,11 +108,13 @@ export default function DeviceSyncLogPage() {
                 <th className="px-4 py-2">Source</th>
                 <th className="px-4 py-2">Status</th>
                 <th className="px-4 py-2">Synced At</th>
+                <th className="px-4 py-2">Low Move</th>
+                <th className="px-4 py-2">Sleep Deprived</th>
                 <th className="px-4 py-2">Data</th>
               </tr>
             </thead>
             <tbody>
-              {logs.map((log) => (
+              {filtered.map((log) => (
                 <tr key={log.id} className="odd:bg-gray-100">
                   <td className="border px-4 py-2">{log.user_id}</td>
                   <td className="border px-4 py-2">{log.source}</td>
@@ -90,6 +132,8 @@ export default function DeviceSyncLogPage() {
                     </span>
                   </td>
                   <td className="border px-4 py-2">{fmt(log.synced_at)}</td>
+                  <td className="border px-4 py-2 text-center">{flags(log).lowMove ? 'Yes' : '-'}</td>
+                  <td className="border px-4 py-2 text-center">{flags(log).lowSleep ? 'Yes' : '-'}</td>
                   <td className="border px-4 py-2 text-sm">
                     {JSON.stringify(log.raw_data_preview).slice(0, 30)}
                   </td>

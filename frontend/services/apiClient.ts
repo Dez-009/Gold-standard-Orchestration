@@ -1517,6 +1517,29 @@ export async function resolveConflictFlag(flagId: string, token: string) {
   return response.data;
 }
 
+// Trigger habit synchronization for the current user
+export async function postHabitSync(
+  token: string,
+  payload: { source: string }
+) {
+  const response = await apiClient.post('/habit-sync/sync', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Retrieve averaged habit metrics
+export async function getHabitSummary(
+  token: string,
+  params: { days?: number }
+) {
+  const response = await apiClient.get('/habit-sync/summary', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
+  });
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
