@@ -28,6 +28,7 @@ from routes.journal_summary import router as journal_summary_router
 from routes.journal_trends import router as journal_trends_router
 # Notes: Import router exposing account-related endpoints
 from routes.account import router as account_router
+from routes.account_personalization import router as account_personalization_router
 from routes.vida import router as vida_router
 from routes.root import router as root_router
 from routes.health import router as health_router
@@ -117,6 +118,7 @@ app.include_router(task_router)
 app.include_router(daily_checkin_router)
 app.include_router(checkins_router)
 app.include_router(account_router)
+app.include_router(account_personalization_router)
 app.include_router(reporting_router)
 app.include_router(personality_router)
 app.include_router(agent_personality_router)

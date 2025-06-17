@@ -1309,6 +1309,32 @@ export async function triggerGoalRecommendations(
   return response.data;
 }
 
+// Retrieve all personalization profiles for the current user
+export async function getPersonalizations(token: string) {
+  // Notes: Issue GET request to the account personalization endpoint
+  const response = await apiClient.get('/account/personalizations', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the list of personalization objects
+  return response.data;
+}
+
+// Persist a personalization profile for a specific agent
+export async function savePersonalization(
+  token: string,
+  agent_name: string,
+  personality_profile: string
+) {
+  // Notes: POST data to the update endpoint with required fields
+  const response = await apiClient.post(
+    '/account/personalizations/update',
+    { agent_name, personality_profile },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the updated or created record
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
