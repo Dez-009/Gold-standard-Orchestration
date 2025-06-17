@@ -32,6 +32,7 @@ from .journal_trends import JournalTrend
 from .analytics_event import AnalyticsEvent
 from .user_session import UserSession
 from .churn_risk import ChurnRisk, RiskCategory
+from .churn_score import ChurnScore
 # Notes: Include the user feedback model for collecting suggestions
 from .user_feedback import UserFeedback, FeedbackType
 # Notes: Import the referral model for viral sharing features
@@ -62,6 +63,7 @@ __all__ = [
     "AnalyticsEvent",
     "UserSession",
     "ChurnRisk",
+    "ChurnScore",
     "RiskCategory",
     "UserFeedback",
     "FeedbackType",
