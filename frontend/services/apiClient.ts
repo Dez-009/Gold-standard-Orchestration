@@ -584,6 +584,26 @@ export async function getReminderLogs(token: string) {
   return response.data;
 }
 
+// Notes: Retrieve churn risk scores for all users
+export async function getChurnRisks(
+  token: string,
+  limit?: number,
+  offset?: number
+) {
+  // Notes: Build optional pagination parameters
+  const params: Record<string, number> = {};
+  if (limit !== undefined) params.limit = limit;
+  if (offset !== undefined) params.offset = offset;
+
+  // Notes: Perform GET request to the admin churn endpoint
+  const response = await apiClient.get('/admin/churn', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
+  });
+  // Notes: Return the raw list of churn risk records
+  return response.data;
+}
+
 // Notes: Retrieve the list of all users for the admin user management page
 // Notes: Performs a GET request to the /admin/users endpoint with auth header
 export async function getAllUsers(token: string) {
