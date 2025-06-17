@@ -20,7 +20,8 @@ from services.agents import (
 # Notes: Service used to record execution details
 from services.agent_execution_log_service import log_agent_execution
 # Notes: Utility to check if an agent is currently active
-from services.agent_context_loader import is_agent_active
+# Notes: Import utilities for loading and checking agent state context
+from services.agent_context_loader import load_agent_context, is_agent_active
 
 # Notes: Timing utility for measuring execution latency
 import time
@@ -47,12 +48,19 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
         .all()
     )
 
+    # Notes: Determine which agents are active for the user one time up front
+    active_agents = load_agent_context(db, user_id)
+
     responses: list[dict] = []
 
     # Notes: Execute each agent processor and log execution details
     for assignment in assignments:
-        # Notes: Skip this agent when the state record marks it inactive
-        if not is_agent_active(db, user_id, assignment.domain):
+        # Notes: When a list of active agents was returned, skip agents not in it
+        if active_agents and assignment.domain not in active_agents:
+            continue
+
+        # Notes: When no list was returned, fall back to individual state check
+        if not active_agents and not is_agent_active(db, user_id, assignment.domain):
             continue
 
         processor = AGENT_PROCESSORS.get(assignment.domain)
@@ -85,4 +93,5 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
 
     # Notes: Aggregated list of agent responses is returned to the caller
     return responses
-# Footnote: Coordinates calling each domain agent for a prompt.
+# Footnote: Coordinates calling each domain agent and filters them using
+# Notes: `load_agent_context` so only active agents generate responses.

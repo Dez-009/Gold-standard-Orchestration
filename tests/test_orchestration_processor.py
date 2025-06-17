@@ -37,7 +37,70 @@ def test_process_user_prompt_collects_all(monkeypatch):
     monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "career", career_agent.process)
     monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "finance", financial_agent.process)
 
+    # Notes: Simulate all agents active by returning every assigned agent
+    monkeypatch.setattr(orchestrator, "load_agent_context", lambda db, uid: ["career", "finance"])
+
     result = orchestrator.process_user_prompt(db, user.id, "help me")
     assert {"agent": "career", "response": "career reply"} in result
     assert {"agent": "finance", "response": "finance reply"} in result
     db.close()
+
+
+# Verify that only active agents return responses when subset active
+
+def test_process_user_prompt_subset_active(monkeypatch):
+    db = TestingSessionLocal()
+    user = create_user(
+        db,
+        {
+            "email": f"orch_{uuid.uuid4().hex}@example.com",
+            "phone_number": str(int(uuid.uuid4().int % 10_000_000_000)).zfill(10),
+            "hashed_password": "password123",
+        },
+    )
+    assign_personality(db, user.id, uuid.uuid4(), "career")
+    assign_personality(db, user.id, uuid.uuid4(), "finance")
+
+    monkeypatch.setattr(career_agent, "process", lambda prompt: "career reply")
+    monkeypatch.setattr(financial_agent, "process", lambda prompt: "finance reply")
+    monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "career", career_agent.process)
+    monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "finance", financial_agent.process)
+
+    # Notes: Only the career agent is marked active
+    monkeypatch.setattr(orchestrator, "load_agent_context", lambda db, uid: ["career"])
+
+    result = orchestrator.process_user_prompt(db, user.id, "help me")
+    assert {"agent": "career", "response": "career reply"} in result
+    assert all(res["agent"] != "finance" for res in result)
+    db.close()
+
+
+# Verify handling when no agents are active for the user
+
+def test_process_user_prompt_no_active(monkeypatch):
+    db = TestingSessionLocal()
+    user = create_user(
+        db,
+        {
+            "email": f"orch_{uuid.uuid4().hex}@example.com",
+            "phone_number": str(int(uuid.uuid4().int % 10_000_000_000)).zfill(10),
+            "hashed_password": "password123",
+        },
+    )
+    assign_personality(db, user.id, uuid.uuid4(), "career")
+    assign_personality(db, user.id, uuid.uuid4(), "finance")
+
+    monkeypatch.setattr(career_agent, "process", lambda prompt: "career reply")
+    monkeypatch.setattr(financial_agent, "process", lambda prompt: "finance reply")
+    monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "career", career_agent.process)
+    monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "finance", financial_agent.process)
+
+    # Notes: Empty active list combined with inactive checks disables all agents
+    monkeypatch.setattr(orchestrator, "load_agent_context", lambda db, uid: [])
+    monkeypatch.setattr(orchestrator, "is_agent_active", lambda db, uid, name: False)
+
+    result = orchestrator.process_user_prompt(db, user.id, "help me")
+    assert result == []
+    db.close()
+
+# Footnote: Ensures orchestration respects active agent context.
