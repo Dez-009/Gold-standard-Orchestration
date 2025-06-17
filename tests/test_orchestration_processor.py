@@ -163,3 +163,64 @@ def test_run_parallel_agents(monkeypatch):
 
     assert result == {"career": "career reply", "finance": "finance reply"}
     db.close()
+
+# Verify role-based access control prevents unauthorized agent execution
+
+def test_orchestrator_blocks_disallowed_agent(monkeypatch):
+    db = TestingSessionLocal()
+    user = create_user(
+        db,
+        {
+            "email": f"orch_{uuid.uuid4().hex}@example.com",
+            "phone_number": str(int(uuid.uuid4().int % 10_000_000_000)).zfill(10),
+            "hashed_password": "password123",
+            "role": "user",
+        },
+    )
+    assign_personality(db, user.id, uuid.uuid4(), "career")
+
+    monkeypatch.setattr(orchestrator, "determine_agent_flow", lambda *_: ["career"])
+    monkeypatch.setattr(orchestrator, "load_agent_context", lambda *_: ["career"])
+    monkeypatch.setattr(orchestrator, "build_personalized_prompt", lambda *a: "p")
+    monkeypatch.setattr(orchestrator, "build_agent_prompt", lambda *a: [])
+    monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "career", lambda _m: "r")
+
+    from services import agent_access_control
+    monkeypatch.setitem(agent_access_control.AGENT_ROLE_REQUIREMENTS, "career", ["admin"])
+
+    result = orchestrator.process_user_prompt(db, user.id, "test")
+    assert result == []
+    db.close()
+
+
+# Verify parallel runner also skips disallowed agents
+
+def test_parallel_agents_respects_role(monkeypatch):
+    db = TestingSessionLocal()
+    user = create_user(
+        db,
+        {
+            "email": f"orch_{uuid.uuid4().hex}@example.com",
+            "phone_number": str(int(uuid.uuid4().int % 10_000_000_000)).zfill(10),
+            "hashed_password": "password123",
+            "role": "user",
+        },
+    )
+
+    monkeypatch.setattr(orchestrator, "build_memory_context", lambda *_: "mem")
+    monkeypatch.setattr(orchestrator, "build_agent_prompt", lambda a, *_: [{"role": "user", "content": a}])
+    import services.llm_call_service as llm_service
+    monkeypatch.setattr(llm_service, "call_llm", lambda *_: "reply")
+
+    from services import agent_access_control
+    monkeypatch.setitem(agent_access_control.AGENT_ROLE_REQUIREMENTS, "career", ["admin"])
+
+    result = orchestrator.run_parallel_agents(
+        user.id,
+        "prompt",
+        ["career", "finance"],
+        db,
+    )
+    assert "career" not in result
+    assert "finance" in result
+    db.close()
