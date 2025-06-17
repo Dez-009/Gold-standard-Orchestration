@@ -483,6 +483,16 @@ export async function getMoodTrends(token: string) {
   return response.data;
 }
 
+// Request aggregated journal trend insights for the authenticated user
+export async function getJournalTrends(token: string) {
+  // Notes: Perform GET request to the /ai/journal-trends endpoint
+  const response = await apiClient.get('/ai/journal-trends', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the trend analysis data from the backend
+  return response.data;
+}
+
 // Notes: Retrieve overall system health information for admin dashboard
 export async function getSystemHealth(token: string) {
   // Notes: Call the backend /admin/health endpoint including auth header

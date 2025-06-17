@@ -8,6 +8,7 @@ from services.ai_memory_service import get_user_context_memory
 # Notes: Import models used for summarization
 from models.journal_entry import JournalEntry
 from models.journal_summary import JournalSummary
+from models.journal_trends import JournalTrend
 
 # Notes: Standard library module for JSON serialization
 import json
@@ -129,3 +130,85 @@ def generate_journal_summary(db: Session, user_id: int) -> str:
 
     # Notes: Return only the text summary to the caller
     return summary_text
+
+
+# Notes: Parse the JSON text returned by the AI trend analyzer
+def _parse_trend_response(text: str) -> dict:
+    """Return dictionary with mood_summary, keyword_trends, and goal_progress_notes."""
+
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return {
+            "mood_summary": "",
+            "keyword_trends": {},
+            "goal_progress_notes": "",
+        }
+
+
+# Notes: Analyze historical journals for sentiment and goal progress patterns
+def analyze_journal_trends(db: Session, user_id: int) -> dict:
+    """Return a structured summary of mood and goal progress trends."""
+
+    from datetime import datetime, timedelta
+
+    # Notes: Retrieve journals from the last 90 days for analysis
+    cutoff = datetime.utcnow() - timedelta(days=90)
+    journals = (
+        db.query(JournalEntry)
+        .filter(JournalEntry.user_id == user_id, JournalEntry.created_at >= cutoff)
+        .order_by(JournalEntry.created_at.desc())
+        .all()
+    )
+
+    if not journals:
+        # Notes: Return an empty structure when no journals exist
+        return {
+            "mood_summary": "",
+            "keyword_trends": {},
+            "goal_progress_notes": "",
+        }
+
+    # Notes: Concatenate journal content for the AI prompt
+    combined_text = "\n".join(j.content for j in journals)
+
+    # Notes: Instruction asking the model to identify mood and goal progress trends
+    analysis_prompt = (
+        "Analyze the following journal entries and summarize mood trends, "
+        "common keywords, and progress on any linked goals. "
+        "Return JSON with keys 'mood_summary', 'keyword_trends', and "
+        "'goal_progress_notes'."
+    )
+
+    # Notes: Call OpenAI to perform the trend analysis
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"{analysis_prompt}\n\n{combined_text}"},
+        ],
+        temperature=0.4,
+        max_tokens=512,
+    )
+
+    # Notes: Parse the response text into a dictionary
+    data = _parse_trend_response(response.choices[0].message.content)
+
+    # Notes: Persist the trend analysis record in the database
+    trend_record = JournalTrend(
+        user_id=user_id,
+        mood_summary=json.dumps(data.get("mood_summary")),
+        keyword_trends=json.dumps(data.get("keyword_trends")),
+        goal_progress_notes=data.get("goal_progress_notes", ""),
+    )
+    db.add(trend_record)
+    db.commit()
+    db.refresh(trend_record)
+
+    # Notes: Include record metadata in the returned structure
+    data.update({
+        "id": str(trend_record.id),
+        "user_id": user_id,
+        "timestamp": trend_record.timestamp,
+    })
+    return data

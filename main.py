@@ -25,6 +25,7 @@ from routes.ai_routes import router as ai_routes_router
 from routes.ai_orchestration import router as ai_orchestration_router
 # Notes: Import router serving journal summaries
 from routes.journal_summary import router as journal_summary_router
+from routes.journal_trends import router as journal_trends_router
 # Notes: Import router exposing account-related endpoints
 from routes.account import router as account_router
 from routes.vida import router as vida_router
@@ -112,6 +113,7 @@ app.include_router(ai_coach_router)
 app.include_router(ai_routes_router)
 # Register the new journal summary route
 app.include_router(journal_summary_router)
+app.include_router(journal_trends_router)
 # Register new multi-agent orchestration route
 app.include_router(ai_orchestration_router)
 # Notes: Include routes that generate action plans for user goals
