@@ -34,3 +34,14 @@ class AgentState(Base):
 
     # Notes: Relationship back to the user model
     user = relationship("User", back_populates="agent_states")
+
+# Footnote: Why Do We Need It?
+# Notes: Explains why each agent has a corresponding state in the system.
+#   - Every agent (career coach, financial coach, mental health coach, etc.)
+#     attached to a user has a state.
+#   - This state tells the orchestration system if the agent is:
+#       active    -> Ready to serve the user
+#       paused    -> Temporarily off
+#       error     -> Something broke, avoid calling it
+#       suspended -> Admin blocked for some reason
+#       retired   -> Deprecated agent logic
