@@ -140,6 +140,19 @@ export async function getJournalTags(token: string) {
   return response.data as { tags: string[] };
 }
 
+// Create a new journal entry for the authenticated user
+export async function createJournalEntry(
+  data: Record<string, unknown>,
+  token: string
+) {
+  // Send a POST request to the /journals endpoint
+  const response = await apiClient.post('/journals', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the newly created entry from the backend
+  return response.data;
+}
+
 // Update an existing journal entry
 // Accepts the entry id, updated fields and the JWT token
 export async function updateJournal(

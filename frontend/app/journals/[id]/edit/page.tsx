@@ -9,6 +9,7 @@ import {
   fetchJournalById,
   updateJournal
 } from '../../../../services/journalService';
+import { fetchGoals } from '../../../../services/goalService';
 // Notes: Reusable component for picking a mood value
 import MoodSelector from '../../../../components/MoodSelector';
 import { getToken, isTokenExpired } from '../../../../services/authUtils';
@@ -33,6 +34,10 @@ export default function EditJournalPage({
   // Form fields for title and content
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  // List of goals for linking the entry
+  const [goals, setGoals] = useState<Array<{ id: number; content: string }>>([]);
+  // Currently selected goal id as string
+  const [linkedGoal, setLinkedGoal] = useState('');
   // Current mood associated with the journal entry
   const [mood, setMood] = useState('Excellent');
   // Flags for loading the entry and submitting updates
@@ -58,13 +63,27 @@ export default function EditJournalPage({
         setContent(data.content);
         // Notes: Update the mood state if provided by the backend
         if (data.mood) setMood(data.mood);
+        // Notes: Preserve any previously linked goal
+        if (data && (data as any).linked_goal_id) {
+          setLinkedGoal(String((data as any).linked_goal_id));
+        }
       } catch {
         setError('Failed to load journal entry');
       } finally {
         setLoading(false);
       }
     };
+    const loadGoals = async () => {
+      try {
+        // Notes: Fetch available goals for the dropdown
+        const all = await fetchGoals();
+        setGoals(all);
+      } catch {
+        setError('Failed to load goals');
+      }
+    };
     loadEntry();
+    loadGoals();
   }, [params.id, router]);
 
   // Submit updated journal fields to the backend
@@ -78,8 +97,10 @@ export default function EditJournalPage({
     setSaving(true);
     setError('');
     try {
-      // Notes: Persist the updated fields including the mood value
-      await updateJournal(params.id, { title, content, mood });
+      // Notes: Persist the updated fields including the mood value and goal
+      const payload: Record<string, unknown> = { title, content, mood };
+      if (linkedGoal) payload['linked_goal_id'] = Number(linkedGoal);
+      await updateJournal(params.id, payload);
       showSuccess('Journal updated!');
       router.push(`/journals/${params.id}`);
     } catch {
@@ -117,6 +138,19 @@ export default function EditJournalPage({
           />
           {/* Selector for the mood associated with this entry */}
           <MoodSelector value={mood} onChange={setMood} />
+          {/* Dropdown to choose a goal for this entry */}
+          <select
+            value={linkedGoal}
+            onChange={(e) => setLinkedGoal(e.target.value)}
+            className="border rounded w-full p-2"
+          >
+            <option value="">No goal</option>
+            {goals.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.content}
+              </option>
+            ))}
+          </select>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}

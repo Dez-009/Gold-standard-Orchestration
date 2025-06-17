@@ -8,6 +8,7 @@ from services import (
     journal_service,
     journal_export_service,
     journal_tagging_service,
+    goal_service,
 )
 from schemas.journal_schemas import JournalEntryCreate, JournalEntryResponse
 from schemas.journal_tagging_schemas import JournalTagsResponse
@@ -26,6 +27,16 @@ def create_journal_entry(
     user = user_service.get_user(db, entry_data.user_id)
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    # Notes: Validate that the linked goal belongs to the authenticated user
+    if entry_data.linked_goal_id is not None:
+        goal = goal_service.get_goal_by_id(db, entry_data.linked_goal_id)
+        if goal is None or goal.user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid goal for linking",
+            )
+
     new_entry = journal_service.create_journal_entry(db, entry_data.model_dump())
     return new_entry
 

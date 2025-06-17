@@ -8,6 +8,8 @@ class JournalEntryCreate(BaseModel):
     user_id: int
     title: str | None = None
     content: str
+    # Optional goal to associate with this journal entry
+    linked_goal_id: int | None = None
 
 
 class JournalEntryResponse(BaseModel):
@@ -17,6 +19,8 @@ class JournalEntryResponse(BaseModel):
     user_id: int
     title: str | None = None
     content: str
+    # Include the linked goal id in responses
+    linked_goal_id: int | None = None
     created_at: datetime
     updated_at: datetime
 
