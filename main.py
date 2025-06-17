@@ -51,6 +51,7 @@ from routes.admin_revenue import router as admin_revenue_router
 from routes.admin.agent_admin import router as admin_agent_router
 from routes.admin_agent_assignment import router as admin_agent_assignment_router
 from routes.admin.agent_override_admin import router as admin_agent_override_router
+from routes.admin_agent_lifecycle import router as admin_agent_lifecycle_router
 from routes.admin_agent import router as admin_agent_query_router
 from routes.admin.user_personality_admin import (
     router as admin_user_personality_router,
@@ -149,6 +150,7 @@ app.include_router(admin_agent_router)
 app.include_router(admin_agent_assignment_router)
 app.include_router(admin_agent_override_router)
 app.include_router(admin_agent_query_router)
+app.include_router(admin_agent_lifecycle_router)
 app.include_router(admin_user_personality_router)
 app.include_router(admin_notifications_router)
 app.include_router(admin_model_logging_router)
