@@ -12,6 +12,10 @@ from sqlalchemy.orm import Session
 from models.journal_entry import JournalEntry
 from models.summarized_journal import SummarizedJournal
 
+# Notes: Import the reflection booster agent and services
+from agents.reflection_booster_agent import generate_reflection_prompt
+from services import reflection_prompt_service, orchestration_audit_service
+
 # Notes: Adapter used to call the LLM summarization agent
 from services.ai_model_adapter import AIModelAdapter
 
@@ -56,6 +60,29 @@ def summarize_journal_entries(user_id: int, db: Session) -> str:
     db.add(record)
     db.commit()
     db.refresh(record)
+
+    # Notes: Generate a follow-up reflection prompt using the booster agent
+    try:
+        prompt_text = generate_reflection_prompt(
+            combined_text,
+            mood=None,
+            goals=[],
+        )
+        # Notes: Persist the generated prompt linked to the newest journal entry
+        if entries:
+            reflection_prompt_service.create_prompt(
+                db, user_id, entries[0].id, prompt_text
+            )
+        # Notes: Log the generation within the orchestration audit trail
+        orchestration_audit_service.log_orchestration_request(
+            db,
+            user_id,
+            "reflection_prompt_generation",
+            ["ReflectionBoosterAgent"],
+            [{"prompt_text": prompt_text}],
+        )
+    except Exception:  # pragma: no cover - best effort logging
+        pass
 
     # Notes: Return the summarized text back to the caller
     return summary
