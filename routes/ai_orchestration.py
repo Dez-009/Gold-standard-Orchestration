@@ -18,6 +18,7 @@ from schemas.ai_orchestration import (
 
 # Notes: Import the processor service that coordinates agents
 from services.orchestration_processor_service import process_user_prompt
+from services import orchestration_audit_service
 
 router = APIRouter(prefix="/ai", tags=["ai-orchestration"])
 
@@ -37,6 +38,15 @@ async def orchestration_endpoint(
 
     # Notes: Delegate to the processor service to gather agent replies
     results = process_user_prompt(db, payload.user_id, payload.user_prompt)
+
+    # Notes: Record the orchestration details for auditing
+    orchestration_audit_service.log_orchestration_request(
+        db,
+        current_user.id,
+        payload.user_prompt,
+        [r["agent"] for r in results],
+        results,
+    )
 
     # Notes: Return the list of responses in the response model
     return AIOrchestrationResponse(responses=results)
