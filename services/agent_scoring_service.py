@@ -4,6 +4,10 @@
 from __future__ import annotations
 from typing import Sequence, Dict
 from uuid import UUID
+from datetime import datetime
+from sqlalchemy.orm import Session
+
+from models.agent_score import AgentScore
 
 
 def score_agent_responses(
@@ -34,3 +38,37 @@ def score_agent_responses(
     return {"user_id": user_id, "scores": scores}
 
 # Footnote: Future improvements will replace stub scoring with NLP-based checks.
+
+
+def list_agent_scores(
+    db: Session,
+    agent_name: str | None = None,
+    user_id: int | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+    limit: int = 100,
+    offset: int = 0,
+) -> list[AgentScore]:
+    """Return scoring entries filtered by the provided parameters."""
+
+    # Notes: Begin building the query selecting from the AgentScore table
+    query = db.query(AgentScore)
+
+    # Notes: Apply optional filters when values are supplied
+    if agent_name:
+        query = query.filter(AgentScore.agent_name == agent_name)
+    if user_id:
+        query = query.filter(AgentScore.user_id == user_id)
+    if start_date:
+        query = query.filter(AgentScore.created_at >= start_date)
+    if end_date:
+        query = query.filter(AgentScore.created_at <= end_date)
+
+    # Notes: Order by most recent and apply pagination before returning
+    return (
+        query.order_by(AgentScore.created_at.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+

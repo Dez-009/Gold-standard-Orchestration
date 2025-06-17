@@ -497,6 +497,27 @@ export async function getAgentExecutionLogs(
   return response.data;
 }
 
+// Notes: Retrieve agent scoring records with optional filters
+export async function getAgentScores(
+  token: string,
+  filters: {
+    agent_name?: string;
+    user_id?: number;
+    start_date?: string;
+    end_date?: string;
+    limit?: number;
+    offset?: number;
+  }
+) {
+  // Notes: Perform GET request to the admin scores endpoint with params
+  const response = await apiClient.get('/admin/agent-scores', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters
+  });
+  // Notes: Response is the array of scoring entries
+  return response.data;
+}
+
 // Notes: Retrieve current agent states for all users
 export async function getAgentStates(
   token: string,
