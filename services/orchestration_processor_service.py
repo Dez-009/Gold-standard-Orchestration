@@ -19,6 +19,8 @@ from services.agents import (
 
 # Notes: Service used to record execution details
 from services.agent_execution_log_service import log_agent_execution
+# Notes: Import prompt builder to inject personalization
+from services.agent_prompt_builder import build_personalized_prompt
 # Notes: Utility to check if an agent is currently active
 # Notes: Import utilities for loading and checking agent state context
 from services.agent_context_loader import load_agent_context, is_agent_active
@@ -69,7 +71,11 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
             continue
         start = time.perf_counter()
         try:
-            result_text = processor(user_prompt)
+            # Notes: Build a personalized prompt before invoking the agent
+            personalized_prompt = build_personalized_prompt(
+                db, user_id, assignment.domain, user_prompt
+            )
+            result_text = processor(personalized_prompt)
             success = True
             error_message = None
         except Exception as exc:  # pragma: no cover - generic failure capture
