@@ -20,9 +20,12 @@ from services.agents import (
 # Notes: Service used to record execution details
 from services.agent_execution_log_service import log_agent_execution
 # Notes: Import prompt builder to inject personalization
+# Notes: Import prompt builder to inject personalization
 from services.agent_prompt_builder import build_personalized_prompt
 # Notes: Import memory context builder to provide conversation history
 from services.conversation_memory_service import build_memory_context
+# Notes: Import prompt assembly helper for building agent requests
+from services.prompt_assembly_service import build_agent_prompt
 # Notes: Utility to check if an agent is currently active
 # Notes: Import utilities for loading and checking agent state context
 from services.agent_context_loader import load_agent_context, is_agent_active
@@ -85,15 +88,18 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
             continue
         start = time.perf_counter()
         try:
-            # Notes: Build a personalized prompt before invoking the agent
+            # Notes: Apply user personalization before assembling the final messages
             personalized_prompt = build_personalized_prompt(
                 db, user_id, assignment.domain, user_prompt
             )
-            # Notes: Prepend shared memory context so the agent has continuity
-            final_prompt = (
-                f"{memory_context}\n\n{personalized_prompt}" if memory_context else personalized_prompt
+            # Notes: Build the message list using the new prompt assembly helper
+            messages = build_agent_prompt(
+                assignment.domain,
+                memory_context,
+                personalized_prompt,
             )
-            result_text = processor(final_prompt)
+            # Notes: Execute the agent using the assembled message payload
+            result_text = processor(messages)
             success = True
             error_message = None
         except Exception as exc:  # pragma: no cover - generic failure capture

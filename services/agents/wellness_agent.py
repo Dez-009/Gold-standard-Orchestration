@@ -8,17 +8,15 @@ from config import get_settings
 client = OpenAI(api_key=get_settings().openai_api_key)
 
 
-# Notes: Generate a response from the wellness agent
+# Notes: Generate a response from the wellness agent using pre-built messages
 
-def process(user_prompt: str) -> str:
-    """Return the wellness agent's reply to the user prompt."""
+def process(messages: list[dict[str, str]]) -> str:
+    """Return the wellness agent's reply to the assembled prompt messages."""
+
     try:
         completion = client.chat.completions.create(
             model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "You are a supportive wellness coach."},
-                {"role": "user", "content": user_prompt},
-            ],
+            messages=messages,
             temperature=0.7,
             max_tokens=512,
         )
