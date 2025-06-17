@@ -33,6 +33,9 @@ from services.agent_context_loader import load_agent_context, is_agent_active
 from services.orchestration_decision_service import determine_agent_flow
 # Notes: Import the aggregator used after parallel execution
 from services.response_aggregation_service import aggregate_agent_responses
+from services.agent_scoring_service import score_agent_responses
+
+from models.agent_score import AgentScore
 
 # Notes: Timing utility for measuring execution latency
 import time
@@ -171,6 +174,24 @@ def orchestrate_and_summarize(
 
     # Notes: Reduce the mapping into a single formatted text block
     summary = aggregate_agent_responses(raw_responses)
+
+    # Notes: Generate quality scores for each agent response
+    score_input = [(name, text) for name, text in raw_responses.items()]
+    results = score_agent_responses(user_id, score_input)
+
+    # Notes: Persist scoring results for future analysis
+    for agent, metrics in results["scores"].items():
+        row = AgentScore(
+            user_id=user_id,
+            agent_name=agent,
+            completeness_score=metrics["completeness_score"],
+            clarity_score=metrics["clarity_score"],
+            relevance_score=metrics["relevance_score"],
+        )
+        db.add(row)
+    db.commit()
+
     return summary
 
 # Footnote: Executes parallel agents and aggregates them into one summary string.
+

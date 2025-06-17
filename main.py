@@ -81,6 +81,8 @@ from routes.admin_agent_state import router as admin_agent_state_router
 # Notes: Import router providing access to agent failure queue
 from routes.admin_agent_failures import router as admin_agent_failures_router
 from routes.admin_agent_logs import router as admin_agent_logs_router
+# Notes: Import router exposing agent scoring records
+from routes.admin_agent_scores import router as admin_agent_scores_router
 # Notes: Import routers handling user feedback
 from routes.feedback import router as feedback_router
 from routes.admin_feedback import router as admin_feedback_router
@@ -160,6 +162,7 @@ app.include_router(admin_agent_query_router)
 app.include_router(admin_agent_lifecycle_router)
 app.include_router(admin_agent_state_router)
 app.include_router(admin_agent_logs_router)
+app.include_router(admin_agent_scores_router)
 app.include_router(admin_agent_failures_router)
 app.include_router(admin_user_personality_router)
 app.include_router(admin_notifications_router)
