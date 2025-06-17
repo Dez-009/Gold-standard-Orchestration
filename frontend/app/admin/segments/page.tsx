@@ -12,6 +12,7 @@ import {
   fetchSegmentUsers,
   UserSegment
 } from '../../../services/segmentationService';
+import { triggerSegmentRecommendations } from '../../../services/recommendationService';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
 
@@ -22,6 +23,7 @@ export default function AdminSegmentsPage() {
   const [error, setError] = useState('');
   const [selected, setSelected] = useState<string | null>(null);
   const [users, setUsers] = useState<Record<string, any[]>>({});
+  const [generating, setGenerating] = useState<Record<string, boolean>>({});
   const [form, setForm] = useState({ name: '', description: '', criteria: '{}' });
 
   // Validate session and load segments on mount
@@ -89,6 +91,18 @@ export default function AdminSegmentsPage() {
       setUsers({ ...users, [id]: result });
     } catch {
       setError('Failed to evaluate segment');
+    }
+  };
+
+  // Trigger goal generation for a segment
+  const handleGenerate = async (id: string) => {
+    setGenerating({ ...generating, [id]: true });
+    try {
+      await triggerSegmentRecommendations(id);
+    } catch {
+      setError('Failed to generate goals');
+    } finally {
+      setGenerating({ ...generating, [id]: false });
     }
   };
 
@@ -190,6 +204,12 @@ export default function AdminSegmentsPage() {
                         className="bg-blue-600 text-white py-1 px-2 rounded hover:bg-blue-700"
                       >
                         Evaluate
+                      </button>
+                      <button
+                        onClick={() => handleGenerate(seg.id)}
+                        className="bg-purple-600 text-white py-1 px-2 rounded hover:bg-purple-700"
+                      >
+                        {generating[seg.id] ? 'Generating...' : 'Generate Goals'}
                       </button>
                     </td>
                   </tr>
