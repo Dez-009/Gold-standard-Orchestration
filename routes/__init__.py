@@ -58,6 +58,7 @@ from .account_personalization import router as account_personalization_router
 from .pdf_export import router as pdf_export_router
 # Notes: Import router serving reflection prompt retrieval
 from .reflection_prompt import router as reflection_prompt_router
+from .conflict_flag import router as conflict_flag_router
 
 router = APIRouter()
 
@@ -68,6 +69,7 @@ router.include_router(protected_router)
 router.include_router(session_router)
 router.include_router(journal_router)
 router.include_router(reflection_prompt_router)
+router.include_router(conflict_flag_router)
 router.include_router(pdf_export_router)
 router.include_router(notification_router)
 router.include_router(goal_router)

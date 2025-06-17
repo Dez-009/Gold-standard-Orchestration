@@ -1499,6 +1499,24 @@ export async function getReflectionPrompts(userId: string, token: string) {
   return response.data;
 }
 
+// Retrieve conflict flags detected for the user
+export async function getConflictFlags(userId: string, token: string) {
+  const response = await apiClient.get(`/conflict-flags/user/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Mark a conflict flag as resolved
+export async function resolveConflictFlag(flagId: string, token: string) {
+  const response = await apiClient.patch(
+    `/conflict-flags/${flagId}/resolve`,
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

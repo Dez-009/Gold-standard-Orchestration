@@ -11,6 +11,11 @@ import {
   getPromptsForUser,
   ReflectionPrompt
 } from '../../../services/reflectionPromptService';
+import {
+  getUserConflictFlags,
+  resolveFlag,
+  ConflictFlag
+} from '../../../services/conflictResolutionService';
 
 // Shape of the journal entry returned from the backend
 interface Entry {
@@ -36,6 +41,7 @@ export default function JournalDetailsPage({
   const [error, setError] = useState('');
   // Notes: Store reflection prompts returned from the backend
   const [prompts, setPrompts] = useState<ReflectionPrompt[]>([]);
+  const [conflicts, setConflicts] = useState<ConflictFlag[]>([]);
 
   // Helper to decode the user id from the JWT token
   const parseUserId = (token: string): string | null => {
@@ -81,10 +87,21 @@ export default function JournalDetailsPage({
     getPromptsForUser(uid)
       .then(setPrompts)
       .catch(() => {});
+    getUserConflictFlags(uid)
+      .then(setConflicts)
+      .catch(() => {});
   }, []);
 
   // Format the timestamp to display just the date
   const formatDate = (iso: string) => iso.split('T')[0];
+
+  // Resolve a conflict flag by id and update state
+  const handleResolve = async (id: string) => {
+    try {
+      await resolveFlag(id);
+      setConflicts((prev) => prev.filter((c) => c.id !== id));
+    } catch {}
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
@@ -131,6 +148,26 @@ export default function JournalDetailsPage({
               <li key={p.id} className="flex text-gray-700">
                 <span className="mr-2">❝</span>
                 <span>{p.prompt_text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {conflicts.length > 0 && (
+        <div className="w-full max-w-md p-4 bg-red-50 rounded border-l-4 border-red-300 space-y-2">
+          <p className="font-semibold text-red-700">Tension Detected</p>
+          <ul className="list-none space-y-1">
+            {conflicts.map((c) => (
+              <li key={c.id} className="flex flex-col text-sm text-red-800">
+                <span className="font-semibold">{c.conflict_type}</span>
+                <span className="italic">{c.summary_excerpt}</span>
+                <span>{c.resolution_prompt}</span>
+                <button
+                  onClick={() => handleResolve(c.id)}
+                  className="self-start mt-1 text-xs text-blue-600 underline"
+                >
+                  Mark Resolved
+                </button>
               </li>
             ))}
           </ul>

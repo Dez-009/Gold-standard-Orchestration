@@ -114,4 +114,9 @@ class User(Base):
         "AgentScore", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: Flags indicating emotional or interpersonal conflict detected in journals
+    conflict_flags = relationship(
+        "ConflictFlag", back_populates="user", cascade="all, delete"
+    )
+
 # Footnote: Defines the User ORM model and relationships.
