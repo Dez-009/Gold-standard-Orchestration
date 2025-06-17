@@ -1255,6 +1255,34 @@ export async function submitFeedback(
   return response.data;
 }
 
+// Interface describing payload for agent summary feedback
+export interface AgentFeedbackPayload {
+  summary_id: string;
+  emoji_reaction: string;
+  feedback_text?: string;
+}
+
+// Submit emoji reaction and optional comment for an agent summary
+export async function postAgentSummaryFeedback(
+  token: string,
+  payload: AgentFeedbackPayload
+) {
+  const response = await apiClient.post('/feedback/agent-summary', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the created feedback record
+  return response.data;
+}
+
+// Retrieve feedback for a specific summary id
+export async function getAgentSummaryFeedback(token: string, summaryId: string) {
+  const response = await apiClient.get(
+    `/feedback/agent-summary/${summaryId}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
 // Retrieve submitted feedback records for admin dashboards
 export async function getAdminFeedback(
   token: string,

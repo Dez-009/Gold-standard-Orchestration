@@ -45,6 +45,8 @@ from .agent_execution_log import AgentExecutionLog
 from .agent_personalization import AgentPersonalization
 # Notes: Import model capturing scoring metrics for agent outputs
 from .agent_score import AgentScore
+# Notes: Import model capturing user reactions to agent summaries
+from .agent_feedback import AgentFeedback
 # Notes: Include the user feedback model for collecting suggestions
 from .user_feedback import UserFeedback, FeedbackType
 # Notes: Import the referral model for viral sharing features
@@ -91,6 +93,7 @@ __all__ = [
     "AgentExecutionLog",
     "AgentPersonalization",
     "AgentScore",
+    "AgentFeedback",
     "DeviceSyncLog",
 ]
 
