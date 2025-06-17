@@ -1250,6 +1250,28 @@ export async function evaluateSegment(segmentId: string, token: string) {
   return response.data;
 }
 
+// Notes: Retrieve queued agent failures for administrators
+export async function getAgentFailures(token: string) {
+  // Notes: Perform GET request to the admin agent-failures endpoint
+  const response = await apiClient.get('/admin/agent-failures', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the list of queue records
+  return response.data;
+}
+
+// Notes: Manually trigger processing of the failure queue
+export async function processFailureQueue(token: string) {
+  // Notes: POST to the admin endpoint that processes queued failures
+  const response = await apiClient.post(
+    '/admin/agent-failures/process',
+    null,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Response is a simple status payload
+  return response.data;
+}
+
 // Trigger goal recommendations for a user segment
 export async function triggerGoalRecommendations(
   token: string,
