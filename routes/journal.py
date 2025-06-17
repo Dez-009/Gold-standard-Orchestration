@@ -3,8 +3,14 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from database.utils import get_db
-from services import user_service, journal_service, journal_export_service
+from services import (
+    user_service,
+    journal_service,
+    journal_export_service,
+    journal_tagging_service,
+)
 from schemas.journal_schemas import JournalEntryCreate, JournalEntryResponse
+from schemas.journal_tagging_schemas import JournalTagsResponse
 from auth.dependencies import get_current_user
 from models.user import User
 
@@ -32,6 +38,18 @@ def export_journals(
 ) -> StreamingResponse:
     """Return a PDF file containing the user's journal history."""
     return journal_export_service.generate_journal_pdf(current_user.id, db)
+
+
+# Notes: Analyze all of the current user's journal entries and return key tags
+@router.get("/analyze-tags", response_model=JournalTagsResponse)
+def analyze_journal_tags(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> JournalTagsResponse:
+    """Return a list of keywords representing themes from the user's journals."""
+
+    tags = journal_tagging_service.extract_tags_from_journals(db, current_user.id)
+    return JournalTagsResponse(tags=tags)
 
 
 @router.get("/{entry_id}", response_model=JournalEntryResponse)
