@@ -25,6 +25,8 @@ from .billing import router as billing_router
 from .admin_behavioral_insights import router as admin_behavioral_insight_router
 # Notes: Import router exposing aggregated behavioral insights
 from .admin_insights import router as admin_insights_router
+# Notes: Import router implementing the admin agent query endpoint
+from .admin_agent import router as admin_agent_query_router
 
 router = APIRouter()
 
@@ -50,6 +52,8 @@ router.include_router(billing_router)
 router.include_router(admin_behavioral_insight_router)
 # Notes: Register aggregated behavioral insights route
 router.include_router(admin_insights_router)
+# Notes: Register the admin agent query route
+router.include_router(admin_agent_query_router)
 # Notes: Register the admin audit log routes
 router.include_router(admin_audit_router)
 

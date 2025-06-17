@@ -846,6 +846,17 @@ export async function assignAgent(domain: string, token: string) {
   return response.data;
 }
 
+// Send a natural language query to the admin agent API
+export async function adminAgentQuery(token: string, user_prompt: string) {
+  const response = await apiClient.post(
+    '/admin/agent-query',
+    { user_prompt },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return whatever structured payload the backend provides
+  return response.data;
+}
+
 // Permanently delete the authenticated user's account
 export async function deleteAccount(token: string) {
   // Notes: Send a DELETE request to the account deletion endpoint
