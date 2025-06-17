@@ -123,3 +123,43 @@ def test_process_user_prompt_no_active(monkeypatch):
     db.close()
 
 # Footnote: Ensures orchestration respects active agent context.
+
+
+# Verify that the parallel runner aggregates responses for multiple agents
+
+def test_run_parallel_agents(monkeypatch):
+    db = TestingSessionLocal()
+    user = create_user(
+        db,
+        {
+            "email": f"orch_{uuid.uuid4().hex}@example.com",
+            "phone_number": str(int(uuid.uuid4().int % 10_000_000_000)).zfill(10),
+            "hashed_password": "password123",
+        },
+    )
+
+    # Notes: Fake memory and prompt assembly to isolate asyncio logic
+    monkeypatch.setattr(orchestrator, "build_memory_context", lambda *_: "mem")
+    monkeypatch.setattr(
+        orchestrator,
+        "build_agent_prompt",
+        lambda a, *_: [{"role": "user", "content": f"{a}"}],
+    )
+
+    # Notes: Stub the LLM call so no external request occurs
+    import services.llm_call_service as llm_service
+
+    def fake_call_llm(payload):
+        return payload[-1]["content"] + " reply"
+
+    monkeypatch.setattr(llm_service, "call_llm", fake_call_llm)
+
+    result = orchestrator.run_parallel_agents(
+        user.id,
+        "help me",
+        ["career", "finance"],
+        db,
+    )
+
+    assert result == {"career": "career reply", "finance": "finance reply"}
+    db.close()

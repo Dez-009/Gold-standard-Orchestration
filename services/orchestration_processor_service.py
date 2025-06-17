@@ -125,3 +125,34 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
     return responses
 # Footnote: Coordinates calling each domain agent and filters them using
 # Notes: `load_agent_context` so only active agents generate responses.
+
+
+# Notes: Execute multiple agents concurrently using asyncio
+
+def run_parallel_agents(
+    user_id: int, user_prompt: str, agent_list: list[str], db: Session
+) -> dict[str, str]:
+    """Return mapping of agent names to their LLM responses."""
+
+    import asyncio
+    from services.llm_call_service import call_llm
+
+    # Notes: Inner coroutine used for each agent execution
+    async def _execute(agent_name: str) -> tuple[str, str]:
+        # Notes: Build personalized memory context for the user and agent
+        memory = build_memory_context(db, user_id, [agent_name], user_prompt)
+        prompt = build_agent_prompt(agent_name, memory, user_prompt)
+        # Notes: Offload the blocking model call to a background thread
+        text = await asyncio.to_thread(call_llm, prompt)
+        return agent_name, text
+
+    # Notes: Gather results for all agents concurrently
+    async def _gather() -> list[tuple[str, str]]:
+        tasks = [_execute(name) for name in agent_list]
+        return await asyncio.gather(*tasks)
+
+    # Notes: Run the event loop and format the output as a dictionary
+    pairs = asyncio.run(_gather())
+    return {name: resp for name, resp in pairs}
+
+# Footnote: Provides parallel execution path for orchestrating multiple agents.

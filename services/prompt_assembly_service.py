@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+# Notes: Import typing helpers for explicit collection types
+from typing import List, Dict
+
 # Notes: Map agent types to their persona system prompts
 AGENT_PERSONAS = {
     "career": "You are a helpful career coach.",
@@ -12,7 +15,9 @@ AGENT_PERSONAS = {
 }
 
 
-def build_agent_prompt(agent_type: str, user_memory_context: str, user_prompt: str) -> list[dict[str, str]]:
+def build_agent_prompt(
+    agent_type: str, user_memory_context: str, user_prompt: str
+) -> List[Dict[str, str]]:
     """Return message payload ready for an LLM call."""
 
     # Notes: Retrieve the system prompt template for this agent type
