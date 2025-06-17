@@ -431,6 +431,16 @@ export async function getSystemLogs(token: string) {
   return response.data;
 }
 
+// Retrieve AI model performance logs for administrators
+// Notes: Sends GET request to the /admin/model-logs endpoint
+export async function getModelLogs(token: string) {
+  const response = await apiClient.get('/admin/model-logs', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the list of model log records
+  return response.data;
+}
+
 // Trigger upcoming subscription renewal reminders
 // Notes: Sends a POST request to the /admin/system/send_renewal_reminders endpoint
 export async function postRenewalReminders(token: string) {
