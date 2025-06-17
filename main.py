@@ -39,6 +39,7 @@ from routes.admin.subscription_history import (
 )
 from routes.admin.impersonation import router as admin_impersonation_router
 from routes.admin.audit_admin import router as admin_audit_router
+from routes.admin_audit import router as recent_audit_router
 from routes.admin.metrics_admin import router as admin_metrics_router
 from routes.admin.agent_admin import router as admin_agent_router
 from routes.admin.agent_assignment_admin import (
@@ -109,6 +110,7 @@ app.include_router(admin_webhook_router)
 app.include_router(admin_subscription_history_router)
 app.include_router(admin_impersonation_router)
 app.include_router(admin_audit_router)
+app.include_router(recent_audit_router)
 app.include_router(admin_agent_router)
 app.include_router(admin_agent_assignment_router)
 app.include_router(admin_agent_override_router)
