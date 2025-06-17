@@ -1489,6 +1489,16 @@ export async function getDeviceSyncLogs(
   }>;
 }
 
+// Retrieve reflection prompts generated for the given user
+export async function getReflectionPrompts(userId: string, token: string) {
+  // Notes: Issue GET request to the new reflection prompts endpoint
+  const response = await apiClient.get(`/reflection-prompts/user/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the array of prompts from the backend
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

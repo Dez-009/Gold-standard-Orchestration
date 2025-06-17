@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation';
 import { fetchJournalById } from '../../../services/journalService';
 import { getToken, isTokenExpired } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
+import {
+  getPromptsForUser,
+  ReflectionPrompt
+} from '../../../services/reflectionPromptService';
 
 // Shape of the journal entry returned from the backend
 interface Entry {
@@ -30,6 +34,18 @@ export default function JournalDetailsPage({
   // Flags for loading status and error messages
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  // Notes: Store reflection prompts returned from the backend
+  const [prompts, setPrompts] = useState<ReflectionPrompt[]>([]);
+
+  // Helper to decode the user id from the JWT token
+  const parseUserId = (token: string): string | null => {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return String(payload.user_id);
+    } catch {
+      return null;
+    }
+  };
 
   // Helper to fetch the entry when the page loads
   useEffect(() => {
@@ -55,6 +71,17 @@ export default function JournalDetailsPage({
     };
     load();
   }, [params.id, router]);
+
+  // Fetch reflection prompts for the logged-in user
+  useEffect(() => {
+    const token = getToken();
+    if (!token) return;
+    const uid = parseUserId(token);
+    if (!uid) return;
+    getPromptsForUser(uid)
+      .then(setPrompts)
+      .catch(() => {});
+  }, []);
 
   // Format the timestamp to display just the date
   const formatDate = (iso: string) => iso.split('T')[0];
@@ -93,6 +120,20 @@ export default function JournalDetailsPage({
               Edit
             </Link>
           </div>
+        </div>
+      )}
+      {/* Reflection prompts encouraging deeper thought */}
+      {prompts.length > 0 && (
+        <div className="w-full max-w-md p-4 bg-gray-50 italic rounded border-l-4 border-blue-200 space-y-2">
+          <p className="font-semibold not-italic">Reflection Boost</p>
+          <ul className="list-none space-y-1">
+            {prompts.map((p) => (
+              <li key={p.id} className="flex text-gray-700">
+                <span className="mr-2">❝</span>
+                <span>{p.prompt_text}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

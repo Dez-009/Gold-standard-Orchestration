@@ -54,6 +54,8 @@ from .referral import Referral
 from .user_segment import UserSegment
 # Notes: Import model capturing wearable device sync events
 from .device_sync import DeviceSyncLog
+# Notes: Import model storing follow-up reflection prompts
+from .reflection_prompt import ReflectionPrompt
 
 __all__ = [
     "User",
@@ -95,6 +97,7 @@ __all__ = [
     "AgentScore",
     "AgentFeedback",
     "DeviceSyncLog",
+    "ReflectionPrompt",
 ]
 
 # Footnote: Model package exposes all ORM models for import.
