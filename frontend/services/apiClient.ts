@@ -4,6 +4,7 @@
  * The helpers below also expose admin log retrieval functions so
  * dashboards can display recent system activity.
  * This file now also exposes a helper for downloading summary PDFs.
+ * Additional helpers allow admins to manage agent toggles.
  */
 import axios from 'axios';
 // Notes: Toast helper used to notify when the session has expired
@@ -1536,6 +1537,25 @@ export async function getHabitSummary(
   const response = await apiClient.get('/habit-sync/summary', {
     headers: { Authorization: `Bearer ${token}` },
     params
+  });
+  return response.data;
+}
+
+// Retrieve current agent toggle states for the admin panel
+export async function getAgentToggles(token: string) {
+  const response = await apiClient.get('/admin/agent-toggles', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Update the enabled status of a specific agent
+export async function updateAgentToggle(
+  token: string,
+  payload: { agent_name: string; enabled: boolean }
+) {
+  const response = await apiClient.post('/admin/agent-toggles', payload, {
+    headers: { Authorization: `Bearer ${token}` }
   });
   return response.data;
 }
