@@ -857,6 +857,33 @@ export async function adminAgentQuery(token: string, user_prompt: string) {
   return response.data;
 }
 
+// Assign a personality specialization for the given domain
+export async function assignPersonality(
+  token: string,
+  domain: string,
+  personality: string
+) {
+  // Notes: POST request with domain and personality name
+  const response = await apiClient.post(
+    '/agent/personality-assignments',
+    { domain, personality },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the assignment data from the backend
+  return response.data;
+}
+
+// Retrieve current personality assignment for a domain
+export async function getPersonalityAssignment(token: string, domain: string) {
+  // Notes: GET request with domain as query parameter
+  const response = await apiClient.get(
+    `/agent/personality-assignments?domain=${encodeURIComponent(domain)}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the assignment if found
+  return response.data;
+}
+
 // Permanently delete the authenticated user's account
 export async function deleteAccount(token: string) {
   // Notes: Send a DELETE request to the account deletion endpoint
