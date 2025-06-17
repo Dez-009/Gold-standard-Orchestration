@@ -50,6 +50,9 @@ from routes.admin.user_personality_admin import (
 )
 from routes.admin.notifications_admin import router as admin_notifications_router
 from routes.admin.model_logging_admin import router as admin_model_logging_router
+from routes.admin_behavioral_insights import (
+    router as admin_behavioral_insight_router,
+)
 
 # Notes: Import router exposing personality CRUD endpoints
 from routes.personality import router as personality_router
@@ -112,4 +115,5 @@ app.include_router(admin_agent_override_router)
 app.include_router(admin_user_personality_router)
 app.include_router(admin_notifications_router)
 app.include_router(admin_model_logging_router)
+app.include_router(admin_behavioral_insight_router)
 

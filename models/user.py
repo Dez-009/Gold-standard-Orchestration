@@ -63,3 +63,8 @@ class User(Base):
         "UserPersonality", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: Collection of generated behavioral insights for the user
+    behavioral_insights = relationship(
+        "BehavioralInsight", back_populates="user", cascade="all, delete"
+    )
+

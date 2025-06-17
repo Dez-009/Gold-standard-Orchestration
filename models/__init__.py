@@ -25,6 +25,7 @@ from .agent_assignment_override import AgentAssignmentOverride
 # Notes: Import notification model for queued messages
 from .notification import Notification
 from .system_metrics import SystemMetric
+from .behavioral_insights import BehavioralInsight
 
 __all__ = [
     "User",
@@ -43,5 +44,6 @@ __all__ = [
     "UserPersonality",
     "Notification",
     "SystemMetric",
+    "BehavioralInsight",
 ]
 
