@@ -26,6 +26,10 @@ def log_agent_run(
         fallback_triggered=metrics.get("fallback_triggered", False),
         # Notes: Persist whether the run exceeded the timeout threshold
         timeout_occurred=metrics.get("timeout_occurred", False),
+        # Notes: Record how many retries were attempted
+        retries=metrics.get("retries", 0),
+        # Notes: Persist the final error message if any
+        error_message=metrics.get("error_message"),
     )
     # Notes: Commit the new record to the database
     db.add(log_entry)

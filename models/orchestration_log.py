@@ -70,5 +70,9 @@ class OrchestrationPerformanceLog(Base):
     fallback_triggered = Column(Boolean, default=False)
     # Notes: True when execution exceeded the configured timeout
     timeout_occurred = Column(Boolean, default=False)
+    # Notes: Number of retry attempts made for this run
+    retries = Column(Integer, default=0)
+    # Notes: Optional message describing the last encountered error
+    error_message = Column(Text, nullable=True)
     # Notes: When the orchestration completed
     timestamp = Column(DateTime, default=datetime.utcnow)

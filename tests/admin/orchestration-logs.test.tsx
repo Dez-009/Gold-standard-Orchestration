@@ -15,6 +15,8 @@ jest.mock('../../frontend/services/apiClient', () => ({
         output_tokens: 10,
         status: 'success',
         fallback_triggered: false,
+        retries: 1,
+        timeout_occurred: false,
         timestamp: '2024-01-01T00:00:00Z'
       }
     ])
@@ -28,4 +30,5 @@ test('renders orchestration performance logs', async () => {
   await waitFor(() => screen.getByText('JournalSummarizationAgent'));
   expect(getOrchestrationLogs).toHaveBeenCalled();
   expect(screen.getByText('JournalSummarizationAgent')).toBeInTheDocument();
+  expect(screen.getByText('1')).toBeInTheDocument();
 });
