@@ -46,6 +46,25 @@ export default function AdminAuditLogsPage() {
   // Notes: Format timestamp strings for display
   const fmt = (iso: string) => new Date(iso).toLocaleString();
 
+  // Notes: Convert the details JSON for agent assignment logs into readable text
+  const renderDetails = (log: AuditLogRecord) => {
+    if (log.event_type === 'AGENT_ASSIGNMENT' && log.details) {
+      try {
+        const data = JSON.parse(log.details);
+        return (
+          <span>
+            Assigned <b>{data.assigned_agent}</b> to user{' '}
+            <b>{data.user_id}</b> for domain <b>{data.domain}</b>
+          </span>
+        );
+      } catch {
+        // Notes: Fallback to raw details if JSON parsing fails
+        return log.details;
+      }
+    }
+    return log.details ?? '';
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
       {/* Link back to dashboard */}
@@ -80,7 +99,7 @@ export default function AdminAuditLogsPage() {
                   <td className="border px-4 py-2">{fmt(log.timestamp)}</td>
                   <td className="border px-4 py-2">{log.user_id ?? 'N/A'}</td>
                   <td className="border px-4 py-2">{log.event_type}</td>
-                  <td className="border px-4 py-2">{log.details ?? ''}</td>
+                  <td className="border px-4 py-2">{renderDetails(log)}</td>
                 </tr>
               ))}
             </tbody>
