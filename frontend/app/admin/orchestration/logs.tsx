@@ -18,6 +18,7 @@ interface PerfLog {
   status: string;
   fallback_triggered: boolean;
   timeout_occurred: boolean;
+  retries: number;
   timestamp: string;
 }
 
@@ -27,6 +28,9 @@ export default function OrchestrationPerformancePage() {
   const [logs, setLogs] = useState<PerfLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [sortField, setSortField] = useState<keyof PerfLog>('timestamp');
+  const [sortAsc, setSortAsc] = useState(false);
+  const [agentFilter, setAgentFilter] = useState('');
   // Notes: Pagination parameters
   const [skip, setSkip] = useState(0);
   const limit = 20;
@@ -56,6 +60,22 @@ export default function OrchestrationPerformancePage() {
   }, [router, skip]);
 
   const fmt = (iso: string) => new Date(iso).toLocaleString();
+  const sorted = [...logs]
+    .filter((l) =>
+      agentFilter ? l.agent_name.includes(agentFilter) : true
+    )
+    .sort((a, b) => {
+      const res = a[sortField] < b[sortField] ? -1 : a[sortField] > b[sortField] ? 1 : 0;
+      return sortAsc ? res : -res;
+    });
+  const toggleSort = (field: keyof PerfLog) => {
+    if (field === sortField) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortField(field);
+      setSortAsc(true);
+    }
+  };
   const badge = (status: string) => {
     const color =
       status === 'success'
@@ -78,24 +98,32 @@ export default function OrchestrationPerformancePage() {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
       )}
       {error && <p className="text-red-600">{error}</p>}
-      {!loading && !error && logs.length === 0 && <p>No logs found.</p>}
-      {!loading && !error && logs.length > 0 && (
+      {/* Filter and table when data is loaded */}
+      {!loading && !error && sorted.length === 0 && <p>No logs found.</p>}
+      {!loading && !error && sorted.length > 0 && (
         <div className="overflow-x-auto w-full max-h-[70vh]">
+          <input
+            value={agentFilter}
+            onChange={(e) => setAgentFilter(e.target.value)}
+            placeholder="Filter by agent"
+            className="border p-1 mb-2 rounded"
+          />
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead>
               <tr>
-                <th className="px-4 py-2">Timestamp</th>
-                <th className="px-4 py-2">Agent</th>
-                <th className="px-4 py-2">Exec ms</th>
+                <th className="px-4 py-2 cursor-pointer" onClick={() => toggleSort('timestamp')}>Timestamp</th>
+                <th className="px-4 py-2 cursor-pointer" onClick={() => toggleSort('agent_name')}>Agent</th>
+                <th className="px-4 py-2 cursor-pointer" onClick={() => toggleSort('execution_time_ms')}>Exec ms</th>
                 <th className="px-4 py-2">In</th>
                 <th className="px-4 py-2">Out</th>
-                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2 cursor-pointer" onClick={() => toggleSort('status')}>Status</th>
                 <th className="px-4 py-2">Fallback</th>
                 <th className="px-4 py-2">Timeout</th>
+                <th className="px-4 py-2">Retries</th>
               </tr>
             </thead>
             <tbody>
-              {logs.map((log) => (
+              {sorted.map((log) => (
                 <tr
                   key={log.id}
                   className={`odd:bg-gray-100 text-center ${log.timeout_occurred ? 'bg-orange-100' : ''}`}
@@ -111,9 +139,16 @@ export default function OrchestrationPerformancePage() {
                   </td>
                   <td className="border px-2 py-1">
                     {log.timeout_occurred ? (
-                      <span className="px-2 py-1 rounded bg-orange-200">Timeout</span>
+                      <span className="px-2 py-1 rounded bg-red-200">Timeout</span>
                     ) : (
                       '-'
+                    )}
+                  </td>
+                  <td className="border px-2 py-1">
+                    {log.retries > 0 ? (
+                      <span className="px-2 py-1 rounded bg-yellow-200">{log.retries}</span>
+                    ) : (
+                      '0'
                     )}
                   </td>
                 </tr>
