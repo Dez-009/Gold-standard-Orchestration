@@ -42,9 +42,7 @@ from routes.admin.audit_admin import router as admin_audit_router
 from routes.admin_audit import router as recent_audit_router
 from routes.admin.metrics_admin import router as admin_metrics_router
 from routes.admin.agent_admin import router as admin_agent_router
-from routes.admin.agent_assignment_admin import (
-    router as admin_agent_assignment_router,
-)
+from routes.admin_agent_assignment import router as admin_agent_assignment_router
 from routes.admin.agent_override_admin import router as admin_agent_override_router
 from routes.admin_agent import router as admin_agent_query_router
 from routes.admin.user_personality_admin import (

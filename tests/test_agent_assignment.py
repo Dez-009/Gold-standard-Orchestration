@@ -12,6 +12,7 @@ from main import app
 from auth.auth_utils import create_access_token
 from services.agent_assignment_service import assign_agent
 from services.user_service import create_user
+from services import personality_service
 from tests.conftest import TestingSessionLocal
 
 client = TestClient(app)
@@ -112,15 +113,28 @@ def test_admin_can_assign_agent_to_user():
     """Admin endpoint should create an assignment for any user."""
     user_id, _, _ = register_user_with_role()
     _, admin_token, _ = register_user_with_role(role="admin")
+
+    db = TestingSessionLocal()
+    personality = personality_service.create_personality(
+        db,
+        {
+            "name": f"Fin_{uuid.uuid4().hex}",
+            "description": "d",
+            "system_prompt": "s",
+        },
+    )
+    db.close()
+
     resp = client.post(
         "/admin/agent-assignments",
-        json={"user_id": user_id, "agent_type": "finance"},
+        json={"user_id": user_id, "domain": "career", "assigned_agent": personality.name},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert resp.status_code in (200, 201)
     data = resp.json()
     assert data["user_id"] == user_id
-    assert data["agent_type"] == "finance"
+    assert data["domain"] == "career"
+    assert data["assigned_agent"] == personality.name
 
 
 def test_user_cannot_assign_agent_via_admin_route():
@@ -129,7 +143,7 @@ def test_user_cannot_assign_agent_via_admin_route():
     _, token, _ = register_user_with_role()
     resp = client.post(
         "/admin/agent-assignments",
-        json={"user_id": target_id, "agent_type": "career"},
+        json={"user_id": target_id, "domain": "career", "assigned_agent": "x"},
         headers={"Authorization": f"Bearer {token}"},
     )
     assert resp.status_code == 403
@@ -143,18 +157,28 @@ def test_admin_assignment_creates_audit_log():
 
     # Notes: Register an admin user to perform the assignment
     admin_id, admin_token, _ = register_user_with_role(role="admin")
+    db = TestingSessionLocal()
+    personality = personality_service.create_personality(
+        db,
+        {
+            "name": f"Health_{uuid.uuid4().hex}",
+            "description": "d",
+            "system_prompt": "s",
+        },
+    )
+    db.close()
 
     # Notes: Perform the admin assignment operation via the API
     resp = client.post(
         "/admin/agent-assignments",
-        json={"user_id": target_id, "agent_type": "health"},
+        json={"user_id": target_id, "domain": "health", "assigned_agent": personality.name},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert resp.status_code in (200, 201)
 
     # Notes: Retrieve audit logs for the admin to verify the entry
-    logs_resp = client.get(f"/audit-logs/user/{admin_id}")
+    logs_resp = client.get(f"/audit-logs/user/{target_id}")
     assert logs_resp.status_code == 200
     logs = logs_resp.json()
-    assert any(log["action"] == "agent_assignment_update" for log in logs)
+    assert any(log["action"] == "admin_agent_assign" for log in logs)
 

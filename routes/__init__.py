@@ -29,6 +29,8 @@ from .admin_behavioral_insights import router as admin_behavioral_insight_router
 from .admin_insights import router as admin_insights_router
 # Notes: Import router implementing the admin agent query endpoint
 from .admin_agent import router as admin_agent_query_router
+# Notes: Import router providing admin agent assignment endpoints
+from .admin_agent_assignment import router as admin_agent_assignment_router
 
 router = APIRouter()
 
@@ -57,6 +59,8 @@ router.include_router(admin_behavioral_insight_router)
 router.include_router(admin_insights_router)
 # Notes: Register the admin agent query route
 router.include_router(admin_agent_query_router)
+# Notes: Register the admin agent assignment routes
+router.include_router(admin_agent_assignment_router)
 # Notes: Register the admin audit log routes
 router.include_router(admin_audit_router)
 
