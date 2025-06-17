@@ -34,6 +34,11 @@ from services.orchestration_decision_service import determine_agent_flow
 # Notes: Import the aggregator used after parallel execution
 from services.response_aggregation_service import aggregate_agent_responses
 from services.agent_scoring_service import score_agent_responses
+from services.agent_access_control import is_agent_accessible
+from services.user_service import get_user
+from utils.logger import get_logger
+
+logger = get_logger()
 
 from models.agent_score import AgentScore
 
@@ -54,6 +59,9 @@ AGENT_PROCESSORS = {
 
 def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dict]:
     """Return responses from each agent assigned to the user."""
+
+    # Notes: Fetch the user object to evaluate role-based permissions
+    user = get_user(db, user_id)
 
     # Notes: Retrieve all personality assignments for the user
     assignments = (
@@ -85,6 +93,16 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
 
         # Notes: When no list was returned, fall back to individual state check
         if not active_agents and not is_agent_active(db, user_id, assignment.domain):
+            continue
+
+        # Notes: Skip execution when the user's role does not permit this agent
+        if not is_agent_accessible(assignment.domain, user):
+            logger.info(
+                "User %s with role %s blocked from agent %s",
+                user_id,
+                user.role,
+                assignment.domain,
+            )
             continue
 
         processor = AGENT_PROCESSORS.get(assignment.domain)
@@ -142,6 +160,22 @@ def run_parallel_agents(
     import asyncio
     from services.llm_call_service import call_llm
 
+    # Notes: Retrieve the user once to evaluate permissions for each agent
+    user = get_user(db, user_id)
+
+    # Notes: Filter the agent list based on role access rules
+    allowed_agents: list[str] = []
+    for name in agent_list:
+        if is_agent_accessible(name, user):
+            allowed_agents.append(name)
+        else:
+            logger.info(
+                "User %s with role %s blocked from agent %s",
+                user_id,
+                user.role,
+                name,
+            )
+
     # Notes: Inner coroutine used for each agent execution
     async def _execute(agent_name: str) -> tuple[str, str]:
         # Notes: Build personalized memory context for the user and agent
@@ -153,7 +187,7 @@ def run_parallel_agents(
 
     # Notes: Gather results for all agents concurrently
     async def _gather() -> list[tuple[str, str]]:
-        tasks = [_execute(name) for name in agent_list]
+        tasks = [_execute(name) for name in allowed_agents]
         return await asyncio.gather(*tasks)
 
     # Notes: Run the event loop and format the output as a dictionary

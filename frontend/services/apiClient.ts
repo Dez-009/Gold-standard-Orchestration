@@ -921,6 +921,15 @@ export async function updateBillingConfig(
   return response.data;
 }
 
+// Retrieve mapping of agents to required roles
+export async function getAgentAccessRules(token: string) {
+  const response = await apiClient.get('/admin/agent-access', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the list of rules from the backend
+  return response.data;
+}
+
 // Notes: Retrieve a list of recent webhook events for administrators
 export async function getRecentWebhooks(token: string) {
   // Notes: Issue GET request to the admin webhooks recent endpoint
