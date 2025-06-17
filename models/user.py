@@ -73,3 +73,8 @@ class User(Base):
         "JournalSummary", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: History of AI-generated journal trend analyses for the user
+    journal_trends = relationship(
+        "JournalTrend", back_populates="user", cascade="all, delete"
+    )
+

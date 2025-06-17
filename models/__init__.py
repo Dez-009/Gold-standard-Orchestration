@@ -28,6 +28,7 @@ from .system_metrics import SystemMetric
 from .behavioral_insights import BehavioralInsight
 from .orchestration_log import OrchestrationLog
 from .journal_summary import JournalSummary
+from .journal_trends import JournalTrend
 
 __all__ = [
     "User",
@@ -49,5 +50,6 @@ __all__ = [
     "BehavioralInsight",
     "OrchestrationLog",
     "JournalSummary",
+    "JournalTrend",
 ]
 
