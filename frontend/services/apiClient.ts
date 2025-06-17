@@ -1248,6 +1248,20 @@ export async function getAdminFeedback(
   return response.data;
 }
 
+// Retrieve summarized journal entries for admin review
+export async function getSummarizedJournals(
+  token: string,
+  params?: { user_id?: string; limit?: number; offset?: number }
+) {
+  // Notes: Send GET request with optional filters and pagination
+  const response = await apiClient.get('/admin/summarized-journals', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
+  });
+  // Notes: Return the array of summary records
+  return response.data;
+}
+
 // Retrieve the current user's referral code
 export async function getReferralCode(token: string) {
   // Notes: Send GET request to the referral code endpoint
