@@ -7,6 +7,7 @@ import {
   getJournalHistory,
   getAllJournals,
   getJournalById,
+  createJournalEntry as createJournalEntryApi,
   updateJournal as updateJournalApi,
   exportJournals as exportJournalsApi,
   getJournalTags
@@ -91,6 +92,30 @@ export async function fetchJournalById(id: string) {
       content: string;
       created_at: string;
       mood?: string | null;
+    };
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Create a new journal entry using the API client helper
+export async function createJournalEntry(data: Record<string, unknown>) {
+  const token = getToken();
+  if (!token) {
+    // Notes: Inform the caller when authentication is missing
+    throw new Error('User not authenticated');
+  }
+  try {
+    // Notes: Persist the journal entry to the backend
+    const created = await createJournalEntryApi(data, token);
+    showSuccess('Saved successfully');
+    return created as {
+      id: number;
+      title: string | null;
+      content: string;
+      created_at: string;
+      linked_goal_id?: number | null;
     };
   } catch (err) {
     showError('Something went wrong');

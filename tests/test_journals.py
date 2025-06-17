@@ -47,6 +47,58 @@ def test_create_journal_entry():
         assert field in data
 
 
+def test_create_journal_with_goal_link():
+    """Ensure a journal can be associated with a user's goal."""
+    user_id, token = register_and_login(f"journal_goal_{uuid.uuid4().hex}@example.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Create a goal to link with the journal entry
+    goal_resp = client.post(
+        "/goals/",
+        json={"user_id": user_id, "title": "Linked Goal"},
+        headers=headers,
+    )
+    assert goal_resp.status_code in (200, 201)
+    goal_id = goal_resp.json()["id"]
+
+    entry_data = {
+        "user_id": user_id,
+        "content": "Linked entry",
+        "linked_goal_id": goal_id,
+    }
+    resp = client.post("/journals/", json=entry_data, headers=headers)
+    assert resp.status_code in (200, 201)
+    data = resp.json()
+    assert data["linked_goal_id"] == goal_id
+
+
+def test_journal_goal_validation():
+    """Validate the API rejects linking to another user's goal."""
+    # Create two users; second user's goal should not be linkable by first
+    user1, token1 = register_and_login(f"journal_owner_{uuid.uuid4().hex}@example.com")
+    user2, token2 = register_and_login(f"journal_owner_{uuid.uuid4().hex}@example.com")
+
+    headers2 = {"Authorization": f"Bearer {token2}"}
+    # User2 creates a goal
+    goal_resp = client.post(
+        "/goals/",
+        json={"user_id": user2, "title": "Other Goal"},
+        headers=headers2,
+    )
+    assert goal_resp.status_code in (200, 201)
+    other_goal_id = goal_resp.json()["id"]
+
+    headers1 = {"Authorization": f"Bearer {token1}"}
+    # User1 attempts to link to user2's goal
+    entry_data = {
+        "user_id": user1,
+        "content": "Should fail",
+        "linked_goal_id": other_goal_id,
+    }
+    resp = client.post("/journals/", json=entry_data, headers=headers1)
+    assert resp.status_code == 400
+
+
 def test_get_journal_entry_by_id():
     user_id, token = register_and_login(f"journal_get_{uuid.uuid4().hex}@example.com")
     headers = {"Authorization": f"Bearer {token}"}

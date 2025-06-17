@@ -17,7 +17,12 @@ class JournalEntry(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     title = Column(String, nullable=True)
     content = Column(Text, nullable=False)
+    # Optional foreign key linking the journal entry to a specific goal
+    linked_goal_id = Column(Integer, ForeignKey("goals.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User", back_populates="journal_entries")
+    # Convenience relationship to access the linked goal object
+    linked_goal = relationship("Goal")
+
