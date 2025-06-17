@@ -41,6 +41,7 @@ from .admin_segments import router as admin_segments_router
 from .admin_recommendations import router as admin_recommendations_router
 # Notes: Import router serving agent state admin endpoints
 from .admin_agent_state import router as admin_agent_state_router
+from .admin_agent_logs import router as admin_agent_logs_router
 
 router = APIRouter()
 
@@ -80,4 +81,6 @@ router.include_router(referral_router)
 router.include_router(admin_segments_router)
 router.include_router(admin_recommendations_router)
 router.include_router(admin_agent_state_router)
+router.include_router(admin_agent_logs_router)
 
+# Footnote: Aggregates and registers all route modules.
