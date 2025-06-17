@@ -14,6 +14,7 @@ from routes.goal import router as goal_router
 from routes.daily_checkin import router as daily_checkin_router
 from routes.checkins import router as checkins_router
 from routes.reporting import router as reporting_router
+from routes.habit_sync import router as habit_sync_router
 # Notes: Import router handling task operations
 from routes.task import router as task_router
 # Notes: Import router for AI coach endpoints
@@ -128,6 +129,7 @@ app.include_router(goal_router)
 app.include_router(task_router)
 app.include_router(daily_checkin_router)
 app.include_router(checkins_router)
+app.include_router(habit_sync_router)
 app.include_router(account_router)
 app.include_router(account_personalization_router)
 app.include_router(reporting_router)

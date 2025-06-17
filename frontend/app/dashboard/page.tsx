@@ -20,6 +20,7 @@ import {
 } from '../../services/subscriptionService';
 import { showError } from '../../components/ToastProvider';
 import { trackEvent } from '../../services/analyticsService';
+import { getHabitTrends } from '../../services/habitSyncService';
 
 export default function DashboardPage() {
   // Notes: Store email and role info parsed from the JWT
@@ -37,6 +38,7 @@ export default function DashboardPage() {
   // Notes: Manage loading and error states for subscription fetch
   const [statusLoading, setStatusLoading] = useState(true);
   const [statusError, setStatusError] = useState('');
+  const [habitSummary, setHabitSummary] = useState<{ steps: number; sleep_hours: number; active_minutes: number } | null>(null);
 
   // Notes: On mount, verify token validity and parse user info
   useEffect(() => {
@@ -75,8 +77,17 @@ export default function DashboardPage() {
         setStatusLoading(false);
       }
     };
+    const loadHabits = async () => {
+      try {
+        const summary = await getHabitTrends();
+        setHabitSummary(summary);
+      } catch {
+        // Ignore errors silently
+      }
+    };
     loadTier();
     loadStatus();
+    loadHabits();
   }, [router]);
 
   // Launch Stripe billing portal and redirect on success
@@ -302,6 +313,16 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Habit summary card */}
+      {habitSummary && (
+        <div className="border rounded p-4 shadow-md text-center w-full max-w-sm">
+          <h2 className="text-xl font-semibold mb-2">Habit Summary</h2>
+          <p>Avg Steps: {habitSummary.steps}</p>
+          <p>Avg Sleep: {habitSummary.sleep_hours} hrs</p>
+          <p>Active Minutes: {habitSummary.active_minutes}</p>
+        </div>
+      )}
 
       {/* Static user profile placeholder information */}
       <div className="border rounded p-4 text-center">
