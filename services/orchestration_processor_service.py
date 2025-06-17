@@ -31,6 +31,8 @@ from services.prompt_assembly_service import build_agent_prompt
 from services.agent_context_loader import load_agent_context, is_agent_active
 # Notes: Import the decision logic that recommends which agents to run
 from services.orchestration_decision_service import determine_agent_flow
+# Notes: Import the aggregator used after parallel execution
+from services.response_aggregation_service import aggregate_agent_responses
 
 # Notes: Timing utility for measuring execution latency
 import time
@@ -156,3 +158,19 @@ def run_parallel_agents(
     return {name: resp for name, resp in pairs}
 
 # Footnote: Provides parallel execution path for orchestrating multiple agents.
+
+
+# Notes: Run agents in parallel then combine responses for display
+def orchestrate_and_summarize(
+    user_id: int, user_prompt: str, agent_list: list[str], db: Session
+) -> str:
+    """Return aggregated coaching summary from parallel agent results."""
+
+    # Notes: Execute agents concurrently and collect the raw mapping
+    raw_responses = run_parallel_agents(user_id, user_prompt, agent_list, db)
+
+    # Notes: Reduce the mapping into a single formatted text block
+    summary = aggregate_agent_responses(raw_responses)
+    return summary
+
+# Footnote: Executes parallel agents and aggregates them into one summary string.
