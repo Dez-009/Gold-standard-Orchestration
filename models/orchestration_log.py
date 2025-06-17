@@ -68,5 +68,7 @@ class OrchestrationPerformanceLog(Base):
     status = Column(String)
     # Notes: True if fallback logic had to be executed
     fallback_triggered = Column(Boolean, default=False)
+    # Notes: True when execution exceeded the configured timeout
+    timeout_occurred = Column(Boolean, default=False)
     # Notes: When the orchestration completed
     timestamp = Column(DateTime, default=datetime.utcnow)

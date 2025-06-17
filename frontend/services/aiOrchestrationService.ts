@@ -44,7 +44,7 @@ export async function sendOrchestrationPrompt(user_prompt: string) {
     const data = await postLegacyOrchestrationPrompt(token, userId, user_prompt);
     showSuccess('Saved successfully');
     // Notes: Typed return value containing array of agent responses
-    return data as { responses: { agent: string; response: string }[] };
+    return data as { responses: { agent: string; status: string; content: string }[] };
   } catch (err) {
     showError('Something went wrong');
     throw err;

@@ -161,7 +161,10 @@ def test_run_parallel_agents(monkeypatch):
         db,
     )
 
-    assert result == {"career": "career reply", "finance": "finance reply"}
+    assert result == {
+        "career": {"status": "success", "content": "career reply"},
+        "finance": {"status": "success", "content": "finance reply"},
+    }
     db.close()
 
 # Verify role-based access control prevents unauthorized agent execution
@@ -222,5 +225,5 @@ def test_parallel_agents_respects_role(monkeypatch):
         db,
     )
     assert "career" not in result
-    assert "finance" in result
+    assert result["finance"]["status"] == "success"
     db.close()

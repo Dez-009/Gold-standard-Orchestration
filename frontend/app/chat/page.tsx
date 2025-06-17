@@ -5,12 +5,15 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { sendOrchestrationPrompt } from '../../services/aiOrchestrationService';
+// Notes: Component handling display of each agent reply
+import AgentResponse from '../../components/AgentResponse';
 import { getToken, isTokenExpired } from '../../services/authUtils';
 import { showError } from '../../components/ToastProvider';
 
-interface AgentResponse {
+interface AgentReply {
   agent: string;
-  response: string;
+  status: string;
+  content: string;
 }
 
 export default function ChatPage() {
@@ -18,7 +21,7 @@ export default function ChatPage() {
   // Notes: Track user input
   const [prompt, setPrompt] = useState('');
   // Notes: Hold the list of agent responses returned by the backend
-  const [responses, setResponses] = useState<AgentResponse[]>([]);
+  const [responses, setResponses] = useState<AgentReply[]>([]);
   // Notes: Show spinner while waiting for the API
   const [loading, setLoading] = useState(false);
   // Notes: Record any error message when the request fails
@@ -82,10 +85,12 @@ export default function ChatPage() {
       {/* Display each agent response in its own card */}
       <div className="w-full max-w-2xl space-y-4">
         {responses.map((r, idx) => (
-          <div key={idx} className="p-4 border rounded shadow bg-white">
-            <h3 className="font-semibold mb-2">{r.agent}</h3>
-            <p>{r.response}</p>
-          </div>
+          <AgentResponse
+            key={idx}
+            reply={r}
+            loading={loading}
+            onRetry={handleSend}
+          />
         ))}
       </div>
     </div>
