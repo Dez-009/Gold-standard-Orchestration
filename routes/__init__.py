@@ -52,6 +52,8 @@ from .admin_agent_personalization import router as admin_agent_personalization_r
 from .admin_agent_scores import router as admin_agent_scores_router
 # Notes: Import router providing user personalization endpoints
 from .account_personalization import router as account_personalization_router
+# Notes: Import router providing summary PDF exports
+from .pdf_export import router as pdf_export_router
 
 router = APIRouter()
 
@@ -61,6 +63,7 @@ router.include_router(auth_router)
 router.include_router(protected_router)
 router.include_router(session_router)
 router.include_router(journal_router)
+router.include_router(pdf_export_router)
 router.include_router(notification_router)
 router.include_router(goal_router)
 router.include_router(task_router)

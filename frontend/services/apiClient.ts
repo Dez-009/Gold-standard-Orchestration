@@ -3,6 +3,7 @@
  * All other frontend services rely on these helpers for network calls.
  * The helpers below also expose admin log retrieval functions so
  * dashboards can display recent system activity.
+ * This file now also exposes a helper for downloading summary PDFs.
  */
 import axios from 'axios';
 // Notes: Toast helper used to notify when the session has expired
@@ -142,6 +143,18 @@ export async function exportJournals(token: string) {
     responseType: 'blob'
   });
   // Provide the binary PDF blob back to the caller
+  return response.data as Blob;
+}
+
+// Download a single journal summary as a PDF
+// Notes: Returns the Blob so the caller can trigger a file download
+export async function downloadSummaryPDF(token: string, summaryId: string) {
+  // Issue the GET request to the new export route
+  const response = await apiClient.get(`/summaries/${summaryId}/export-pdf`, {
+    headers: { Authorization: `Bearer ${token}` },
+    responseType: 'blob'
+  });
+  // Notes: Provide the raw PDF blob back to the caller
   return response.data as Blob;
 }
 

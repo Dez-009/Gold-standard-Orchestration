@@ -32,6 +32,7 @@ from routes.journal_trends import router as journal_trends_router
 # Notes: Import router exposing account-related endpoints
 from routes.account import router as account_router
 from routes.account_personalization import router as account_personalization_router
+from routes.pdf_export import router as pdf_export_router
 from routes.vida import router as vida_router
 from routes.root import router as root_router
 from routes.health import router as health_router
@@ -119,6 +120,7 @@ app.include_router(auth_router)
 app.include_router(protected_router)
 app.include_router(session_router)
 app.include_router(journal_router)
+app.include_router(pdf_export_router)
 app.include_router(notification_router)
 app.include_router(goal_router)
 app.include_router(task_router)
