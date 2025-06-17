@@ -1440,6 +1440,27 @@ export async function savePersonalization(
   return response.data;
 }
 
+// Retrieve device sync logs for the admin dashboard
+export async function getDeviceSyncLogs(
+  token: string,
+  params: { limit?: number; offset?: number }
+) {
+  // Notes: Send GET request with pagination parameters
+  const response = await apiClient.get('/admin/device-sync-logs', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
+  });
+  // Notes: Return array of sync log objects
+  return response.data as Array<{
+    id: string;
+    user_id: number;
+    source: string;
+    sync_status: string;
+    synced_at: string;
+    raw_data_preview: unknown;
+  }>;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

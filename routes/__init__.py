@@ -50,6 +50,8 @@ from .admin_orchestration_logs import router as admin_orchestration_logs_router
 from .admin_agent_personalization import router as admin_agent_personalization_router
 # Notes: Import router providing access to agent scoring logs
 from .admin_agent_scores import router as admin_agent_scores_router
+# Notes: Import router exposing device sync history
+from .admin_device_sync import router as admin_device_sync_router
 # Notes: Import router providing user personalization endpoints
 from .account_personalization import router as account_personalization_router
 # Notes: Import router providing summary PDF exports
@@ -101,5 +103,6 @@ router.include_router(admin_orchestration_logs_router)
 router.include_router(admin_agent_personalization_router)
 router.include_router(admin_agent_scores_router)
 router.include_router(account_personalization_router)
+router.include_router(admin_device_sync_router)
 
 # Footnote: Aggregates and registers all route modules.
