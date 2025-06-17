@@ -46,6 +46,7 @@ from routes.admin.agent_assignment_admin import (
     router as admin_agent_assignment_router,
 )
 from routes.admin.agent_override_admin import router as admin_agent_override_router
+from routes.admin_agent import router as admin_agent_query_router
 from routes.admin.user_personality_admin import (
     router as admin_user_personality_router,
 )
@@ -116,6 +117,7 @@ app.include_router(recent_audit_router)
 app.include_router(admin_agent_router)
 app.include_router(admin_agent_assignment_router)
 app.include_router(admin_agent_override_router)
+app.include_router(admin_agent_query_router)
 app.include_router(admin_user_personality_router)
 app.include_router(admin_notifications_router)
 app.include_router(admin_model_logging_router)
