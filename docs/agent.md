@@ -1,7 +1,0 @@
-{
-  "features": {
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.11"
-    }
-  }
-}
