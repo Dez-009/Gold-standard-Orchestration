@@ -1,6 +1,8 @@
 /**
  * Axios client wrapper for communicating with the FastAPI backend.
  * All other frontend services rely on these helpers for network calls.
+ * The helpers below also expose admin log retrieval functions so
+ * dashboards can display recent system activity.
  */
 import axios from 'axios';
 // Notes: Toast helper used to notify when the session has expired
@@ -445,22 +447,16 @@ export async function getAuditLogs(
   return response.data;
 }
 
-// Notes: Retrieve orchestration history for administrator view
-// Notes: Sends GET request to the /admin/orchestration-log endpoint
+// Notes: Retrieve orchestration performance logs for administrator view
 export async function getOrchestrationLogs(
   token: string,
-  limit?: number,
-  offset?: number
+  limit = 100,
+  skip = 0
 ) {
-  // Notes: Build query params conditionally
-  const params: Record<string, number> = {};
-  if (limit !== undefined) params.limit = limit;
-  if (offset !== undefined) params.offset = offset;
-
-  // Notes: Issue the HTTP request to fetch orchestration records
-  const response = await apiClient.get('/admin/orchestration-log', {
+  // Notes: Issue GET request with pagination parameters
+  const response = await apiClient.get('/admin/orchestration-logs', {
     headers: { Authorization: `Bearer ${token}` },
-    params
+    params: { limit, skip }
   });
   // Notes: Return the resulting log array
   return response.data;
@@ -647,6 +643,8 @@ export async function getModelLogs(token: string) {
   // Notes: Return the list of model log records
   return response.data;
 }
+
+// Retrieve orchestration performance logs for the admin dashboard
 
 // Trigger upcoming subscription renewal reminders
 // Notes: Sends a POST request to the /admin/system/send_renewal_reminders endpoint

@@ -26,7 +26,7 @@ from .agent_assignment_override import AgentAssignmentOverride
 from .notification import Notification
 from .system_metrics import SystemMetric
 from .behavioral_insights import BehavioralInsight
-from .orchestration_log import OrchestrationLog
+from .orchestration_log import OrchestrationLog, OrchestrationPerformanceLog
 from .agent_lifecycle_log import AgentLifecycleLog
 from .journal_summary import JournalSummary
 from .journal_trends import JournalTrend
@@ -70,6 +70,7 @@ __all__ = [
     "SystemMetric",
     "BehavioralInsight",
     "OrchestrationLog",
+    "OrchestrationPerformanceLog",
     "AgentLifecycleLog",
     "JournalSummary",
     "JournalTrend",
