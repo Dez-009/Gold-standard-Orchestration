@@ -14,7 +14,12 @@ from models.summarized_journal import SummarizedJournal
 
 # Notes: Import the reflection booster agent and services
 from agents.reflection_booster_agent import generate_reflection_prompt
-from services import reflection_prompt_service, orchestration_audit_service
+from agents.conflict_resolution_agent import detect_conflict_issues
+from services import (
+    reflection_prompt_service,
+    orchestration_audit_service,
+    conflict_resolution_service,
+)
 
 # Notes: Adapter used to call the LLM summarization agent
 from services.ai_model_adapter import AIModelAdapter
@@ -81,6 +86,29 @@ def summarize_journal_entries(user_id: int, db: Session) -> str:
             ["ReflectionBoosterAgent"],
             [{"prompt_text": prompt_text}],
         )
+    except Exception:  # pragma: no cover - best effort logging
+        pass
+
+    # Notes: Run the conflict detection agent and persist any flags
+    try:
+        flags = detect_conflict_issues(combined_text)
+        if flags and entries:
+            conflict_resolution_service.save_conflict_flags(
+                db, user_id, entries[0].id, flags
+            )
+            # Notes: Log the conflict results for auditing
+            orchestration_audit_service.log_orchestration_request(
+                db,
+                user_id,
+                "conflict_detection",
+                ["ConflictResolutionAgent"],
+                [
+                    {
+                        "type": str(flags[0].conflict_type),
+                        "excerpt": flags[0].summary_excerpt,
+                    }
+                ],
+            )
     except Exception:  # pragma: no cover - best effort logging
         pass
 

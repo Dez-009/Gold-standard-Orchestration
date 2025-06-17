@@ -56,6 +56,7 @@ from .user_segment import UserSegment
 from .device_sync import DeviceSyncLog
 # Notes: Import model storing follow-up reflection prompts
 from .reflection_prompt import ReflectionPrompt
+from .conflict_flag import ConflictFlag, ConflictType
 
 __all__ = [
     "User",
@@ -98,6 +99,8 @@ __all__ = [
     "AgentFeedback",
     "DeviceSyncLog",
     "ReflectionPrompt",
+    "ConflictFlag",
+    "ConflictType",
 ]
 
 # Footnote: Model package exposes all ORM models for import.
