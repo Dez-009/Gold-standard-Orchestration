@@ -9,6 +9,7 @@ interface Field {
   name: string;
   label: string;
   type: string;
+  required?: boolean; // Indicates if the input must be filled in
 }
 
 interface AuthFormProps {
@@ -51,7 +52,8 @@ export default function AuthForm({ fields, submitText, onSubmit }: AuthFormProps
             name={field.name}
             type={field.type}
             onChange={handleChange}
-            required
+            // Notes: Inputs default to required unless explicitly set false
+            required={field.required !== false}
             className="border rounded p-2"
           />
         </div>
