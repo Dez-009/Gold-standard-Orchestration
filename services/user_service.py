@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 
 from models.user import User
 from utils.password_utils import hash_password
+# Notes: Import referral service to generate invitation codes
+from services import referral_service
 
 
 def create_user(db: Session, user_data: dict) -> User:
@@ -15,6 +17,8 @@ def create_user(db: Session, user_data: dict) -> User:
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+    # Notes: Generate a referral code tied to the new user
+    referral_service.create_referral_record(db, new_user.id)
     return new_user
 
 

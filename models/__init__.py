@@ -34,6 +34,8 @@ from .user_session import UserSession
 from .churn_risk import ChurnRisk, RiskCategory
 # Notes: Include the user feedback model for collecting suggestions
 from .user_feedback import UserFeedback, FeedbackType
+# Notes: Import the referral model for viral sharing features
+from .referral import Referral
 
 __all__ = [
     "User",
@@ -62,5 +64,6 @@ __all__ = [
     "RiskCategory",
     "UserFeedback",
     "FeedbackType",
+    "Referral",
 ]
 

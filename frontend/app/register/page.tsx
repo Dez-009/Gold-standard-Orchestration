@@ -4,6 +4,7 @@
 'use client';
 import AuthForm from '../../components/AuthForm';
 import { registerUser } from '../../services/authService';
+import { applyReferralCode } from '../../services/referralService';
 
 export default function RegisterPage() {
   // Handler passed to AuthForm for submission
@@ -13,13 +14,22 @@ export default function RegisterPage() {
       email: values.email,
       password: values.password
     });
+    // Notes: Apply referral code if the optional field was filled
+    if (values.referral_code) {
+      try {
+        await applyReferralCode(values.referral_code);
+      } catch {
+        // Silently ignore referral errors to avoid blocking signup
+      }
+    }
   };
 
   // Fields required for registration form
   const fields = [
     { name: 'name', label: 'Name', type: 'text' },
     { name: 'email', label: 'Email', type: 'email' },
-    { name: 'password', label: 'Password', type: 'password' }
+    { name: 'password', label: 'Password', type: 'password' },
+    { name: 'referral_code', label: 'Referral Code (optional)', type: 'text', required: false }
   ];
 
   return (

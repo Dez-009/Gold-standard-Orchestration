@@ -1098,6 +1098,28 @@ export async function getAdminFeedback(
   return response.data;
 }
 
+// Retrieve the current user's referral code
+export async function getReferralCode(token: string) {
+  // Notes: Send GET request to the referral code endpoint
+  const response = await apiClient.get('/referral/code', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: The backend returns an object with the code string
+  return response.data as { referral_code: string };
+}
+
+// Redeem a referral code for the authenticated user
+export async function submitReferralCode(code: string, token: string) {
+  // Notes: POST the code to the referral redemption endpoint
+  const response = await apiClient.post(
+    '/referral/use',
+    code,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the backend confirmation payload
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

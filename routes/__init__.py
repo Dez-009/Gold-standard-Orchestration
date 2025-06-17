@@ -34,6 +34,8 @@ from .admin_agent_assignment import router as admin_agent_assignment_router
 from .analytics import router as analytics_router
 # Notes: Import router serving analytics summaries for admins
 from .admin_analytics import router as admin_analytics_router
+# Notes: Import router providing referral endpoints
+from .referral import router as referral_router
 
 router = APIRouter()
 
@@ -68,4 +70,5 @@ router.include_router(admin_agent_assignment_router)
 router.include_router(admin_audit_router)
 router.include_router(analytics_router)
 router.include_router(admin_analytics_router)
+router.include_router(referral_router)
 
