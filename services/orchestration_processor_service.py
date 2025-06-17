@@ -21,6 +21,8 @@ from services.agents import (
 from services.agent_execution_log_service import log_agent_execution
 # Notes: Import prompt builder to inject personalization
 from services.agent_prompt_builder import build_personalized_prompt
+# Notes: Import memory context builder to provide conversation history
+from services.conversation_memory_service import build_memory_context
 # Notes: Utility to check if an agent is currently active
 # Notes: Import utilities for loading and checking agent state context
 from services.agent_context_loader import load_agent_context, is_agent_active
@@ -55,6 +57,9 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
     # Notes: Consult the decision service to pick agents relevant to this prompt
     recommended = determine_agent_flow(db, user_id, user_prompt)
 
+    # Notes: Build a single memory block summarizing prior context for the prompt
+    memory_context = build_memory_context(db, user_id, recommended, user_prompt)
+
     # Notes: Keep only assignments that were recommended by the decision logic
     if recommended:
         assignments = [a for a in assignments if a.domain in recommended]
@@ -84,7 +89,11 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
             personalized_prompt = build_personalized_prompt(
                 db, user_id, assignment.domain, user_prompt
             )
-            result_text = processor(personalized_prompt)
+            # Notes: Prepend shared memory context so the agent has continuity
+            final_prompt = (
+                f"{memory_context}\n\n{personalized_prompt}" if memory_context else personalized_prompt
+            )
+            result_text = processor(final_prompt)
             success = True
             error_message = None
         except Exception as exc:  # pragma: no cover - generic failure capture
