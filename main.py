@@ -50,6 +50,8 @@ from routes.admin_agent import router as admin_agent_query_router
 from routes.admin.user_personality_admin import (
     router as admin_user_personality_router,
 )
+# Notes: Import router exposing agent personality assignment endpoints
+from routes.agent_personality import router as agent_personality_router
 from routes.admin.notifications_admin import router as admin_notifications_router
 from routes.admin.model_logging_admin import router as admin_model_logging_router
 from routes.admin_behavioral_insights import (
@@ -93,6 +95,7 @@ app.include_router(checkins_router)
 app.include_router(account_router)
 app.include_router(reporting_router)
 app.include_router(personality_router)
+app.include_router(agent_personality_router)
 app.include_router(vida_router)
 # Register billing routes for webhook handling
 app.include_router(billing_router)
