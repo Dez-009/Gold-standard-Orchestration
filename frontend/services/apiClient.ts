@@ -1130,6 +1130,54 @@ export async function submitReferralCode(code: string, token: string) {
   return response.data;
 }
 
+// ---------------------------------------------------------------------------
+// Segment management endpoints used by the admin interface
+// ---------------------------------------------------------------------------
+
+// Retrieve all user segments defined in the backend
+export async function getSegments(token: string) {
+  const response = await apiClient.get('/admin/segments', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Create a new segment using the provided definition
+export async function createSegment(data: Record<string, unknown>, token: string) {
+  const response = await apiClient.post('/admin/segments', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Update an existing segment by id
+export async function updateSegment(
+  segmentId: string,
+  data: Record<string, unknown>,
+  token: string
+) {
+  const response = await apiClient.put(`/admin/segments/${segmentId}`, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Delete a segment by id
+export async function deleteSegment(segmentId: string, token: string) {
+  const response = await apiClient.delete(`/admin/segments/${segmentId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Evaluate a segment and return matching users
+export async function evaluateSegment(segmentId: string, token: string) {
+  const response = await apiClient.get(`/admin/segments/${segmentId}/evaluate`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

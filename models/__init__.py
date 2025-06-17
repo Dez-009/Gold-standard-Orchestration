@@ -36,6 +36,7 @@ from .churn_risk import ChurnRisk, RiskCategory
 from .user_feedback import UserFeedback, FeedbackType
 # Notes: Import the referral model for viral sharing features
 from .referral import Referral
+from .user_segment import UserSegment
 
 __all__ = [
     "User",
@@ -65,5 +66,6 @@ __all__ = [
     "UserFeedback",
     "FeedbackType",
     "Referral",
+    "UserSegment",
 ]
 
