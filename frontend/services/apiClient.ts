@@ -514,6 +514,29 @@ export async function getAgentAssignments(token: string) {
   return response.data;
 }
 
+// Retrieve current agent overrides and base assignments
+export async function getAgentOverrides(token: string) {
+  // Notes: Issue a GET request to the admin override endpoint
+  const response = await apiClient.get('/admin/agent-override', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Response includes both assignments and overrides
+  return response.data;
+}
+
+// Persist a new override mapping a user to an agent
+export async function setAgentOverride(
+  token: string,
+  payload: { user_id: number; agent_id: string }
+) {
+  // Notes: POST the override payload to the backend
+  const response = await apiClient.post('/admin/agent-override', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the created override record
+  return response.data;
+}
+
 // Notes: Retrieve high level system metrics for the admin dashboard
 // Notes: Sends a GET request to the /admin/metrics endpoint with auth header
 export async function getSystemMetrics(token: string) {

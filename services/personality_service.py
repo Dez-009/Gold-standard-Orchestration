@@ -20,7 +20,12 @@ def get_all_personalities(db: Session) -> list[Personality]:
     return db.query(Personality).all()
 
 
+from uuid import UUID
+
+
 def get_personality(db: Session, personality_id: str) -> Personality | None:
     """Retrieve a single personality by its UUID."""
+    # Notes: Convert to UUID object for SQLite compatibility
+    pid = UUID(personality_id)
     # Notes: Filter by the primary key
-    return db.query(Personality).filter(Personality.id == personality_id).first()
+    return db.query(Personality).filter(Personality.id == pid).first()
