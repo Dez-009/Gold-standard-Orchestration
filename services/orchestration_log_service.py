@@ -24,6 +24,8 @@ def log_agent_run(
         output_tokens=metrics.get("output_tokens"),
         status=metrics.get("status"),
         fallback_triggered=metrics.get("fallback_triggered", False),
+        # Notes: Persist whether the run exceeded the timeout threshold
+        timeout_occurred=metrics.get("timeout_occurred", False),
     )
     # Notes: Commit the new record to the database
     db.add(log_entry)

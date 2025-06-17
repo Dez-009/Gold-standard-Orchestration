@@ -19,6 +19,8 @@ from services.agents import (
 
 # Notes: Service used to record execution details
 from services.agent_execution_log_service import log_agent_execution
+# Notes: Performance logging service capturing timeout information
+from services.orchestration_log_service import log_agent_run
 # Notes: Import prompt builder to inject personalization
 # Notes: Import prompt builder to inject personalization
 from services.agent_prompt_builder import build_personalized_prompt
@@ -153,9 +155,17 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
 # Notes: Execute multiple agents concurrently using asyncio
 
 def run_parallel_agents(
-    user_id: int, user_prompt: str, agent_list: list[str], db: Session
-) -> dict[str, str]:
-    """Return mapping of agent names to their LLM responses."""
+    user_id: int,
+    user_prompt: str,
+    agent_list: list[str],
+    db: Session,
+    timeout_seconds: int = 10,
+) -> dict[str, dict]:
+    """Return mapping of agent names to their LLM responses.
+
+    The timeout_seconds parameter limits how long each agent may run before
+    marking the result as a timeout. This prevents the orchestration layer from
+    hanging indefinitely when an agent is slow to respond."""
 
     import asyncio
     from services.llm_call_service import call_llm
@@ -177,13 +187,39 @@ def run_parallel_agents(
             )
 
     # Notes: Inner coroutine used for each agent execution
-    async def _execute(agent_name: str) -> tuple[str, str]:
+    async def _execute(agent_name: str) -> tuple[str, dict]:
         # Notes: Build personalized memory context for the user and agent
         memory = build_memory_context(db, user_id, [agent_name], user_prompt)
         prompt = build_agent_prompt(agent_name, memory, user_prompt)
-        # Notes: Offload the blocking model call to a background thread
-        text = await asyncio.to_thread(call_llm, prompt)
-        return agent_name, text
+        start = time.perf_counter()
+        try:
+            # Notes: Enforce timeout on the blocking LLM call
+            text = await asyncio.wait_for(
+                asyncio.to_thread(call_llm, prompt), timeout_seconds
+            )
+            status = "success"
+            timed_out = False
+        except asyncio.TimeoutError:
+            # Notes: Provide fallback content when the call exceeds the limit
+            text = "This agent took too long to respond."
+            status = "timeout"
+            timed_out = True
+        elapsed_ms = int((time.perf_counter() - start) * 1000)
+        # Notes: Record metrics to the orchestration performance log
+        log_agent_run(
+            db,
+            agent_name,
+            user_id,
+            {
+                "execution_time_ms": elapsed_ms,
+                "input_tokens": len(str(prompt)),
+                "output_tokens": len(str(text)),
+                "status": status,
+                "fallback_triggered": False,
+                "timeout_occurred": timed_out,
+            },
+        )
+        return agent_name, {"status": status, "content": text}
 
     # Notes: Gather results for all agents concurrently
     async def _gather() -> list[tuple[str, str]]:
@@ -210,7 +246,9 @@ def orchestrate_and_summarize(
     summary = aggregate_agent_responses(raw_responses)
 
     # Notes: Generate quality scores for each agent response
-    score_input = [(name, text) for name, text in raw_responses.items()]
+    score_input = [
+        (name, data["content"]) for name, data in raw_responses.items()
+    ]
     results = score_agent_responses(user_id, score_input)
 
     # Notes: Persist scoring results for future analysis

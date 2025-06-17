@@ -17,6 +17,7 @@ interface PerfLog {
   output_tokens: number;
   status: string;
   fallback_triggered: boolean;
+  timeout_occurred: boolean;
   timestamp: string;
 }
 
@@ -90,11 +91,15 @@ export default function OrchestrationPerformancePage() {
                 <th className="px-4 py-2">Out</th>
                 <th className="px-4 py-2">Status</th>
                 <th className="px-4 py-2">Fallback</th>
+                <th className="px-4 py-2">Timeout</th>
               </tr>
             </thead>
             <tbody>
               {logs.map((log) => (
-                <tr key={log.id} className="odd:bg-gray-100 text-center">
+                <tr
+                  key={log.id}
+                  className={`odd:bg-gray-100 text-center ${log.timeout_occurred ? 'bg-orange-100' : ''}`}
+                >
                   <td className="border px-2 py-1">{fmt(log.timestamp)}</td>
                   <td className="border px-2 py-1">{log.agent_name}</td>
                   <td className="border px-2 py-1">{log.execution_time_ms}</td>
@@ -103,6 +108,13 @@ export default function OrchestrationPerformancePage() {
                   <td className="border px-2 py-1">{badge(log.status)}</td>
                   <td className="border px-2 py-1">
                     {log.fallback_triggered ? 'Yes' : 'No'}
+                  </td>
+                  <td className="border px-2 py-1">
+                    {log.timeout_occurred ? (
+                      <span className="px-2 py-1 rounded bg-orange-200">Timeout</span>
+                    ) : (
+                      '-'
+                    )}
                   </td>
                 </tr>
               ))}

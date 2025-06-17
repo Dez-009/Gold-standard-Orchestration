@@ -36,6 +36,8 @@ def get_orchestration_logs(
             "output_tokens": log.output_tokens,
             "status": log.status,
             "fallback_triggered": log.fallback_triggered,
+            # Notes: Expose timeout flag for admin dashboards
+            "timeout_occurred": log.timeout_occurred,
             "timestamp": log.timestamp.isoformat(),
         }
         for log in logs
