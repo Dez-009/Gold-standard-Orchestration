@@ -5,6 +5,13 @@ from config import get_settings
 # Notes: Import function for retrieving user context memory
 from services.ai_memory_service import get_user_context_memory
 
+# Notes: Import models used for summarization
+from models.journal_entry import JournalEntry
+from models.journal_summary import JournalSummary
+
+# Notes: Standard library module for JSON serialization
+import json
+
 # Notes: Import SQLAlchemy Session type for typing the database argument
 from sqlalchemy.orm import Session
 
@@ -85,3 +92,40 @@ def suggest_goals(db: Session, user_id: int) -> str:
 
     # Notes: Return the generated goals as a string
     return response.choices[0].message.content
+
+
+# Notes: Summarize a set of journal entries using a simple count-based message
+def _summarize_entries(entries: list[JournalEntry]) -> str:
+    """Return a short text summary describing the number of entries."""
+
+    return f"You wrote {len(entries)} journal entries recently."
+
+
+# Notes: Generate and persist an AI summary of recent journal entries
+def generate_journal_summary(db: Session, user_id: int) -> str:
+    """Return a summary string for the user's latest journals."""
+
+    # Notes: Retrieve the five most recent journal entries for the user
+    journals = (
+        db.query(JournalEntry)
+        .filter(JournalEntry.user_id == user_id)
+        .order_by(JournalEntry.created_at.desc())
+        .limit(5)
+        .all()
+    )
+
+    # Notes: Compose a summary using the helper or external AI model
+    summary_text = _summarize_entries(journals)
+
+    # Notes: Persist the generated summary for later reuse
+    summary_record = JournalSummary(
+        user_id=user_id,
+        summary_text=summary_text,
+        source_entry_ids=json.dumps([j.id for j in journals]),
+    )
+    db.add(summary_record)
+    db.commit()
+    db.refresh(summary_record)
+
+    # Notes: Return only the text summary to the caller
+    return summary_text
