@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from config import AGENT_MAX_RETRIES, AGENT_TIMEOUT_SECONDS
 from services.orchestration_log_service import log_agent_run
+from services import agent_toggle_service
 from utils.logger import get_logger
 
 logger = get_logger()
@@ -22,6 +23,26 @@ async def execute_agent(
     agent_call: Callable[[], Awaitable[str]],
 ) -> str:
     """Run ``agent_call`` with timeout and retry handling."""
+
+    # Notes: Bypass execution when admin disabled the agent
+    if not agent_toggle_service.is_agent_enabled(db, agent_name):
+        log_agent_run(
+            db,
+            agent_name,
+            user_id,
+            {
+                "execution_time_ms": 0,
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "status": "disabled_by_admin",
+                "fallback_triggered": False,
+                "timeout_occurred": False,
+                "retries": 0,
+                "error_message": None,
+            },
+        )
+        logger.info("Agent %s skipped due to admin toggle", agent_name)
+        return ""
 
     # Notes: Track timing and diagnostic info
     start = time.perf_counter()
