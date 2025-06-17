@@ -29,6 +29,8 @@ class SummarizedJournal(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     # Notes: Optional list of journal entry ids used for the summary
     source_entry_ids = Column(Text, nullable=True)
+    # Notes: Optional free-form notes left by administrators
+    admin_notes = Column(Text, nullable=True)
 
     # Notes: Relationship back to the user
     user = relationship("User", back_populates="summarized_journals")

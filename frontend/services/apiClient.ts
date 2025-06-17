@@ -1282,6 +1282,31 @@ export async function getSummarizedJournals(
   return response.data;
 }
 
+// Retrieve a single summarized journal for admin view
+export async function getAdminJournalSummary(token: string, summaryId: string) {
+  const response = await apiClient.get(
+    `/admin/journal-summaries/${summaryId}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the summary object including admin notes
+  return response.data;
+}
+
+// Update admin notes associated with a summary
+export async function updateAdminNotes(
+  token: string,
+  summaryId: string,
+  notes: string
+) {
+  const response = await apiClient.patch(
+    `/admin/journal-summaries/${summaryId}/notes`,
+    { notes },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  // Notes: Return the updated summary payload
+  return response.data;
+}
+
 // Retrieve the current user's referral code
 export async function getReferralCode(token: string) {
   // Notes: Send GET request to the referral code endpoint
