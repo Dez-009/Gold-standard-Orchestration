@@ -83,3 +83,8 @@ class User(Base):
         "AnalyticsEvent", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: Login sessions recorded for usage tracking
+    user_sessions = relationship(
+        "UserSession", back_populates="user", cascade="all, delete"
+    )
+

@@ -440,6 +440,16 @@ export async function getOrchestrationLogs(
   return response.data;
 }
 
+// Notes: Retrieve recent user login sessions for admins
+export async function getUserSessions(token: string) {
+  // Notes: Perform GET request to the /admin/user-sessions endpoint
+  const response = await apiClient.get('/admin/user-sessions', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the list of session records
+  return response.data;
+}
+
 // Notes: Retrieve captured application error logs from the backend
 // Notes: Sends GET request to the /admin/errors endpoint with auth header
 export async function getErrorLogs(token: string) {

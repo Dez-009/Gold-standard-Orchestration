@@ -3,9 +3,11 @@ import urllib.parse
 from sqlalchemy.orm import Session
 
 from database.utils import get_db
-from services import user_service
+from services import user_service, user_session_service
 from utils.password_utils import verify_password
 from auth.auth_utils import create_access_token
+from auth.dependencies import get_current_user
+from models.user import User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -30,4 +32,21 @@ async def login(request: Request, db: Session = Depends(get_db)):
 
     # Issue a signed access token
     token = create_access_token({"user_id": user.id})
+
+    # Notes: Capture request context for the session record
+    user_agent = request.headers.get("user-agent")
+    ip_addr = request.client.host if request.client else "unknown"
+    user_session_service.start_session(db, user.id, user_agent, ip_addr)
+
     return {"access_token": token, "token_type": "bearer"}
+
+
+@router.post("/logout")
+def logout(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """End the current user session."""
+
+    user_session_service.end_session(db, current_user.id)
+    return {"detail": "Logged out"}

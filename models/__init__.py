@@ -30,6 +30,7 @@ from .orchestration_log import OrchestrationLog
 from .journal_summary import JournalSummary
 from .journal_trends import JournalTrend
 from .analytics_event import AnalyticsEvent
+from .user_session import UserSession
 
 __all__ = [
     "User",
@@ -53,5 +54,6 @@ __all__ = [
     "JournalSummary",
     "JournalTrend",
     "AnalyticsEvent",
+    "UserSession",
 ]
 
