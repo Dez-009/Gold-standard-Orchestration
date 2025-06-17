@@ -1043,6 +1043,16 @@ export async function getAdminAnalyticsSummary(token: string) {
   return response.data;
 }
 
+// Retrieve revenue summary metrics for admin dashboards
+export async function getRevenueSummary(token: string) {
+  // Notes: Send GET request to the /admin/revenue/summary endpoint
+  const response = await apiClient.get('/admin/revenue/summary', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the aggregated revenue data
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

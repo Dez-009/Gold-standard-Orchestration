@@ -47,6 +47,7 @@ from routes.admin.impersonation import router as admin_impersonation_router
 from routes.admin.audit_admin import router as admin_audit_router
 from routes.admin_audit import router as recent_audit_router
 from routes.admin.metrics_admin import router as admin_metrics_router
+from routes.admin_revenue import router as admin_revenue_router
 from routes.admin.agent_admin import router as admin_agent_router
 from routes.admin_agent_assignment import router as admin_agent_assignment_router
 from routes.admin.agent_override_admin import router as admin_agent_override_router
@@ -130,6 +131,7 @@ app.include_router(analytics_router)
 # Register routes for auditing user actions
 app.include_router(audit_log_router)
 app.include_router(admin_metrics_router)
+app.include_router(admin_revenue_router)
 app.include_router(admin_billing_router)
 app.include_router(admin_system_router)
 app.include_router(admin_webhook_router)
