@@ -1,20 +1,33 @@
 'use client';
-// Admin page showing behavioral insights per user
+// Admin dashboard page displaying aggregated behavioral insights
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchBehavioralInsights, BehavioralInsight } from '../../../services/behavioralInsightService';
+import { fetchBehavioralInsights, BehavioralInsightsData } from '../../../services/behavioralInsightsService';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
 
 export default function BehavioralInsightsPage() {
   const router = useRouter();
-  // Notes: Track form input and retrieved insights
-  const [userId, setUserId] = useState('');
-  const [insights, setInsights] = useState<BehavioralInsight[]>([]);
-  const [loading, setLoading] = useState(false);
+  // Notes: Store the metrics returned from the backend
+  const [data, setData] = useState<BehavioralInsightsData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Notes: Helper that fetches the insights once authentication is verified
+  const loadInsights = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const result = await fetchBehavioralInsights();
+      setData(result);
+    } catch {
+      setError('Failed to load insights');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Notes: Ensure the visitor is an authenticated admin
   useEffect(() => {
@@ -23,24 +36,31 @@ export default function BehavioralInsightsPage() {
       localStorage.removeItem('token');
       showError('Session expired. Please login again.');
       router.push('/login');
+    } else {
+      // Notes: Fetch insights once admin authentication is confirmed
+      loadInsights();
     }
   }, [router]);
 
-  const loadInsights = async () => {
-    if (!userId) return;
-    setLoading(true);
-    setError('');
-    try {
-      const data = await fetchBehavioralInsights(Number(userId));
-      setInsights(data);
-    } catch {
-      setError('Failed to load insights');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fmt = (d: string) => new Date(d).toLocaleString();
+  // Notes: Helper used to render the metrics table
+  const renderTable = () => (
+    <table className="min-w-full text-sm">
+      <thead>
+        <tr>
+          <th className="px-2 py-1">User ID</th>
+          <th className="px-2 py-1">Check-ins</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data?.top_active_users.map((u) => (
+          <tr key={u.user_id} className="odd:bg-gray-100">
+            <td className="border px-2 py-1">{u.user_id}</td>
+            <td className="border px-2 py-1">{u.checkins}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
@@ -48,50 +68,28 @@ export default function BehavioralInsightsPage() {
         Back to Dashboard
       </Link>
       <h1 className="text-2xl font-bold">Behavioral Insights</h1>
-      <div className="flex space-x-2 w-full max-w-sm">
-        <input
-          type="number"
-          placeholder="User ID"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-        <button
-          onClick={loadInsights}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Load
-        </button>
-      </div>
       {loading && (
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
       )}
       {error && <p className="text-red-600">{error}</p>}
-      {!loading && !error && insights.length === 0 && <p>No insights found.</p>}
-      {!loading && !error && insights.length > 0 && (
-        <div className="overflow-x-auto w-full max-w-2xl">
-          <table className="min-w-full border divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-4 py-2">ID</th>
-                <th className="px-4 py-2">Text</th>
-                <th className="px-4 py-2">Type</th>
-                <th className="px-4 py-2">Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {insights.map((i) => (
-                <tr key={i.id} className="odd:bg-gray-100">
-                  <td className="border px-4 py-2">{i.id}</td>
-                  <td className="border px-4 py-2 whitespace-pre-wrap">{i.insight_text}</td>
-                  <td className="border px-4 py-2 capitalize">{i.insight_type}</td>
-                  <td className="border px-4 py-2">{fmt(i.created_at)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {!loading && !error && data && (
+        <div className="w-full max-w-xl space-y-4">
+          <div className="bg-white rounded shadow p-4">
+            <p className="font-medium">Average Check-ins / Week:</p>
+            <p>{data.avg_checkins_per_week.toFixed(2)}</p>
+          </div>
+          <div className="bg-white rounded shadow p-4">
+            <p className="font-medium">Journal Entries:</p>
+            <p>{data.journal_entries}</p>
+          </div>
+          <div className="bg-white rounded shadow p-4 overflow-x-auto">
+            <p className="font-medium mb-2">Top Active Users</p>
+            {renderTable()}
+          </div>
+          <p className="italic text-center">{data.ai_summary}</p>
         </div>
       )}
+      {!loading && !error && !data && <p>No insights available.</p>}
     </div>
   );
 }

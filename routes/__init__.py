@@ -23,6 +23,8 @@ from .action_plan import router as action_plan_router
 # Notes: Import billing router for Stripe webhook endpoints
 from .billing import router as billing_router
 from .admin_behavioral_insights import router as admin_behavioral_insight_router
+# Notes: Import router exposing aggregated behavioral insights
+from .admin_insights import router as admin_insights_router
 
 router = APIRouter()
 
@@ -46,6 +48,8 @@ router.include_router(action_plan_router)
 # Notes: Register billing routes so webhooks can be received
 router.include_router(billing_router)
 router.include_router(admin_behavioral_insight_router)
+# Notes: Register aggregated behavioral insights route
+router.include_router(admin_insights_router)
 # Notes: Register the admin audit log routes
 router.include_router(admin_audit_router)
 
