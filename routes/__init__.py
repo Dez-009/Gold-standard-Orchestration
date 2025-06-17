@@ -14,6 +14,8 @@ from .checkins import router as checkins_router
 from .reporting import router as reporting_router
 from .health import router as health_router
 from .audit_log import router as audit_log_router
+# Notes: Import router serving audit log list for admins
+from .admin_audit import router as admin_audit_router
 # Notes: Import router exposing personalities API
 from .personality import router as personality_router
 # Notes: Import the new action plan router
@@ -44,4 +46,6 @@ router.include_router(action_plan_router)
 # Notes: Register billing routes so webhooks can be received
 router.include_router(billing_router)
 router.include_router(admin_behavioral_insight_router)
+# Notes: Register the admin audit log routes
+router.include_router(admin_audit_router)
 

@@ -358,11 +358,21 @@ export async function getAiSuggestions(token: string) {
 }
 
 // Notes: Retrieve audit log history for administrators
-// Notes: Sends a GET request to the /admin/audit/logs endpoint
-export async function getAuditLogs(token: string) {
+// Notes: Sends a GET request to the /admin/audit-logs endpoint
+export async function getAuditLogs(
+  token: string,
+  limit?: number,
+  offset?: number
+) {
+  // Notes: Build query params only when values are provided
+  const params: Record<string, number> = {};
+  if (limit !== undefined) params.limit = limit;
+  if (offset !== undefined) params.offset = offset;
+
   // Notes: Issue the HTTP request to fetch log records
-  const response = await apiClient.get('/admin/audit/logs', {
-    headers: { Authorization: `Bearer ${token}` }
+  const response = await apiClient.get('/admin/audit-logs', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
   });
   // Notes: Return the array of log objects from the backend
   return response.data;

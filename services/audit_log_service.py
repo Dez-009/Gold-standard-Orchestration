@@ -23,3 +23,15 @@ def get_all_audit_logs(db: Session) -> list[AuditLog]:
     """Return all audit log entries."""
     # Fetch every audit log entry in the database
     return db.query(AuditLog).all()
+
+
+def get_recent_audit_logs(db: Session, limit: int = 100, offset: int = 0) -> list[AuditLog]:
+    """Return audit logs ordered by timestamp DESC with pagination."""
+    # Notes: Query the AuditLog table applying order and pagination
+    return (
+        db.query(AuditLog)
+        .order_by(AuditLog.timestamp.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
