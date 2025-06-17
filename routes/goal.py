@@ -2,8 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from database.utils import get_db
-from services import user_service, goal_service
+from services import goal_service, goal_refinement_service, user_service
 from schemas.goal_schemas import GoalCreate, GoalResponse
+from schemas.goal_refinement_schemas import (
+    GoalRefinementRequest,
+    GoalRefinementResponse,
+)
 from auth.dependencies import get_current_user
 from models.user import User
 
@@ -35,3 +39,18 @@ def read_goal(goal_id: int, db: Session = Depends(get_db)) -> GoalResponse:
 def read_goals_by_user(user_id: int, db: Session = Depends(get_db)) -> list[GoalResponse]:
     goals = goal_service.get_goals_by_user(db, user_id)
     return goals
+
+
+# Notes: Endpoint that refines existing goals using journal context
+@router.post("/suggest-refined", response_model=GoalRefinementResponse)
+def suggest_refined_goals(
+    payload: GoalRefinementRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> GoalRefinementResponse:
+    """Return improved versions of the user's goals."""
+
+    refined = goal_refinement_service.refine_goals(
+        current_user.id, payload.existing_goals, payload.journal_tags
+    )
+    return GoalRefinementResponse(refined_goals=refined)

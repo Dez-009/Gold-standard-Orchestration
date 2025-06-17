@@ -184,6 +184,19 @@ export async function getGoalSuggestions(token: string) {
   return response.data;
 }
 
+// Submit existing goals and journal tags for AI refinement
+// Notes: Performs a POST request to /goals/suggest-refined with JWT token
+export async function refineGoals(
+  token: string,
+  payload: { existing_goals: string[]; journal_tags: string[] }
+) {
+  const response = await apiClient.post('/goals/suggest-refined', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Response contains a list of refined goal strings
+  return response.data as { refined_goals: string[] };
+}
+
 // Retrieve the weekly review summary for the authenticated user
 // Notes: Performs a GET request to the new /weekly-review endpoint
 export async function getWeeklyReview(token: string) {

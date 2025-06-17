@@ -2,7 +2,12 @@
 // Uses authUtils to obtain the JWT token and delegates HTTP calls to apiClient
 
 import { getToken } from './authUtils';
-import { postGoal, getGoals, getGoalProgress } from './apiClient';
+import {
+  postGoal,
+  getGoals,
+  getGoalProgress,
+  refineGoals as apiRefineGoals
+} from './apiClient';
 import { showSuccess, showError } from '../components/ToastProvider';
 
 // Persist a new goal to the backend for the logged-in user
@@ -63,4 +68,19 @@ export async function fetchGoalProgress() {
     showError('Something went wrong');
     throw err;
   }
+}
+
+// Request AI-refined goals using existing goals and journal tags
+export async function refineGoals(existingGoals: string[], journalTags: string[]) {
+  const token = getToken();
+  if (!token) {
+    // Notes: Throw when the user is not authenticated
+    throw new Error('User not authenticated');
+  }
+  // Notes: Call the API client helper with auth token and payload
+  const data = await apiRefineGoals(token, {
+    existing_goals: existingGoals,
+    journal_tags: journalTags
+  });
+  return data.refined_goals as string[];
 }
