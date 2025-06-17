@@ -24,6 +24,8 @@ from services.agent_prompt_builder import build_personalized_prompt
 # Notes: Utility to check if an agent is currently active
 # Notes: Import utilities for loading and checking agent state context
 from services.agent_context_loader import load_agent_context, is_agent_active
+# Notes: Import the decision logic that recommends which agents to run
+from services.orchestration_decision_service import determine_agent_flow
 
 # Notes: Timing utility for measuring execution latency
 import time
@@ -49,6 +51,13 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
         .filter(UserPersonality.user_id == user_id)
         .all()
     )
+
+    # Notes: Consult the decision service to pick agents relevant to this prompt
+    recommended = determine_agent_flow(db, user_id, user_prompt)
+
+    # Notes: Keep only assignments that were recommended by the decision logic
+    if recommended:
+        assignments = [a for a in assignments if a.domain in recommended]
 
     # Notes: Determine which agents are active for the user one time up front
     active_agents = load_agent_context(db, user_id)

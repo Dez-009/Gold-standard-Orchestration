@@ -37,6 +37,13 @@ def test_process_user_prompt_collects_all(monkeypatch):
     monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "career", career_agent.process)
     monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "finance", financial_agent.process)
 
+    # Notes: Decision service recommends both agents based on the prompt
+    monkeypatch.setattr(
+        orchestrator,
+        "determine_agent_flow",
+        lambda db, uid, prompt: ["career", "finance"],
+    )
+
     # Notes: Simulate all agents active by returning every assigned agent
     monkeypatch.setattr(orchestrator, "load_agent_context", lambda db, uid: ["career", "finance"])
 
@@ -65,6 +72,13 @@ def test_process_user_prompt_subset_active(monkeypatch):
     monkeypatch.setattr(financial_agent, "process", lambda prompt: "finance reply")
     monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "career", career_agent.process)
     monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "finance", financial_agent.process)
+
+    # Notes: Decision service recommends both agents but only career is active
+    monkeypatch.setattr(
+        orchestrator,
+        "determine_agent_flow",
+        lambda db, uid, prompt: ["career", "finance"],
+    )
 
     # Notes: Only the career agent is marked active
     monkeypatch.setattr(orchestrator, "load_agent_context", lambda db, uid: ["career"])
@@ -98,6 +112,11 @@ def test_process_user_prompt_no_active(monkeypatch):
     # Notes: Empty active list combined with inactive checks disables all agents
     monkeypatch.setattr(orchestrator, "load_agent_context", lambda db, uid: [])
     monkeypatch.setattr(orchestrator, "is_agent_active", lambda db, uid, name: False)
+    monkeypatch.setattr(
+        orchestrator,
+        "determine_agent_flow",
+        lambda db, uid, prompt: ["career", "finance"],
+    )
 
     result = orchestrator.process_user_prompt(db, user.id, "help me")
     assert result == []
