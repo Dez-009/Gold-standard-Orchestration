@@ -30,6 +30,7 @@ from .orchestration_log import OrchestrationLog
 from .agent_lifecycle_log import AgentLifecycleLog
 from .journal_summary import JournalSummary
 from .journal_trends import JournalTrend
+from .summarized_journal import SummarizedJournal
 from .analytics_event import AnalyticsEvent
 from .user_session import UserSession
 from .churn_risk import ChurnRisk, RiskCategory
@@ -72,6 +73,7 @@ __all__ = [
     "AgentLifecycleLog",
     "JournalSummary",
     "JournalTrend",
+    "SummarizedJournal",
     "AnalyticsEvent",
     "UserSession",
     "ChurnRisk",

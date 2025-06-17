@@ -23,6 +23,9 @@ from routes.ai_coach import router as ai_coach_router
 from routes.ai_routes import router as ai_routes_router
 # Notes: Import router powering multi-agent orchestration
 from routes.ai_orchestration import router as ai_orchestration_router
+from routes.orchestration_journal_summary import (
+    router as orchestration_journal_summary_router,
+)
 # Notes: Import router serving journal summaries
 from routes.journal_summary import router as journal_summary_router
 from routes.journal_trends import router as journal_trends_router
@@ -135,6 +138,7 @@ app.include_router(ai_coach_router)
 app.include_router(ai_routes_router)
 # Register the new journal summary route
 app.include_router(journal_summary_router)
+app.include_router(orchestration_journal_summary_router)
 app.include_router(journal_trends_router)
 # Register new multi-agent orchestration route
 app.include_router(ai_orchestration_router)
