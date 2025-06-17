@@ -68,3 +68,8 @@ class User(Base):
         "BehavioralInsight", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: List of AI-generated journal summaries for the user
+    journal_summaries = relationship(
+        "JournalSummary", back_populates="user", cascade="all, delete"
+    )
+

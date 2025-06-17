@@ -48,8 +48,8 @@ def test_journal_summary(monkeypatch):
         assert resp.status_code in (200, 201)
 
     # Notes: Patch the summarization service to avoid calling OpenAI
-    import routes.ai_routes as ai_routes
-    monkeypatch.setattr(ai_routes, "summarize_user_journals", lambda *_: "Mock Summary")
+    import services.ai_processor as ai_processor
+    monkeypatch.setattr(ai_processor, "generate_journal_summary", lambda *_: "Mock Summary")
 
     # Notes: Request the journal summary
     response = client.get("/ai/journal-summary", headers=headers)

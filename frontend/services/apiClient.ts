@@ -249,6 +249,17 @@ export async function getProgressReport(token: string) {
   return response.data;
 }
 
+// Retrieve the AI-generated journal summary for the authenticated user
+// Notes: Performs a GET request to the /ai/journal-summary endpoint
+export async function getJournalSummary(token: string) {
+  // Notes: Issue the request with the Authorization header
+  const response = await apiClient.get('/ai/journal-summary', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the summary payload
+  return response.data as { summary: string };
+}
+
 // Retrieve the list of completed goals for the authenticated user
 // Notes: Performs a GET request to the /goals/history endpoint including auth header
 export async function getCompletedGoals(token: string) {
