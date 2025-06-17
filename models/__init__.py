@@ -50,6 +50,8 @@ from .user_feedback import UserFeedback, FeedbackType
 # Notes: Import the referral model for viral sharing features
 from .referral import Referral
 from .user_segment import UserSegment
+# Notes: Import model capturing wearable device sync events
+from .device_sync import DeviceSyncLog
 
 __all__ = [
     "User",
@@ -89,6 +91,7 @@ __all__ = [
     "AgentExecutionLog",
     "AgentPersonalization",
     "AgentScore",
+    "DeviceSyncLog",
 ]
 
 # Footnote: Model package exposes all ORM models for import.
