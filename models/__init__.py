@@ -36,6 +36,8 @@ from .churn_risk import ChurnRisk, RiskCategory
 from .churn_score import ChurnScore
 # Notes: Import model tracking the latest state for each agent
 from .agent_state import AgentState
+# Notes: Import model for queued agent failures
+from .agent_failure_queue import AgentFailureQueue
 # Notes: Include the user feedback model for collecting suggestions
 from .user_feedback import UserFeedback, FeedbackType
 # Notes: Import the referral model for viral sharing features
@@ -74,5 +76,6 @@ __all__ = [
     "Referral",
     "UserSegment",
     "AgentState",
+    "AgentFailureQueue",
 ]
 
