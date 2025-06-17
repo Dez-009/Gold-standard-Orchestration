@@ -1073,6 +1073,16 @@ export async function getRevenueSummary(token: string) {
   return response.data;
 }
 
+// Retrieve detailed revenue report for admin dashboards
+export async function getRevenueReport(token: string) {
+  // Notes: Send GET request to the /admin/revenue/report endpoint
+  const response = await apiClient.get('/admin/revenue/report', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Return the full revenue report payload
+  return response.data;
+}
+
 // Submit feedback on behalf of an authenticated or anonymous user
 export async function submitFeedback(
   data: { feedback_type: string; message: string },

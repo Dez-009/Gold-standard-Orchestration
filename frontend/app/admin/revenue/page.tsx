@@ -4,13 +4,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchRevenueSummary, RevenueSummary } from '../../../services/revenueService';
+import { fetchRevenueReport, RevenueReport } from '../../../services/revenueService';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
 
 export default function RevenuePage() {
   const router = useRouter(); // Notes: Used for navigation and redirects
-  const [data, setData] = useState<RevenueSummary | null>(null); // Notes: Metrics state
+  const [data, setData] = useState<RevenueReport | null>(null); // Notes: Metrics state
   const [loading, setLoading] = useState(true); // Notes: Loading indicator
   const [error, setError] = useState(''); // Notes: Error message storage
 
@@ -27,8 +27,8 @@ export default function RevenuePage() {
       setLoading(true);
       setError('');
       try {
-        // Notes: Request revenue summary from the service layer
-        const resp = await fetchRevenueSummary();
+        // Notes: Request detailed revenue report from the service layer
+        const resp = await fetchRevenueReport();
         setData(resp);
       } catch {
         setError('Failed to load revenue metrics');
@@ -54,7 +54,7 @@ export default function RevenuePage() {
         Back to Dashboard
       </Link>
       {/* Page heading */}
-      <h1 className="text-2xl font-bold">Revenue Summary</h1>
+      <h1 className="text-2xl font-bold">Revenue Report</h1>
       {/* Loading spinner and error message handling */}
       {loading && (
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
@@ -62,12 +62,20 @@ export default function RevenuePage() {
       {error && <p className="text-red-600">{error}</p>}
       {/* Metrics grid when data is present */}
       {!loading && !error && data && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-4xl">
-          <MetricCard label="Active Subs" value={data.active_subscriptions} />
-          <MetricCard label="MRR" value={data.mrr} />
-          <MetricCard label="ARR" value={data.arr} />
-          <MetricCard label="Lifetime Rev" value={data.lifetime_revenue} />
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full max-w-6xl">
+            <MetricCard label="MRR" value={data.mrr} />
+            <MetricCard label="ARR" value={data.arr} />
+            <MetricCard label="ARPU" value={data.arpu} />
+            <MetricCard label="Growth %" value={data.revenue_growth} />
+            <MetricCard label="Subscribers" value={data.active_subscribers} />
+            <MetricCard label="Churned" value={data.churned_subscribers} />
+          </div>
+          {/* Placeholder for future revenue trend chart */}
+          <div className="bg-gray-200 w-full max-w-6xl h-48 rounded flex items-center justify-center mt-4">
+            <span className="text-gray-600">Revenue Trend Chart</span>
+          </div>
+        </>
       )}
     </div>
   );
