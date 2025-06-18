@@ -25,6 +25,8 @@ interface Entry {
   created_at: string;
   // Optional mood metadata associated with the entry
   mood?: string | null;
+  // Indicates whether the entry was written by the user or AI
+  ai_generated?: boolean;
 }
 
 // Component receives the dynamic id param from the route
@@ -123,6 +125,10 @@ export default function JournalDetailsPage({
       {entry && !loading && (
         <div className="border rounded p-4 w-full max-w-md space-y-2 bg-gray-100">
           {entry.title && <h2 className="text-xl font-semibold">{entry.title}</h2>}
+          {/* Badge indicating source of the entry */}
+          <span className="text-xs" data-testid="source-badge">
+            {entry.ai_generated ? '🤖 AI-Generated Entry' : '✍️ Written by You'}
+          </span>
           <p>{entry.content}</p>
           <p className="text-sm text-gray-600">Created: {formatDate(entry.created_at)}</p>
           {entry.mood && (

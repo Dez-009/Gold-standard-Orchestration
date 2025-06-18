@@ -92,6 +92,7 @@ export async function fetchJournalById(id: string) {
       content: string;
       created_at: string;
       mood?: string | null;
+      ai_generated?: boolean;
     };
   } catch (err) {
     showError('Something went wrong');
@@ -116,6 +117,7 @@ export async function createJournalEntry(data: Record<string, unknown>) {
       content: string;
       created_at: string;
       linked_goal_id?: number | null;
+      ai_generated?: boolean;
     };
   } catch (err) {
     showError('Something went wrong');
