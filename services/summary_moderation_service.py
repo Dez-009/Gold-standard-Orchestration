@@ -4,6 +4,7 @@ from __future__ import annotations
 from openai import OpenAI, OpenAIError
 from config import get_settings
 from sqlalchemy.orm import Session
+from datetime import datetime
 from utils.logger import get_logger
 from models.summarized_journal import SummarizedJournal
 from models.journal_summary import JournalSummary
@@ -31,12 +32,18 @@ def _moderation_flagged(text: str) -> bool:
 def flag_summary_if_needed(db: Session, summary: SummarizedJournal | JournalSummary, user_id: int) -> None:
     """Create an AgentOutputFlag when the summary text is unsafe."""
     if _moderation_flagged(summary.summary_text):
+        reason = "moderation_violation"
         agent_flag_service.flag_agent_output(
             db,
             "JournalSummarizationAgent",
             user_id,
-            "moderation_violation",
+            reason,
             summary_id=summary.id,
         )
+        # Notes: Persist flag details directly on the summary record
+        summary.flagged = True
+        summary.flag_reason = reason
+        summary.flagged_at = datetime.utcnow()
+        db.commit()
 
 

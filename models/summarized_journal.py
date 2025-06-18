@@ -7,7 +7,7 @@ from uuid import uuid4
 from datetime import datetime
 
 # Notes: SQLAlchemy column helpers and types
-from sqlalchemy import Column, DateTime, ForeignKey, Text
+from sqlalchemy import Column, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -31,6 +31,12 @@ class SummarizedJournal(Base):
     source_entry_ids = Column(Text, nullable=True)
     # Notes: Optional free-form notes left by administrators
     admin_notes = Column(Text, nullable=True)
+    # Notes: Mark when moderation or user reports flag this summary
+    flagged = Column(Boolean, default=False)
+    # Notes: Explanation of why the summary was flagged
+    flag_reason = Column(Text, nullable=True)
+    # Notes: Timestamp when the flag was recorded
+    flagged_at = Column(DateTime, nullable=True)
 
     # Notes: Timeline of admin notes associated with this summary
     admin_notes_timeline = relationship(

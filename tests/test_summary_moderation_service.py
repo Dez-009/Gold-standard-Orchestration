@@ -38,6 +38,9 @@ def test_flag_summary_when_moderation_fails():
     summary_moderation_service.flag_summary_if_needed(db, summary, user_id)
     flags = db.query(AgentOutputFlag).all()
     summary_id = summary.id
+    db.refresh(summary)
     db.close()
     assert any(f.summary_id == summary_id for f in flags)
+    assert summary.flagged is True
+    assert summary.flag_reason == "moderation_violation"
 
