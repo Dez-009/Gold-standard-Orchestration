@@ -1371,6 +1371,19 @@ export async function postOverrideRun(
   return response.data;
 }
 
+/**
+ * Trigger a rerun of the summarization agent for the specified summary.
+ * Returns the updated summary record from the backend.
+ */
+export async function rerunSummary(token: string, summaryId: string) {
+  const response = await apiClient.post(
+    `/admin/journal-summaries/${summaryId}/rerun`,
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
 // Retrieve the current user's referral code
 export async function getReferralCode(token: string) {
   // Notes: Send GET request to the referral code endpoint
