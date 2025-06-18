@@ -11,4 +11,5 @@ migrations are required; simply restart the server or run the tests to apply
 the schema changes.
 
 Run the test suite with `pytest` to verify functionality, including the new
-personality endpoints.
+personality endpoints. Before running tests, install dependencies using
+`pip install -r requirements.txt`.
