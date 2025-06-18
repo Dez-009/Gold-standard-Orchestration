@@ -1463,6 +1463,20 @@ export async function retryAgent(
   }
 }
 
+// ---------------------------------------------------------------------------
+// Admin summary diff endpoint
+// ---------------------------------------------------------------------------
+
+/**
+ * Retrieve an HTML diff showing changes between summary versions.
+ */
+export async function getSummaryDiff(summaryId: string, token: string) {
+  const response = await apiClient.get(`/admin/summaries/${summaryId}/diff`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data as { summary_id: string; diff: string };
+}
+
 // Retrieve the current user's referral code
 export async function getReferralCode(token: string) {
   // Notes: Send GET request to the referral code endpoint
