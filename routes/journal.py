@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -21,6 +21,7 @@ router = APIRouter(prefix="/journals", tags=["journals"])
 @router.post("/", response_model=JournalEntryResponse, status_code=status.HTTP_201_CREATED)
 def create_journal_entry(
     entry_data: JournalEntryCreate,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> JournalEntryResponse:
@@ -36,6 +37,15 @@ def create_journal_entry(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid goal for linking",
             )
+
+    # Notes: Determine if the caller is allowed to set the ai_generated flag
+    allowed_flag = (
+        getattr(current_user, "role", "user") == "admin"
+        or request.headers.get("X-Orchestrated") == "true"
+    )
+    # Notes: Inline comment for security and UX separation
+    if entry_data.ai_generated and not allowed_flag:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to mark as AI-generated")
 
     new_entry = journal_service.create_journal_entry(db, entry_data.model_dump())
     return new_entry

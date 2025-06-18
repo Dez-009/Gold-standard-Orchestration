@@ -1365,6 +1365,19 @@ export async function getAdminJournalSummary(token: string, summaryId: string) {
   return response.data;
 }
 
+// Retrieve journal entries for admin dashboard
+export async function getAdminJournals(
+  token: string,
+  params?: { user_id?: number; ai_only?: boolean; limit?: number; offset?: number }
+) {
+  // Notes: Issue GET request to admin journals endpoint with filters
+  const response = await apiClient.get('/admin/journals', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
+  });
+  return response.data;
+}
+
 // Update admin notes associated with a summary
 export async function updateAdminNotes(
   token: string,

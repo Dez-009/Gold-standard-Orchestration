@@ -5,6 +5,8 @@ from models.journal_entry import JournalEntry
 
 def create_journal_entry(db: Session, entry_data: dict) -> JournalEntry:
     """Create a new journal entry and persist it."""
+    # Notes: Default to user generated unless flagged otherwise
+    entry_data.setdefault("ai_generated", False)
     # Notes: Construct the model instance using the provided dictionary
     new_entry = JournalEntry(**entry_data)
     db.add(new_entry)
