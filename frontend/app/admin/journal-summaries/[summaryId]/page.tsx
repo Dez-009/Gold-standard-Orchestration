@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getToken, isTokenExpired, isAdmin } from '../../../../services/authUtils';
-import { downloadSummaryPDF } from '../../../../services/apiClient';
+import { downloadSummaryPDF, retryAgent } from '../../../../services/apiClient';
 import { fetchSummary, provideNotes, triggerRerun } from '../../../../services/adminJournalSummaryService';
-import { showError } from '../../../../components/ToastProvider';
+import { showError, showSuccess } from '../../../../components/ToastProvider';
 import { FiRefreshCw } from 'react-icons/fi';
 
 export default function AdminSummaryDownload({
@@ -21,6 +21,9 @@ export default function AdminSummaryDownload({
   const [summary, setSummary] = useState(''); // Notes: Fetched summary text
   const [notes, setNotes] = useState(''); // Notes: Admin notes textarea value
   const [showModal, setShowModal] = useState(false); // Notes: Confirmation modal visibility
+  const [retryLoading, setRetryLoading] = useState(false); // Notes: Retry button state
+  const [agent, setAgent] = useState('JournalSummarizationAgent'); // Notes: Selected agent for retry
+  const agents = ['JournalSummarizationAgent', 'GoalSuggestionAgent', 'ProgressReportingAgent'];
 
   // Notes: Ensure the user is authenticated and has admin rights
   useEffect(() => {
@@ -86,6 +89,21 @@ export default function AdminSummaryDownload({
     }
   };
 
+  // Notes: invoke the new admin retry endpoint for a specific agent
+  const handleRetry = async () => {
+    const token = getToken();
+    if (!token) return;
+    setRetryLoading(true);
+    try {
+      await retryAgent(params.summaryId, agent, token);
+      showSuccess('Agent retry complete');
+    } catch {
+      showError('Failed to retry agent');
+    } finally {
+      setRetryLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
       {/* Back link to the summary list */}
@@ -116,6 +134,28 @@ export default function AdminSummaryDownload({
       >
         <FiRefreshCw /> Rerun Agent
       </button>
+      {/* Admin-triggered retry for any agent */}
+      {/* Admin override purpose: rerun an agent when results are missing or outdated */}
+      <div className="flex items-center gap-2">
+        <select
+          value={agent}
+          onChange={(e) => setAgent(e.target.value)}
+          className="border p-1 rounded"
+        >
+          {agents.map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={handleRetry}
+          disabled={retryLoading}
+          className="px-3 py-1 border rounded"
+        >
+          {retryLoading ? 'Retrying...' : 'Retry Agent'}
+        </button>
+      </div>
       {/* Admin notes textarea */}
       <textarea
         value={notes}
