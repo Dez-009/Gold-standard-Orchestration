@@ -45,6 +45,8 @@ def get_summarized_journals(
                 "user_id": row.user_id,
                 "summary_text": row.summary_text,
                 "created_at": row.created_at.isoformat(),
+                "flagged": row.flagged,
+                "flag_reason": row.flag_reason,
             }
         )
 
@@ -64,6 +66,8 @@ def get_summary_by_id(db: Session, summary_id: UUID | str) -> Optional[Dict]:
         "summary_text": row.summary_text,
         "created_at": row.created_at.isoformat(),
         "admin_notes": row.admin_notes,
+        "flagged": row.flagged,
+        "flag_reason": row.flag_reason,
     }
 
 
@@ -83,6 +87,8 @@ def update_admin_notes(db: Session, summary_id: UUID | str, notes: str) -> Optio
         "summary_text": summary.summary_text,
         "created_at": summary.created_at.isoformat(),
         "admin_notes": summary.admin_notes,
+        "flagged": summary.flagged,
+        "flag_reason": summary.flag_reason,
     }
 
 # Footnote: Allows administrators to audit the summarization pipeline.
