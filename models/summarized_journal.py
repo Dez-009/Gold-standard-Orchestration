@@ -32,6 +32,13 @@ class SummarizedJournal(Base):
     # Notes: Optional free-form notes left by administrators
     admin_notes = Column(Text, nullable=True)
 
+    # Notes: Timeline of admin notes associated with this summary
+    admin_notes_timeline = relationship(
+        "AdminSummaryNote",
+        back_populates="summary",
+        cascade="all, delete-orphan",
+    )
+
     # Notes: Relationship back to the user
     user = relationship("User", back_populates="summarized_journals")
     # Notes: Relationship containing any agent self scored evaluations

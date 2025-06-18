@@ -5,8 +5,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getToken, isTokenExpired, isAdmin } from '../../../../services/authUtils';
-import { downloadSummaryPDF, retryAgent } from '../../../../services/apiClient';
-import { fetchSummary, provideNotes, triggerRerun } from '../../../../services/adminJournalSummaryService';
+import {
+  downloadSummaryPDF,
+  retryAgent,
+  getSummaryNotes,
+  addSummaryNote
+} from '../../../../services/apiClient';
+import { fetchSummary, triggerRerun } from '../../../../services/adminJournalSummaryService';
 import { showError, showSuccess } from '../../../../components/ToastProvider';
 import { FiRefreshCw } from 'react-icons/fi';
 
@@ -19,7 +24,8 @@ export default function AdminSummaryDownload({
   const [loading, setLoading] = useState(false); // Notes: Download button state
   const [saving, setSaving] = useState(false); // Notes: Save button state
   const [summary, setSummary] = useState(''); // Notes: Fetched summary text
-  const [notes, setNotes] = useState(''); // Notes: Admin notes textarea value
+  const [timeline, setTimeline] = useState<any[]>([]); // Notes: Fetched notes timeline
+  const [noteInput, setNoteInput] = useState(''); // Notes: New note textarea value
   const [showModal, setShowModal] = useState(false); // Notes: Confirmation modal visibility
   const [retryLoading, setRetryLoading] = useState(false); // Notes: Retry button state
   const [agent, setAgent] = useState('JournalSummarizationAgent'); // Notes: Selected agent for retry
@@ -38,7 +44,8 @@ export default function AdminSummaryDownload({
       try {
         const data = await fetchSummary(params.summaryId);
         setSummary(data.summary_text);
-        setNotes(data.admin_notes || '');
+        const notes = await getSummaryNotes(token, params.summaryId);
+        setTimeline(notes);
       } catch {
         showError('Failed to load summary');
       }
@@ -66,12 +73,16 @@ export default function AdminSummaryDownload({
     }
   };
 
-  const handleSave = async () => {
+  const handleAdd = async () => {
+    const token = getToken();
+    if (!token) return;
     setSaving(true);
     try {
-      await provideNotes(params.summaryId, notes);
+      const newNote = await addSummaryNote(token, params.summaryId, noteInput);
+      setTimeline([newNote, ...timeline]);
+      setNoteInput('');
     } catch {
-      // Error toast shown in service
+      showError('Failed to add note');
     } finally {
       setSaving(false);
     }
@@ -156,21 +167,35 @@ export default function AdminSummaryDownload({
           {retryLoading ? 'Retrying...' : 'Retry Agent'}
         </button>
       </div>
-      {/* Admin notes textarea */}
-      <textarea
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        placeholder="Admin Notes"
-        className="border rounded w-full max-w-2xl p-2"
-        rows={4}
-      />
-      <button
-        onClick={handleSave}
-        disabled={saving}
-        className="px-4 py-2 bg-green-600 text-white rounded"
-      >
-        {saving ? 'Saving...' : 'Save Notes'}
-      </button>
+      {/* Notes Timeline */}
+      <div className="w-full max-w-2xl space-y-2">
+        <h2 className="font-semibold">Notes Timeline</h2>
+        <div className="border rounded p-2 max-h-60 overflow-y-auto space-y-2 bg-white">
+          {timeline.length === 0 && <p className="text-sm">No notes yet.</p>}
+          {timeline.map((n) => (
+            <div key={n.id} className="border-b pb-1 last:border-b-0">
+              <p className="text-xs text-gray-500">
+                {new Date(n.created_at).toLocaleString()} - Admin {n.author_id}
+              </p>
+              <p>{n.content}</p>
+            </div>
+          ))}
+        </div>
+        <textarea
+          value={noteInput}
+          onChange={(e) => setNoteInput(e.target.value)}
+          placeholder="Add note"
+          className="border rounded w-full p-2"
+          rows={3}
+        />
+        <button
+          onClick={handleAdd}
+          disabled={saving}
+          className="px-4 py-2 bg-green-600 text-white rounded"
+        >
+          {saving ? 'Adding...' : 'Add Note'}
+        </button>
+      </div>
       {/* Confirmation modal shown when rerun is requested */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

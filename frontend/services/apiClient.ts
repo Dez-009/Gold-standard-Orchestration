@@ -1393,6 +1393,29 @@ export async function updateAdminNotes(
   return response.data;
 }
 
+// Retrieve the full note timeline for a summary
+export async function getSummaryNotes(token: string, summaryId: string) {
+  const response = await apiClient.get(
+    `/admin/summaries/${summaryId}/notes`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+// Append a new note to the summary
+export async function addSummaryNote(
+  token: string,
+  summaryId: string,
+  content: string
+) {
+  const response = await apiClient.post(
+    `/admin/summaries/${summaryId}/notes`,
+    { content },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
 /**
  * Retrieve override history for a given user and agent.
  * Returns an array of override records from the backend.
