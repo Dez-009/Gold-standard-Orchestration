@@ -1886,6 +1886,18 @@ export async function reviewAgentFlag(token: string, flagId: string) {
   return response.data;
 }
 
+// Retrieve summaries that have been flagged for moderation
+export async function getFlaggedSummaries(
+  token: string,
+  filters?: Record<string, unknown>
+) {
+  const response = await apiClient.get('/admin/summaries/flagged', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters
+  });
+  return response.data;
+}
+
 // Assign a persona token to a user via the admin API
 export async function postPersonaToken(
   token: string,

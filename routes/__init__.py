@@ -69,6 +69,7 @@ from .admin_agent_access import router as admin_agent_access_router
 from .admin_feedback_alerts import router as admin_feedback_alerts_router
 # Notes: Import router managing flagged agent outputs
 from .admin_agent_flags import router as admin_agent_flags_router
+from .admin_flagged_summaries import router as admin_flagged_summaries_router
 # Notes: Router exposing user feedback submission and retrieval
 from .feedback import router as feedback_router
 # Notes: Router allowing admins to review submitted feedback
@@ -164,6 +165,7 @@ router.include_router(admin_agent_access_router)
 # Notes: Admin feedback alerts are not feature gated
 router.include_router(admin_feedback_alerts_router)
 router.include_router(admin_agent_flags_router)
+router.include_router(admin_flagged_summaries_router)
 router.include_router(admin_persona_token_router)
 router.include_router(admin_persona_preset_router)
 router.include_router(admin_prompt_versions_router)
