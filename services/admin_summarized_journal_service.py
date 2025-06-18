@@ -64,6 +64,8 @@ def get_summary_by_id(db: Session, summary_id: UUID | str) -> Optional[Dict]:
         "summary_text": row.summary_text,
         "created_at": row.created_at.isoformat(),
         "admin_notes": row.admin_notes,
+        "flagged": row.flagged,
+        "flag_reason": row.flag_reason,
     }
 
 

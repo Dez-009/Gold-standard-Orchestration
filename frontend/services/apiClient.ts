@@ -1898,6 +1898,30 @@ export async function getFlaggedSummaries(
   return response.data;
 }
 
+// Flag a summary via the admin API
+export async function flagSummary(
+  summaryId: string,
+  reason: string,
+  token: string
+) {
+  const response = await apiClient.post(
+    `/admin/summaries/${summaryId}/flag`,
+    { reason },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+// Remove a moderation flag from a summary
+export async function unflagSummary(summaryId: string, token: string) {
+  const response = await apiClient.post(
+    `/admin/summaries/${summaryId}/unflag`,
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
 // Assign a persona token to a user via the admin API
 export async function postPersonaToken(
   token: string,

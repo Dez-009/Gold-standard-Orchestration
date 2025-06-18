@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+from uuid import UUID
 
 from sqlalchemy.orm import Session
 
@@ -48,4 +49,46 @@ def list_flagged_summaries(
         }
         for r in rows
     ]
+
+
+def flag_summary(db: Session, summary_id: UUID | str, reason: str) -> Optional[Dict]:
+    """Mark a summary as flagged and persist the reason."""
+
+    sid = UUID(str(summary_id)) if not isinstance(summary_id, UUID) else summary_id
+    summary = db.query(SummarizedJournal).get(sid)
+    if summary is None:
+        return None
+    summary.flagged = True
+    summary.flag_reason = reason
+    summary.flagged_at = datetime.utcnow()
+    db.commit()
+    db.refresh(summary)
+    return {
+        "id": str(summary.id),
+        "user_id": summary.user_id,
+        "flagged": summary.flagged,
+        "flag_reason": summary.flag_reason,
+        "flagged_at": summary.flagged_at.isoformat() if summary.flagged_at else None,
+    }
+
+
+def unflag_summary(db: Session, summary_id: UUID | str) -> Optional[Dict]:
+    """Clear the flag status for the given summary."""
+
+    sid = UUID(str(summary_id)) if not isinstance(summary_id, UUID) else summary_id
+    summary = db.query(SummarizedJournal).get(sid)
+    if summary is None:
+        return None
+    summary.flagged = False
+    summary.flag_reason = None
+    summary.flagged_at = None
+    db.commit()
+    db.refresh(summary)
+    return {
+        "id": str(summary.id),
+        "user_id": summary.user_id,
+        "flagged": summary.flagged,
+        "flag_reason": summary.flag_reason,
+        "flagged_at": None,
+    }
 
