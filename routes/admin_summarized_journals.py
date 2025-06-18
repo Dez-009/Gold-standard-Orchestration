@@ -19,6 +19,10 @@ from services.admin_summarized_journal_service import (
     get_summary_by_id,
     update_admin_notes,
 )
+from services.orchestration_log_service import log_agent_run
+from models.summarized_journal import SummarizedJournal
+from uuid import UUID
+from datetime import datetime
 
 # Notes: Prefix registers the route under /admin
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -65,5 +69,48 @@ def set_admin_notes(
     if result is None:
         raise HTTPException(status_code=404, detail="Summary not found")
     return result
+
+
+@router.post("/journal-summaries/{summary_id}/override")
+def override_summary_run(
+    summary_id: str,
+    body: dict,
+    _: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Manually re-run the summarization agent and log override."""
+
+    sid = UUID(str(summary_id))
+    summary = db.query(SummarizedJournal).get(sid)
+    if summary is None:
+        raise HTTPException(status_code=404, detail="Summary not found")
+
+    reason = body.get("reason", "")
+
+    # Notes: Log the override event for auditing
+    log_agent_run(
+        db,
+        "JournalSummarizationAgent",
+        summary.user_id,
+        {
+            "execution_time_ms": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "status": "override",  # placeholder status
+            "fallback_triggered": False,
+            "timeout_occurred": False,
+            "retries": 0,
+            "error_message": None,
+            "override_triggered": True,
+            "override_reason": reason,
+        },
+    )
+
+    # Notes: Update the timestamp so admins know when it was rerun
+    summary.created_at = datetime.utcnow()
+    db.commit()
+    db.refresh(summary)
+
+    return {"message": "override logged"}
 
 # Footnote: Used by the internal moderation dashboard.

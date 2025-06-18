@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getOrchestrationLogs } from '../../../services/apiClient';
+import { getOverrideHistory } from '../../../services/apiClient';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
 
@@ -20,6 +21,8 @@ interface PerfLog {
   timeout_occurred: boolean;
   retries: number;
   timestamp: string;
+  override_triggered?: boolean;
+  override_reason?: string | null;
 }
 
 export default function OrchestrationPerformancePage() {
@@ -31,8 +34,10 @@ export default function OrchestrationPerformancePage() {
   const [sortField, setSortField] = useState<keyof PerfLog>('timestamp');
   const [sortAsc, setSortAsc] = useState(false);
   const [agentFilter, setAgentFilter] = useState('');
+  const [overrideFilter, setOverrideFilter] = useState('all');
   // Notes: Pagination parameters
   const [skip, setSkip] = useState(0);
+  const [historyModal, setHistoryModal] = useState<PerfLog[] | null>(null);
   const limit = 20;
 
   // Notes: Load logs when page mounts or pagination changes
@@ -48,7 +53,9 @@ export default function OrchestrationPerformancePage() {
       setLoading(true);
       setError('');
       try {
-        const data = await getOrchestrationLogs(token, limit, skip);
+        const overrideParam =
+          overrideFilter === 'yes' ? true : overrideFilter === 'no' ? false : undefined;
+        const data = await getOrchestrationLogs(token, limit, skip, overrideParam);
         setLogs(data);
       } catch {
         setError('Failed to load logs');
@@ -57,12 +64,19 @@ export default function OrchestrationPerformancePage() {
       }
     };
     load();
-  }, [router, skip]);
+  }, [router, skip, overrideFilter]);
 
   const fmt = (iso: string) => new Date(iso).toLocaleString();
   const sorted = [...logs]
     .filter((l) =>
       agentFilter ? l.agent_name.includes(agentFilter) : true
+    )
+    .filter((l) =>
+      overrideFilter === 'all'
+        ? true
+        : overrideFilter === 'yes'
+        ? l.override_triggered
+        : !l.override_triggered
     )
     .sort((a, b) => {
       const res = a[sortField] < b[sortField] ? -1 : a[sortField] > b[sortField] ? 1 : 0;
@@ -108,6 +122,15 @@ export default function OrchestrationPerformancePage() {
             placeholder="Filter by agent"
             className="border p-1 mb-2 rounded"
           />
+          <select
+            value={overrideFilter}
+            onChange={(e) => setOverrideFilter(e.target.value)}
+            className="border p-1 mb-2 rounded ml-2"
+          >
+            <option value="all">All</option>
+            <option value="yes">Overrides</option>
+            <option value="no">Normal</option>
+          </select>
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead>
               <tr>
@@ -120,6 +143,7 @@ export default function OrchestrationPerformancePage() {
                 <th className="px-4 py-2">Fallback</th>
                 <th className="px-4 py-2">Timeout</th>
                 <th className="px-4 py-2">Retries</th>
+                <th className="px-4 py-2">Override</th>
               </tr>
             </thead>
             <tbody>
@@ -151,6 +175,21 @@ export default function OrchestrationPerformancePage() {
                       '0'
                     )}
                   </td>
+                  <td
+                    className="border px-2 py-1 cursor-pointer text-blue-600 underline"
+                    onClick={async () => {
+                      const token = getToken();
+                      if (!token) return;
+                      const hist = await getOverrideHistory(
+                        token,
+                        log.user_id,
+                        log.agent_name
+                      );
+                      setHistoryModal(hist as PerfLog[]);
+                    }}
+                  >
+                    {log.override_triggered ? 'Yes' : 'No'}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -172,6 +211,32 @@ export default function OrchestrationPerformancePage() {
           >
             Next
           </button>
+        </div>
+      )}
+      {historyModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+          <div className="bg-white p-4 rounded shadow max-h-[70vh] overflow-y-auto">
+            <h2 className="text-lg font-bold mb-2">Override History</h2>
+            <table className="text-sm border divide-y divide-gray-200 mb-2">
+              <thead>
+                <tr>
+                  <th className="px-2 py-1">Date</th>
+                  <th className="px-2 py-1">Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {historyModal.map((h) => (
+                  <tr key={h.id} className="odd:bg-gray-100 text-center">
+                    <td className="border px-2 py-1">{fmt(h.timestamp)}</td>
+                    <td className="border px-2 py-1">{h.override_reason || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button className="px-3 py-1 border rounded" onClick={() => setHistoryModal(null)}>
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>
