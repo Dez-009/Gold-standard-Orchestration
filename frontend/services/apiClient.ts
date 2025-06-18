@@ -2126,6 +2126,30 @@ export async function updateFeatures(token: string, payload: { features: string[
   return response.data;
 }
 
+// Retrieve all feature flag records for admin management
+export async function getFeatureFlags(token: string) {
+  const response = await apiClient.get('/admin/feature-flags', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data as {
+    feature_key: string;
+    access_tier: string;
+    enabled: boolean;
+    updated_at: string;
+  }[];
+}
+
+// Create or update a feature flag entry
+export async function updateFeatureFlag(
+  token: string,
+  payload: { feature_key: string; access_tier: string; enabled: boolean }
+) {
+  const response = await apiClient.post('/admin/feature-flags/update', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Retrieve prompt versions for a specific agent
 export async function getPromptVersions(token: string, agentName: string) {
   const response = await apiClient.get('/admin/prompt-versions', {

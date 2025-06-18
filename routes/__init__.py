@@ -79,6 +79,7 @@ from .admin_feedback import router as admin_feedback_router
 from .settings import router as settings_router
 # Notes: Router allowing admins to toggle features when permitted
 from .admin_features import router as admin_features_router
+from .admin_feature_flags import router as admin_feature_flags_router
 # Notes: Import router for managing persona tokens
 from .admin.persona_token_admin import router as admin_persona_token_router
 # Notes: Import router providing persona preset CRUD endpoints
@@ -180,5 +181,6 @@ router.include_router(settings_router)
 # Notes: Allow runtime feature updates when enabled in the config
 if settings.ALLOW_FEATURE_TOGGLE:
     router.include_router(admin_features_router)
+    router.include_router(admin_feature_flags_router)
 
 # Footnote: Aggregates and registers all route modules.

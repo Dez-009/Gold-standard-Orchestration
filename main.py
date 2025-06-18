@@ -37,6 +37,7 @@ from routes.account_personalization import router as account_personalization_rou
 from routes.pdf_export import router as pdf_export_router
 from routes.settings import router as settings_router
 from routes.admin_features import router as admin_features_router
+from routes.admin_feature_flags import router as admin_feature_flags_router
 from routes.vida import router as vida_router
 from routes.root import router as root_router
 from routes.health import router as health_router
@@ -235,5 +236,6 @@ app.include_router(settings_router)
 # Expose admin feature editing when allowed by config
 if settings.ALLOW_FEATURE_TOGGLE:
     app.include_router(admin_features_router)
+    app.include_router(admin_feature_flags_router)
 
 # Footnote: Main application configuring all API routes and middleware.

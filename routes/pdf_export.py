@@ -15,8 +15,13 @@ from database.utils import get_db
 from models.user import User
 from models.journal_summary import JournalSummary
 from services.pdf_export_service import export_summary_to_pdf
+from middleware.feature_gate import feature_gate
 
-router = APIRouter(prefix="/summaries", tags=["summaries"])
+router = APIRouter(
+    prefix="/summaries",
+    tags=["summaries"],
+    dependencies=[Depends(feature_gate("pdf_export"))],
+)
 
 
 @router.get("/{summary_id}/export-pdf")

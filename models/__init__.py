@@ -80,6 +80,7 @@ from .agent_access_policy import AgentAccessPolicy, SubscriptionTier
 from .admin_summary_note import AdminSummaryNote
 from .admin_prompt_override import AdminPromptOverride
 from .flag_reason import FlagReason
+from .feature_flag import FeatureFlag, AccessTier
 
 __all__ = [
     "User",
@@ -144,6 +145,8 @@ __all__ = [
     "AdminPromptOverride",
     "AdminSummaryNote",
     "FlagReason",
+    "FeatureFlag",
+    "AccessTier",
 ]
 
 # Footnote: Model package exposes all ORM models for import.
