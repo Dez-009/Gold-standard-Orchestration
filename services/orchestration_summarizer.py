@@ -23,6 +23,10 @@ from services import (
 
 # Notes: Adapter used to call the LLM summarization agent
 from services.ai_model_adapter import AIModelAdapter
+from services.agent_self_score_service import log_self_score
+from utils.logger import get_logger
+
+logger = get_logger()
 
 
 # Notes: Summarize the latest set of journal entries for a user
@@ -65,6 +69,32 @@ def summarize_journal_entries(user_id: int, db: Session) -> str:
     db.add(record)
     db.commit()
     db.refresh(record)
+
+    # Notes: Ask the language model to self-assess confidence in the summary
+    try:
+        score_prompt = [
+            {"role": "system", "content": "You just generated the above summary."},
+            {
+                "role": "user",
+                "content": (
+                    "On a scale from 1-10, how confident are you this summary was "
+                    "accurate? Reply with only the number and optionally a short explanation."
+                ),
+            },
+        ]
+        score_text = adapter.generate(score_prompt, temperature=0)
+        parsed = float(score_text.strip().split()[0])
+        normalized = max(0.0, min(parsed / 10.0, 1.0))
+        log_self_score(
+            db,
+            "JournalSummarizationAgent",
+            record.id,
+            user_id,
+            normalized,
+            reasoning=score_text,
+        )
+    except Exception as exc:  # pragma: no cover - best effort logging
+        logger.warning("Self score generation failed: %s", exc)
 
     # Notes: Generate a follow-up reflection prompt using the booster agent
     try:

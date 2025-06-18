@@ -113,6 +113,12 @@ class User(Base):
     agent_scores = relationship(
         "AgentScore", back_populates="user", cascade="all, delete"
     )
+    # Notes: Self-reported accuracy scores linked to summaries
+    agent_self_scores = relationship(
+        "AgentSelfScore",
+        back_populates="user",
+        cascade="all, delete",
+    )
 
     # Notes: Flags indicating emotional or interpersonal conflict detected in journals
     conflict_flags = relationship(

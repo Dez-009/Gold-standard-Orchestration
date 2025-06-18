@@ -542,6 +542,21 @@ export async function getAgentScores(
   return response.data;
 }
 
+// Notes: Retrieve agent self scoring entries for analytics
+export async function getAgentSelfScores(
+  token: string,
+  agentName?: string,
+  limit: number = 100
+) {
+  // Notes: Issue GET request to the self score admin endpoint
+  const response = await apiClient.get('/admin/agent-self-scores', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { agent_name: agentName, limit }
+  });
+  // Notes: Return the array of self score objects
+  return response.data;
+}
+
 // Notes: Retrieve current agent states for all users
 export async function getAgentStates(
   token: string,
