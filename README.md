@@ -13,3 +13,5 @@ the schema changes.
 Run the test suite with `pytest` to verify functionality, including the new
 personality endpoints. Before running tests, install dependencies using
 `pip install -r requirements.txt`.
+
+See [docs/model_pricing.md](docs/model_pricing.md) for adjusting model pricing without modifying code.
