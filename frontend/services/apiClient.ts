@@ -1806,6 +1806,22 @@ export async function getUserPersonaSnapshot(userId: string, token: string) {
   return response.data as { traits: string[]; last_updated: string };
 }
 
+// Retrieve aggregated agent usage for a user
+export async function getUserAgentUsageSummary(userId: string, token: string) {
+  const response = await apiClient.get(
+    `/admin/agents/usage-summary/${userId}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data as Array<{
+    agent_name: string;
+    runs: number;
+    input_tokens: number;
+    output_tokens: number;
+    cost_usd: number;
+    last_run: string;
+  }>;
+}
+
 // Retrieve all persona presets via the admin API
 // Notes: Fetch all persona presets for the admin dashboard
 export async function getPersonaPresets(token: string) {
