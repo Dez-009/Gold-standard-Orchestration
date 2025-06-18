@@ -1,7 +1,11 @@
 // Service wrapper for retrieving agent access rules
 
 import { getToken } from './authUtils';
-import { getAgentAccessRules, getAgentAccess, updateAgentAccess } from './apiClient';
+import {
+  getAgentAccessRules,
+  getAgentAccessConfig,
+  updateAgentAccessTier
+} from './apiClient';
 import { showError } from '../components/ToastProvider';
 
 export interface AgentAccessRule {
@@ -9,10 +13,9 @@ export interface AgentAccessRule {
   role: string;
 }
 
-export interface AccessPolicy {
+export interface AccessConfig {
   agent_name: string;
-  subscription_tier: string;
-  is_enabled: boolean;
+  access_tier: string;
 }
 
 export async function fetchAgentAccessRules() {
@@ -31,15 +34,15 @@ export async function fetchAgentAccessRules() {
 }
 
 // Retrieve the full agent access policy matrix
-export async function fetchAccessPolicies() {
+export async function fetchAccessConfig() {
   const token = getToken();
   if (!token) {
     showError('Something went wrong');
     throw new Error('User not authenticated');
   }
   try {
-    const data = await getAgentAccess(token);
-    return data as AccessPolicy[];
+    const data = await getAgentAccessConfig(token);
+    return data as AccessConfig[];
   } catch (err) {
     showError('Something went wrong');
     throw err;
@@ -47,18 +50,14 @@ export async function fetchAccessPolicies() {
 }
 
 // Update a single policy row
-export async function saveAccessPolicy(
-  agent_name: string,
-  subscription_tier: string,
-  is_enabled: boolean
-) {
+export async function saveAccessTier(agent_name: string, access_tier: string) {
   const token = getToken();
   if (!token) {
     showError('Something went wrong');
     return;
   }
   try {
-    await updateAgentAccess(token, { agent_name, subscription_tier, is_enabled });
+    await updateAgentAccessTier(token, { agent_name, access_tier });
   } catch {
     showError('Failed to update');
     throw new Error('Update failed');
