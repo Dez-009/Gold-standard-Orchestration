@@ -1913,6 +1913,19 @@ export async function deleteFlagReason(token: string, id: string) {
   return response.data;
 }
 
+// Retrieve aggregated flag reason usage statistics
+export async function getFlagReasonAnalytics(
+  token: string,
+  startDate?: string,
+  endDate?: string
+) {
+  const response = await apiClient.get('/admin/flag-reason-analytics', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { start: startDate, end: endDate }
+  });
+  return response.data as Array<{ reason: string; count: number }>;
+}
+
 // Retrieve summaries that have been flagged for moderation
 export async function getFlaggedSummaries(
   token: string,
