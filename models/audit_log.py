@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, JSON
 from sqlalchemy.orm import relationship
 from enum import Enum
 
@@ -25,6 +25,9 @@ class AuditLog(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     action = Column(String, nullable=False)
     detail = Column(Text, nullable=True)
+    summary_id = Column(String, nullable=True)
+    event_type = Column(String, nullable=True)
+    metadata_json = Column(JSON, nullable=True)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="audit_logs")
