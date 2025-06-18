@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import List
 from pydantic_settings import BaseSettings
 
 # ---------------------------------------------------------------------------
@@ -40,6 +41,21 @@ class Settings(BaseSettings):
     stripe_webhook_secret: str
     # Notes: Secret key for JWT token generation
     secret_key: str
+    # Notes: Allows enabling/disabling major app modules for modular deployments
+    ENABLED_FEATURES: List[str] = [
+        "journal",
+        "goals",
+        "pdf_export",
+        "agent_feedback",
+    ]
+    """List of feature names enabled for this deployment.
+
+    Operators can override this list via the ``ENABLED_FEATURES`` environment
+    variable to hide entire sections of the application when white‑labeling or
+    rolling out features gradually.
+    """
+    # Notes: Toggles whether the admin API allows modifying features at runtime
+    ALLOW_FEATURE_TOGGLE: bool = False
 
     class Config:
         env_file = ".env"

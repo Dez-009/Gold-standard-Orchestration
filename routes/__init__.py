@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+# Notes: Import settings helper so we can check enabled features
+from config import get_settings
 
 from .vida import router as vida_router
 from .user import router as user_router
@@ -61,6 +63,14 @@ from .admin_agent_toggles import router as admin_agent_toggles_router
 # Notes: Import router exposing feedback alert logs
 # Notes: Import router exposing feedback alert logs
 from .admin_feedback_alerts import router as admin_feedback_alerts_router
+# Notes: Router exposing user feedback submission and retrieval
+from .feedback import router as feedback_router
+# Notes: Router allowing admins to review submitted feedback
+from .admin_feedback import router as admin_feedback_router
+# Notes: Router exposing enabled features for the UI
+from .settings import router as settings_router
+# Notes: Router allowing admins to toggle features when permitted
+from .admin_features import router as admin_features_router
 # Notes: Import router for managing persona tokens
 from .admin.persona_token_admin import router as admin_persona_token_router
 # Notes: Import router providing persona preset CRUD endpoints
@@ -77,21 +87,31 @@ from .habit_sync import router as habit_sync_router
 from .user_wearable import router as user_wearable_router
 
 router = APIRouter()
+# Notes: Load configuration so feature flags can be checked
+settings = get_settings()
 
 router.include_router(vida_router)
 router.include_router(user_router)
 router.include_router(auth_router)
 router.include_router(protected_router)
 router.include_router(session_router)
-router.include_router(journal_router)
-router.include_router(reflection_prompt_router)
-router.include_router(conflict_flag_router)
-router.include_router(pdf_export_router)
+# Notes: Journal routes are only mounted when the feature is enabled
+if "journal" in settings.ENABLED_FEATURES:
+    router.include_router(journal_router)
+    router.include_router(reflection_prompt_router)
+    router.include_router(conflict_flag_router)
+# Notes: Export routes depend on the PDF export feature flag
+if "pdf_export" in settings.ENABLED_FEATURES:
+    router.include_router(pdf_export_router)
 router.include_router(notification_router)
-router.include_router(goal_router)
-router.include_router(task_router)
-router.include_router(daily_checkin_router)
-router.include_router(checkins_router)
+# Notes: Goal management routes controlled by the goals feature flag
+if "goals" in settings.ENABLED_FEATURES:
+    router.include_router(goal_router)
+    router.include_router(task_router)
+# Notes: Daily check-in and history routes depend on check-ins feature
+if "checkins" in settings.ENABLED_FEATURES:
+    router.include_router(daily_checkin_router)
+    router.include_router(checkins_router)
 router.include_router(reporting_router)
 router.include_router(personality_router)
 router.include_router(agent_personality_router)
@@ -132,9 +152,19 @@ router.include_router(admin_agent_self_scores_router)
 router.include_router(account_personalization_router)
 router.include_router(admin_device_sync_router)
 router.include_router(admin_agent_toggles_router)
+# Notes: Admin feedback alerts are not feature gated
 router.include_router(admin_feedback_alerts_router)
 router.include_router(admin_persona_token_router)
 router.include_router(admin_persona_preset_router)
 router.include_router(admin_prompt_versions_router)
+# Notes: Include feedback routes only when the feature is active
+if "agent_feedback" in settings.ENABLED_FEATURES:
+    router.include_router(feedback_router)
+    router.include_router(admin_feedback_router)
+# Notes: Provide a read-only endpoint exposing current feature flags
+router.include_router(settings_router)
+# Notes: Allow runtime feature updates when enabled in the config
+if settings.ALLOW_FEATURE_TOGGLE:
+    router.include_router(admin_features_router)
 
 # Footnote: Aggregates and registers all route modules.
