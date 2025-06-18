@@ -47,6 +47,8 @@ from .agent_personalization import AgentPersonalization
 from .agent_score import AgentScore
 # Notes: Import model capturing user reactions to agent summaries
 from .agent_feedback import AgentFeedback
+# Notes: Import model storing low rating alerts for admin review
+from .agent_feedback_alert import AgentFeedbackAlert
 # Notes: Import model storing admin toggles per agent
 from .agent_settings import AgentToggle
 # Notes: Include the user feedback model for collecting suggestions
@@ -103,6 +105,7 @@ __all__ = [
     "AgentPersonalization",
     "AgentScore",
     "AgentFeedback",
+    "AgentFeedbackAlert",
     "AgentToggle",
     "DeviceSyncLog",
     "HabitSyncData",

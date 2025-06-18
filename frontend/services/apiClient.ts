@@ -1629,6 +1629,14 @@ export async function updateAgentToggle(
   return response.data;
 }
 
+// Retrieve recent low rating alerts for admins
+export async function getFeedbackAlerts(token: string) {
+  const response = await apiClient.get('/admin/feedback-alerts', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Assign a persona token to a user via the admin API
 export async function postPersonaToken(
   token: string,
