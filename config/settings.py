@@ -13,8 +13,13 @@ class AppSettings(BaseSettings):
     AGENT_TIMEOUT_SECONDS: int = 45
     """Controls max seconds an agent is allowed to run before timeout."""
 
+    # Notes: Maximum number of times to retry an agent before giving up
+    MAX_AGENT_RETRIES: int = 2
+    """Max retry attempts before agent failure is logged."""
+
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 
 # Notes: Provide a cached accessor for settings

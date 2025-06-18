@@ -39,6 +39,8 @@ from .churn_score import ChurnScore
 from .agent_state import AgentState
 # Notes: Import model for queued agent failures
 from .agent_failure_queue import AgentFailureQueue
+# Notes: Import model logging final agent failures
+from .agent_failure_log import AgentFailureLog
 # Notes: Import model capturing metrics for each agent execution
 from .agent_execution_log import AgentExecutionLog
 # Notes: Import model storing per-user agent personalization
@@ -107,6 +109,7 @@ __all__ = [
     "UserSegment",
     "AgentState",
     "AgentFailureQueue",
+    "AgentFailureLog",
     "AgentExecutionLog",
     "AgentPersonalization",
     "AgentScore",
