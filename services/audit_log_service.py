@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy.orm import Session
 
 from models.audit_log import AuditLog
@@ -35,3 +36,37 @@ def get_recent_audit_logs(db: Session, limit: int = 100, offset: int = 0) -> lis
         .limit(limit)
         .all()
     )
+
+
+def get_audit_logs(db: Session, filters: dict) -> list[AuditLog]:
+    """Return audit logs filtered by user, agent and date range."""
+
+    # Notes: Start building the base query
+    query = db.query(AuditLog)
+
+    # Notes: Filter by user id when provided
+    user_id = filters.get("user_id")
+    if user_id is not None:
+        query = query.filter(AuditLog.user_id == user_id)
+
+    # Notes: Filter by agent name substring match within detail field
+    agent_name = filters.get("agent_name")
+    if agent_name:
+        query = query.filter(AuditLog.detail.contains(agent_name))
+
+    # Notes: Filter by start and end timestamps when provided
+    start = filters.get("start_date")
+    if start:
+        query = query.filter(AuditLog.timestamp >= datetime.fromisoformat(start))
+
+    end = filters.get("end_date")
+    if end:
+        query = query.filter(AuditLog.timestamp <= datetime.fromisoformat(end))
+
+    # Notes: Apply ordering and pagination
+    limit = filters.get("limit", 100)
+    offset = filters.get("offset", 0)
+    query = query.order_by(AuditLog.timestamp.desc()).offset(offset).limit(limit)
+
+    # Notes: Execute the query and return results
+    return query.all()

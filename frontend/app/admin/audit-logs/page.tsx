@@ -1,25 +1,35 @@
 'use client';
-// Admin page that lists recent audit logs in a paginated table
+/**
+ * Admin page displaying the system audit logs.
+ * Allows filtering by user, agent and date range.
+ */
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchAuditLogs, AuditLogRecord } from '../../../services/auditService';
+import { fetchAuditLogs } from '../../../services/auditLogService';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
 
-export default function AdminAuditLogsPage() {
-  const router = useRouter(); // Notes: Router used for redirects
-  // Notes: State storing the fetched logs
-  const [logs, setLogs] = useState<AuditLogRecord[]>([]);
-  // Notes: Loading and error indicators
+interface AuditLogRow {
+  timestamp: string;
+  action_type: string;
+  metadata: string | null;
+  user_id: number | null;
+}
+
+export default function AuditLogsPage() {
+  const router = useRouter();
+  // Notes: Local state for rows and UI controls
+  const [logs, setLogs] = useState<AuditLogRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  // Notes: Pagination state tracking offset and limit
-  const [offset, setOffset] = useState(0);
-  const limit = 20;
+  const [userId, setUserId] = useState('');
+  const [agentName, setAgentName] = useState('');
+  const [start, setStart] = useState('');
+  const [end, setEnd] = useState('');
 
-  // Notes: Load audit logs once user/session validation passes
+  // Notes: Load data whenever filters change
   useEffect(() => {
     const token = getToken();
     if (!token || isTokenExpired(token) || !isAdmin()) {
@@ -32,7 +42,12 @@ export default function AdminAuditLogsPage() {
       setLoading(true);
       setError('');
       try {
-        const data = await fetchAuditLogs(limit, offset);
+        const data = await fetchAuditLogs({
+          user_id: userId || undefined,
+          agent_name: agentName || undefined,
+          start_date: start || undefined,
+          end_date: end || undefined
+        });
         setLogs(data);
       } catch {
         setError('Failed to load audit logs');
@@ -41,91 +56,85 @@ export default function AdminAuditLogsPage() {
       }
     };
     load();
-  }, [router, offset]);
+  }, [router, userId, agentName, start, end]);
 
-  // Notes: Format timestamp strings for display
+  // Notes: Format timestamp for display
   const fmt = (iso: string) => new Date(iso).toLocaleString();
-
-  // Notes: Convert the details JSON for agent assignment logs into readable text
-  const renderDetails = (log: AuditLogRecord) => {
-    if (log.event_type === 'AGENT_ASSIGNMENT' && log.details) {
-      try {
-        const data = JSON.parse(log.details);
-        return (
-          <span>
-            Assigned <b>{data.assigned_agent}</b> to user{' '}
-            <b>{data.user_id}</b> for domain <b>{data.domain}</b>
-          </span>
-        );
-      } catch {
-        // Notes: Fallback to raw details if JSON parsing fails
-        return log.details;
-      }
-    }
-    return log.details ?? '';
-  };
 
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
-      {/* Link back to dashboard */}
+      {/* Navigation */}
       <Link href="/dashboard" className="self-start text-blue-600 underline">
         Back to Dashboard
       </Link>
-
-      {/* Page heading */}
+      {/* Heading */}
       <h1 className="text-2xl font-bold">Audit Logs</h1>
-
-      {/* Loading indicator, error message or table */}
+      {/* Filters */}
+      <div className="flex flex-wrap gap-2">
+        <input
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          placeholder="User ID"
+          className="border p-1 rounded"
+        />
+        <input
+          value={agentName}
+          onChange={(e) => setAgentName(e.target.value)}
+          placeholder="Agent"
+          className="border p-1 rounded"
+        />
+        <input
+          type="date"
+          value={start}
+          onChange={(e) => setStart(e.target.value)}
+          className="border p-1 rounded"
+        />
+        <input
+          type="date"
+          value={end}
+          onChange={(e) => setEnd(e.target.value)}
+          className="border p-1 rounded"
+        />
+      </div>
+      {/* Loading and error states */}
       {loading && (
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
       )}
       {error && <p className="text-red-600">{error}</p>}
       {!loading && !error && logs.length === 0 && <p>No logs found.</p>}
-
+      {/* Table */}
       {!loading && !error && logs.length > 0 && (
         <div className="overflow-x-auto w-full">
           <table className="min-w-full border divide-y divide-gray-200">
             <thead>
               <tr>
                 <th className="px-4 py-2">Timestamp</th>
-                <th className="px-4 py-2">User ID</th>
-                <th className="px-4 py-2">Event</th>
-                <th className="px-4 py-2">Details</th>
+                <th className="px-4 py-2">Agent</th>
+                <th className="px-4 py-2">Action</th>
+                <th className="px-4 py-2">Metadata</th>
+                <th className="px-4 py-2">User</th>
               </tr>
             </thead>
             <tbody>
-              {logs.map((log) => (
-                <tr key={log.id} className="odd:bg-gray-100">
+              {logs.map((log, idx) => (
+                <tr key={idx} className="odd:bg-gray-100">
                   <td className="border px-4 py-2">{fmt(log.timestamp)}</td>
-                  <td className="border px-4 py-2">{log.user_id ?? 'N/A'}</td>
-                  <td className="border px-4 py-2">{log.event_type}</td>
-                  <td className="border px-4 py-2">{renderDetails(log)}</td>
+                  <td className="border px-4 py-2">{agentName || '-'}</td>
+                  <td className="border px-4 py-2">{log.action_type}</td>
+                  <td className="border px-4 py-2">
+                    <span className="block max-w-xs truncate hover:whitespace-normal">
+                      {log.metadata}
+                    </span>
+                  </td>
+                  <td className="border px-4 py-2">{log.user_id}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
-
-      {/* Pagination buttons for previous/next */}
-      {!loading && !error && (
-        <div className="flex space-x-4">
-          <button
-            onClick={() => setOffset(Math.max(0, offset - limit))}
-            disabled={offset === 0}
-            className="px-3 py-1 border rounded disabled:opacity-50"
-          >
-            Prev
-          </button>
-          <button
-            onClick={() => setOffset(offset + limit)}
-            className="px-3 py-1 border rounded"
-          >
-            Next
-          </button>
-        </div>
-      )}
     </div>
   );
 }
 
+// Footnote: React page enabling admins to inspect audit trail entries.
