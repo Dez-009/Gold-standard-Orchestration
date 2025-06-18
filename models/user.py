@@ -109,6 +109,11 @@ class User(Base):
         "AgentExecutionLog", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: Timeout events recorded when agents exceed allowed runtime
+    agent_timeout_logs = relationship(
+        "AgentTimeoutLog", back_populates="user", cascade="all, delete"
+    )
+
     # Notes: Scoring results produced for each agent response
     agent_scores = relationship(
         "AgentScore", back_populates="user", cascade="all, delete"
