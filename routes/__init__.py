@@ -58,9 +58,12 @@ from .admin_agent_scores import router as admin_agent_scores_router
 from .admin_device_sync import router as admin_device_sync_router
 from .admin_agent_toggles import router as admin_agent_toggles_router
 # Notes: Import router exposing feedback alert logs
+# Notes: Import router exposing feedback alert logs
 from .admin_feedback_alerts import router as admin_feedback_alerts_router
 # Notes: Import router for managing persona tokens
 from .admin.persona_token_admin import router as admin_persona_token_router
+# Notes: Import router providing persona preset CRUD endpoints
+from .admin_persona_presets import router as admin_persona_preset_router
 # Notes: Import router providing user personalization endpoints
 from .account_personalization import router as account_personalization_router
 # Notes: Import router providing summary PDF exports
@@ -128,5 +131,6 @@ router.include_router(admin_device_sync_router)
 router.include_router(admin_agent_toggles_router)
 router.include_router(admin_feedback_alerts_router)
 router.include_router(admin_persona_token_router)
+router.include_router(admin_persona_preset_router)
 
 # Footnote: Aggregates and registers all route modules.

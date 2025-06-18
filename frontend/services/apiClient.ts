@@ -1663,6 +1663,49 @@ export async function getPersonaToken(token: string, user_id: number) {
   return response.data;
 }
 
+// Retrieve all persona presets via the admin API
+// Notes: Fetch all persona presets for the admin dashboard
+export async function getPersonaPresets(token: string) {
+  const response = await apiClient.get('/admin/persona-presets', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Create a new persona preset using the admin API
+// Notes: Persist a new persona preset record
+export async function createPersonaPreset(
+  token: string,
+  data: Record<string, unknown>
+) {
+  const response = await apiClient.post('/admin/persona-presets', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Update an existing persona preset
+// Notes: Update fields on an existing preset
+export async function updatePersonaPreset(
+  token: string,
+  id: string,
+  data: Record<string, unknown>
+) {
+  const response = await apiClient.put(`/admin/persona-presets/${id}`, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Delete a persona preset
+// Notes: Remove a persona preset
+export async function deletePersonaPreset(token: string, id: string) {
+  const response = await apiClient.delete(`/admin/persona-presets/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
