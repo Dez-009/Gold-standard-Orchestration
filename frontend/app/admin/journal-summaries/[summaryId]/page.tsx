@@ -8,6 +8,8 @@ import { getToken, isTokenExpired, isAdmin } from '../../../../services/authUtil
 import {
   downloadSummaryPDF,
   retryAgent,
+  flagSummary,
+  unflagSummary,
   getSummaryNotes,
   addSummaryNote
 } from '../../../../services/apiClient';
@@ -30,6 +32,11 @@ export default function AdminSummaryDownload({
   const [retryLoading, setRetryLoading] = useState(false); // Notes: Retry button state
   const [agent, setAgent] = useState('JournalSummarizationAgent'); // Notes: Selected agent for retry
   const agents = ['JournalSummarizationAgent', 'GoalSuggestionAgent', 'ProgressReportingAgent'];
+  const [flagged, setFlagged] = useState(false); // Notes: Current flag state
+  const [flagReason, setFlagReason] = useState(''); // Notes: Existing flag reason
+  const [showFlag, setShowFlag] = useState(false); // Notes: Flag modal visibility
+  const [flagInput, setFlagInput] = useState(''); // Notes: Flag reason textarea
+  const [flagLoading, setFlagLoading] = useState(false); // Notes: Flag API state
 
   // Notes: Ensure the user is authenticated and has admin rights
   useEffect(() => {
@@ -44,6 +51,8 @@ export default function AdminSummaryDownload({
       try {
         const data = await fetchSummary(params.summaryId);
         setSummary(data.summary_text);
+        setFlagged(Boolean(data.flagged));
+        setFlagReason(data.flag_reason || '');
         const notes = await getSummaryNotes(token, params.summaryId);
         setTimeline(notes);
       } catch {
@@ -115,6 +124,42 @@ export default function AdminSummaryDownload({
     }
   };
 
+  // Notes: send a flag request with provided reason
+  const handleFlag = async () => {
+    const token = getToken();
+    if (!token) return;
+    setFlagLoading(true);
+    try {
+      await flagSummary(params.summaryId, flagInput, token);
+      showSuccess('Summary flagged');
+      setFlagged(true);
+      setFlagReason(flagInput);
+      setFlagInput('');
+      setShowFlag(false);
+    } catch {
+      showError('Failed to flag summary');
+    } finally {
+      setFlagLoading(false);
+    }
+  };
+
+  // Notes: remove the moderation flag
+  const handleUnflag = async () => {
+    const token = getToken();
+    if (!token) return;
+    setFlagLoading(true);
+    try {
+      await unflagSummary(params.summaryId, token);
+      showSuccess('Flag removed');
+      setFlagged(false);
+      setFlagReason('');
+    } catch {
+      showError('Failed to update');
+    } finally {
+      setFlagLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
       {/* Back link to the summary list */}
@@ -124,8 +169,20 @@ export default function AdminSummaryDownload({
       >
         Back to List
       </Link>
-      {/* Heading */}
-      <h1 className="text-2xl font-bold">Summary Detail</h1>
+      {/* Heading with flag status */}
+      <div className="flex items-center gap-2">
+        <h1 className="text-2xl font-bold">Summary Detail</h1>
+        {flagged ? (
+          <span className="bg-red-100 text-red-800 px-2 py-1 rounded">Flagged</span>
+        ) : (
+          <span className="bg-green-100 text-green-800 px-2 py-1 rounded">Not Flagged</span>
+        )}
+      </div>
+      {flagged && flagReason && (
+        <div className="bg-red-50 border border-red-200 p-2 rounded text-sm">
+          {flagReason}
+        </div>
+      )}
       {/* Summary text */}
       <p className="border p-4 rounded bg-gray-50 max-w-2xl whitespace-pre-line">
         {summary}
@@ -167,6 +224,24 @@ export default function AdminSummaryDownload({
           {retryLoading ? 'Retrying...' : 'Retry Agent'}
         </button>
       </div>
+      {/* Moderation controls */}
+      {!flagged && (
+        <button
+          onClick={() => setShowFlag(true)}
+          className="px-3 py-1 border rounded bg-red-600 text-white"
+        >
+          Flag Summary
+        </button>
+      )}
+      {flagged && (
+        <button
+          onClick={handleUnflag}
+          disabled={flagLoading}
+          className="px-3 py-1 border rounded"
+        >
+          {flagLoading ? 'Updating...' : 'Remove Flag'}
+        </button>
+      )}
       {/* Notes Timeline */}
       <div className="w-full max-w-2xl space-y-2">
         <h2 className="font-semibold">Notes Timeline</h2>
@@ -213,6 +288,28 @@ export default function AdminSummaryDownload({
                 className="px-3 py-1 bg-blue-600 text-white rounded"
               >
                 Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal for entering a flag reason */}
+      {showFlag && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded space-y-4 w-80">
+            <textarea
+              value={flagInput}
+              onChange={(e) => setFlagInput(e.target.value)}
+              placeholder="Flag reason"
+              className="border rounded w-full p-2"
+              rows={3}
+            />
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowFlag(false)} className="px-3 py-1 border rounded">
+                Cancel
+              </button>
+              <button onClick={handleFlag} disabled={flagLoading} className="px-3 py-1 bg-red-600 text-white rounded">
+                {flagLoading ? 'Flagging...' : 'Confirm Flag'}
               </button>
             </div>
           </div>

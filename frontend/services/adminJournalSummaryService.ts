@@ -15,6 +15,8 @@ export interface SummarizedJournalRecord {
   summary_text: string;
   created_at: string;
   admin_notes?: string;
+  flagged?: boolean;
+  flag_reason?: string | null;
 }
 
 // Fetch summarized journals optionally filtered by user id

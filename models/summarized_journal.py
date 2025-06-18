@@ -31,9 +31,12 @@ class SummarizedJournal(Base):
     source_entry_ids = Column(Text, nullable=True)
     # Notes: Optional free-form notes left by administrators
     admin_notes = Column(Text, nullable=True)
-    # Notes: Mark when moderation or user reports flag this summary
+    # Notes: Indicates a summary that has been flagged either automatically or
+    # manually by an administrator for further review. When set to True the
+    # summary should be hidden from normal user flows.
     flagged = Column(Boolean, default=False)
-    # Notes: Explanation of why the summary was flagged
+    # Notes: Optional text describing why the summary was flagged. This helps
+    # moderators understand context when reviewing the entry.
     flag_reason = Column(Text, nullable=True)
     # Notes: Timestamp when the flag was recorded
     flagged_at = Column(DateTime, nullable=True)
