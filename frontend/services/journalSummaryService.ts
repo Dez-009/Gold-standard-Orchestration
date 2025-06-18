@@ -13,7 +13,11 @@ export async function fetchJournalSummary() {
   }
   // Notes: Request the summary text from the backend service
   const data = await getJournalSummary(token);
-  return data as { summary: string };
+  return data as {
+    summary: string;
+    retry_count: number;
+    timeout_occurred: boolean;
+  };
 }
 
 // Request the orchestration pipeline to generate a journal summary
@@ -24,5 +28,9 @@ export async function requestJournalSummary(user_id: string) {
   }
   // Notes: Submit the request and return the summary payload
   const data = await postJournalSummary(token, user_id);
-  return data as { summary: string };
+  return data as {
+    summary: string;
+    retry_count: number;
+    timeout_occurred: boolean;
+  };
 }

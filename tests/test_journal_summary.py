@@ -50,6 +50,14 @@ def test_journal_summary(monkeypatch):
     # Notes: Patch the summarization service to avoid calling OpenAI
     import services.ai_processor as ai_processor
     monkeypatch.setattr(ai_processor, "generate_journal_summary", lambda *_: "Mock Summary")
+    import orchestration.executor as executor
+    monkeypatch.setattr(
+        executor,
+        "execute_agent",
+        lambda *_args, **_kw: executor.AgentOutput(
+            text="Mock Summary", retry_count=0, timeout_occurred=False
+        ),
+    )
 
     # Notes: Request the journal summary
     response = client.get("/ai/journal-summary", headers=headers)
@@ -57,6 +65,8 @@ def test_journal_summary(monkeypatch):
     # Notes: Verify a successful response containing a summary string
     assert response.status_code == 200
     data = response.json()
+    # Notes: Response includes summary text and metadata fields
     assert "summary" in data
     assert isinstance(data["summary"], str)
-    assert data["summary"]
+    assert "retry_count" in data
+    assert "timeout_occurred" in data

@@ -9,10 +9,13 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 from services.orchestration_log_service import log_agent_run, fetch_logs
 from services.user_service import create_user
 from models.orchestration_log import OrchestrationPerformanceLog
-from tests.conftest import TestingSessionLocal
+from tests.conftest import TestingSessionLocal, engine
+from database.base import Base
 
 
 def test_log_agent_run_persists():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     user = create_user(
         db,
