@@ -14,6 +14,7 @@ from models.user import User
 from services.agent_orchestration import retry_agent_run
 from services.agent_failure_log import get_failures
 from services.agent_cost_service import aggregate_agent_costs
+from services.agent_analytics_service import get_user_agent_usage_summary
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -77,5 +78,21 @@ def agent_cost_totals(
     """Return aggregated token costs for admin dashboards."""
 
     return aggregate_agent_costs(db)
+
+
+@router.get("/agents/usage-summary/{user_id}")
+def agent_usage_summary(
+    user_id: str,
+    _: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+) -> list[dict]:
+    """Return aggregated agent usage metrics for the given user."""
+
+    try:
+        uid = int(user_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid user id")
+
+    return get_user_agent_usage_summary(db, uid)
 
 # Footnote: Fully admin protected endpoint for manual agent retry operations.
