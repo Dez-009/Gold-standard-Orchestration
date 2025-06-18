@@ -452,18 +452,12 @@ export async function getAiSuggestions(token: string) {
 // Notes: Sends a GET request to the /admin/audit-logs endpoint
 export async function getAuditLogs(
   token: string,
-  limit?: number,
-  offset?: number
+  filters: Record<string, unknown>
 ) {
-  // Notes: Build query params only when values are provided
-  const params: Record<string, number> = {};
-  if (limit !== undefined) params.limit = limit;
-  if (offset !== undefined) params.offset = offset;
-
-  // Notes: Issue the HTTP request to fetch log records
+  // Notes: Issue the HTTP request with filter parameters
   const response = await apiClient.get('/admin/audit-logs', {
     headers: { Authorization: `Bearer ${token}` },
-    params
+    params: filters
   });
   // Notes: Return the array of log objects from the backend
   return response.data;

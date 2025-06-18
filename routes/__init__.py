@@ -16,6 +16,8 @@ from .health import router as health_router
 from .audit_log import router as audit_log_router
 # Notes: Import router serving audit log list for admins
 from .admin_audit import router as admin_audit_router
+# Notes: Import router exposing filtered audit log endpoint
+from .admin_audit_log import router as admin_audit_log_router
 # Notes: Import router exposing personalities API
 from .personality import router as personality_router
 # Notes: Import router handling agent personality selection
@@ -106,6 +108,7 @@ router.include_router(admin_agent_lifecycle_router)
 router.include_router(admin_summarized_journals_router)
 # Notes: Register the admin audit log routes
 router.include_router(admin_audit_router)
+router.include_router(admin_audit_log_router)
 router.include_router(analytics_router)
 router.include_router(admin_analytics_router)
 router.include_router(referral_router)
