@@ -1,6 +1,14 @@
+"""Main configuration module exposing application settings."""
+
+# Notes: Standard utilities for caching
 from functools import lru_cache
 from typing import List
+
+# Notes: Base class for environment driven settings
 from pydantic_settings import BaseSettings
+
+# Notes: Additional settings loaded from ``config/settings.py``
+from .settings import get_settings as get_timeout_settings
 
 # ---------------------------------------------------------------------------
 # Agent execution tuning constants used across the orchestration layer
@@ -68,3 +76,5 @@ def get_settings() -> Settings:
     return Settings()
 
 
+# Notes: Expose timeout settings for consumers of this module
+get_timeout_settings = get_timeout_settings

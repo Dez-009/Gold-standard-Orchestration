@@ -41,6 +41,11 @@ export async function postAiPrompt(prompt: string, token: string) {
     { prompt },
     { headers: { Authorization: `Bearer ${token}` } }
   );
+  // Notes: Detect timeout error to allow UI retry logic
+  if (response.data?.error === 'timeout') {
+    // Optional: Could automatically retry here if desired
+    return response.data;
+  }
   // Return the parsed response from the backend
   // The shape of this object is determined by the backend implementation
   return response.data;
@@ -55,6 +60,10 @@ export async function orchestrateAiRequest(prompt: string, token: string) {
     { prompt },
     { headers: { Authorization: `Bearer ${token}` } }
   );
+  // Notes: Return timeout error directly so caller can display banner
+  if (response.data?.error === 'timeout') {
+    return response.data;
+  }
   // Notes: Return the backend payload containing agent and response
   return response.data;
 }
@@ -73,6 +82,10 @@ export async function postLegacyOrchestrationPrompt(
     { user_id, user_prompt },
     { headers: { Authorization: `Bearer ${token}` } }
   );
+  // Notes: Surface timeout error so caller may display retry UI
+  if (response.data?.error === 'timeout') {
+    return response.data;
+  }
   // Notes: Return the aggregated agent responses
   return response.data;
 }
@@ -85,6 +98,10 @@ export async function postOrchestrationPrompt(token: string, prompt: string) {
     { prompt },
     { headers: { Authorization: `Bearer ${token}` } }
   );
+  if (response.data?.error === 'timeout') {
+    // Notes: Optional retry could be implemented here in the future
+    return response.data;
+  }
   // Notes: Return the unified response text from the backend
   return response.data as { response: string };
 }
@@ -1488,6 +1505,17 @@ export async function processFailureQueue(token: string) {
     { headers: { Authorization: `Bearer ${token}` } }
   );
   // Notes: Response is a simple status payload
+  return response.data;
+}
+
+// Notes: Retrieve recent agent timeouts for administrators
+export async function getAgentTimeouts(token: string, limit = 100) {
+  // Notes: Perform GET request to the admin agent-timeouts endpoint
+  const response = await apiClient.get('/admin/agent-timeouts', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { limit }
+  });
+  // Notes: Return the list of timeout records
   return response.data;
 }
 
