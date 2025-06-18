@@ -495,6 +495,21 @@ export async function getOrchestrationLogs(
   return response.data;
 }
 
+// Notes: Replay a historical orchestration run by log id
+export async function replayOrchestration(token: string, logId: string) {
+  const response = await apiClient.post(
+    `/admin/orchestration-replay/${logId}`,
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data as {
+    user_id: number;
+    agent: string;
+    outputs: { summary: string; reflection: string };
+    meta: { runtime_ms: number; error: string | null };
+  };
+}
+
 // Notes: Retrieve agent lifecycle logs with optional filters
 export async function getAgentLifecycleLogs(
   token: string,

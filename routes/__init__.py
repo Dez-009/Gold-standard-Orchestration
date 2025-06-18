@@ -51,6 +51,7 @@ from .admin_agent_state import router as admin_agent_state_router
 from .admin_agent_logs import router as admin_agent_logs_router
 # Notes: Import router exposing orchestration performance logs
 from .admin_orchestration_logs import router as admin_orchestration_logs_router
+from .admin_orchestration_replay import router as admin_orchestration_replay_router
 # Notes: Import router allowing admins to rerun journal summaries
 from .admin_journal_rerun import router as admin_journal_rerun_router
 # Notes: Import router handling admin agent personalization endpoints
@@ -154,6 +155,7 @@ router.include_router(admin_recommendations_router)
 router.include_router(admin_agent_state_router)
 router.include_router(admin_agent_logs_router)
 router.include_router(admin_orchestration_logs_router)
+router.include_router(admin_orchestration_replay_router)
 router.include_router(admin_agent_personalization_router)
 router.include_router(admin_agent_scores_router)
 router.include_router(admin_agent_self_scores_router)
