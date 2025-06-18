@@ -79,6 +79,8 @@ class OrchestrationPerformanceLog(Base):
     retries = Column(Integer, default=0)
     # Notes: Optional message describing the last encountered error
     error_message = Column(Text, nullable=True)
+    # Notes: Version label of the prompt template used for this run
+    prompt_version = Column(String, nullable=True)
     # Notes: Flag denoting when an admin manually re-ran the agent
     override_triggered = Column(Boolean, default=False)
     # Notes: Optional free form text describing why the override occurred

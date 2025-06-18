@@ -30,6 +30,8 @@ def log_agent_run(
         retries=metrics.get("retries", 0),
         # Notes: Persist the final error message if any
         error_message=metrics.get("error_message"),
+        # Notes: Persist which prompt version the agent used
+        prompt_version=metrics.get("prompt_version"),
         # Notes: Capture whether the run was manually overridden by an admin
         override_triggered=metrics.get("override_triggered", False),
         # Notes: Persist any reason provided for the override
