@@ -39,7 +39,7 @@ def test_log_and_list_failures():
     user = create_user(
         db,
         {
-            "email": "user@example.com",
+            "email": f"uf_{uuid.uuid4().hex}@example.com",
             "phone_number": str(int(uuid.uuid4().int % 10_000_000_000)).zfill(10),
             "hashed_password": "pwd",
         },

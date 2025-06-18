@@ -12,15 +12,12 @@ from main import app
 client = TestClient(app)
 
 
-def test_register_user():
-    user_data = {
-        "email": "user@example.com",
-        "phone_number": "1234567890",
-        "hashed_password": "password123",
-        "full_name": "Vida Tester",
-        "age": 30,
-        "sex": "F",
-    }
+def test_register_user(unique_user_data):
+    user_data = unique_user_data(
+        full_name="Vida Tester",
+        age=30,
+        sex="F",
+    )
     response = client.post("/users/", json=user_data)
     assert response.status_code == 201 or response.status_code == 200
     data = response.json()
@@ -29,12 +26,8 @@ def test_register_user():
     assert data["email"] == user_data["email"]
 
 
-def test_register_duplicate_email():
-    user_data = {
-        "email": "duplicate@example.com",
-        "phone_number": "9876543210",
-        "hashed_password": "password123",
-    }
+def test_register_duplicate_email(unique_user_data):
+    user_data = unique_user_data()
     first_response = client.post("/users/", json=user_data)
     assert first_response.status_code in (200, 201)
 
@@ -42,8 +35,10 @@ def test_register_duplicate_email():
     assert second_response.status_code == 400
 
 
-def test_login_success():
-    credentials = {"username": "user@example.com", "password": "password123"}
+def test_login_success(unique_user_data):
+    user_data = unique_user_data()
+    client.post("/users/", json=user_data)
+    credentials = {"username": user_data["email"], "password": "password123"}
     response = client.post("/auth/login", data=credentials)
     assert response.status_code == 200
     data = response.json()
