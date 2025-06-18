@@ -43,7 +43,11 @@ def test_generate_reflection_prompt_text():
     reflection_booster_agent.adapter.generate = fake_generate
     try:
         text = reflection_booster_agent.generate_reflection_prompt(
-            "I felt great today", "happy", ["run"]
+            "I felt great today",
+            "happy",
+            ["run"],
+            db=TestingSessionLocal(),
+            user_id=1,
         )
         assert isinstance(text, str)
         assert text

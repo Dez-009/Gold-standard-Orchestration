@@ -58,6 +58,7 @@ from .user_segment import UserSegment
 from .device_sync import DeviceSyncLog
 # Notes: Import model storing follow-up reflection prompts
 from .habit_sync import HabitSyncData, HabitDataSource
+from .wearable_sync import WearableSyncData, WearableDataType
 from .reflection_prompt import ReflectionPrompt
 from .conflict_flag import ConflictFlag, ConflictType
 # Notes: Import model storing persona token assignments
@@ -106,6 +107,8 @@ __all__ = [
     "DeviceSyncLog",
     "HabitSyncData",
     "HabitDataSource",
+    "WearableSyncData",
+    "WearableDataType",
     "ReflectionPrompt",
     "ConflictFlag",
     "ConflictType",

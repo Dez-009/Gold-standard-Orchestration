@@ -1582,6 +1582,34 @@ export async function getHabitSummary(
   return response.data;
 }
 
+// Submit a single wearable metric
+export async function pushWearableData(
+  token: string,
+  payload: {
+    source: string;
+    data_type: string;
+    value: string | number;
+    recorded_at: string;
+  }
+) {
+  const response = await apiClient.post('/user/wearables', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Retrieve the latest wearable metric of a given type
+export async function getWearableData(
+  token: string,
+  params: { data_type: string }
+) {
+  const response = await apiClient.get('/user/wearables', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
+  });
+  return response.data;
+}
+
 // Retrieve current agent toggle states for the admin panel
 export async function getAgentToggles(token: string) {
   const response = await apiClient.get('/admin/agent-toggles', {
