@@ -8,6 +8,7 @@ from services.ai_memory_service import get_user_context_memory
 # Notes: Import models used for summarization
 from models.journal_entry import JournalEntry
 from models.journal_summary import JournalSummary
+from services.summary_moderation_service import flag_summary_if_needed
 from models.journal_trends import JournalTrend
 
 # Notes: Standard library module for JSON serialization
@@ -127,6 +128,9 @@ def generate_journal_summary(db: Session, user_id: int) -> str:
     db.add(summary_record)
     db.commit()
     db.refresh(summary_record)
+
+    # Notes: Run moderation check and flag if necessary
+    flag_summary_if_needed(db, summary_record, user_id)
 
     # Notes: Return only the text summary to the caller
     return summary_text
