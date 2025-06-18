@@ -953,6 +953,14 @@ export async function getBehavioralInsights(token: string) {
   return response.data;
 }
 
+// Retrieve global platform insights for admin dashboard
+export async function getGlobalInsights(token: string) {
+  const response = await apiClient.get('/admin/insights/global', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Retrieve all notifications for the admin notifications page
 // Notes: Performs a GET request to the /admin/notifications endpoint
 export async function getNotifications(token: string) {
