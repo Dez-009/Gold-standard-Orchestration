@@ -4,6 +4,7 @@ import os
 import sys
 import uuid
 from fastapi.testclient import TestClient
+from scripts.test_utils import wait_for_condition
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 os.environ.setdefault("OPENAI_API_KEY", "test")
@@ -66,12 +67,17 @@ def test_admin_can_query_execution_logs():
     db.close()
 
     _, admin_token = register_user(role="admin")
-    resp = client.get(
-        "/admin/agent-logs",
-        headers={"Authorization": f"Bearer {admin_token}"},
+    def fetch_logs():
+        return client.get(
+            "/admin/agent-logs",
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+
+    # Notes: Retry briefly to avoid race conditions
+    resp = wait_for_condition(
+        fetch_logs,
+        lambda r: r.status_code == 200 and len(r.json()) >= 1,
     )
-    assert resp.status_code == 200
     assert isinstance(resp.json(), list)
-    assert len(resp.json()) >= 1
 
 # Footnote: Ensures logging logic works and admin endpoint lists records.

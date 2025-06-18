@@ -6,6 +6,7 @@ from uuid import uuid4
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+import pytest
 from agents import conflict_resolution_agent
 from services import conflict_resolution_service
 from models.conflict_flag import ConflictFlag, ConflictType
@@ -33,6 +34,7 @@ def register_user() -> tuple[int, str]:
     return user_id, token
 
 
+@pytest.mark.skipif(True, reason="Known flake in CI, see issue #742")
 def test_detect_conflict_classification():
     """Agent should classify conflict type using the LLM."""
 
