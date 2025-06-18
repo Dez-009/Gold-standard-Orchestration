@@ -1336,6 +1336,39 @@ export async function updateAdminNotes(
   return response.data;
 }
 
+/**
+ * Retrieve override history for a given user and agent.
+ * Returns an array of override records from the backend.
+ */
+export async function getOverrideHistory(
+  token: string,
+  user_id: number,
+  agent_name: string
+) {
+  const response = await apiClient.get('/admin/orchestration-override', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { user_id, agent_name }
+  });
+  return response.data;
+}
+
+/**
+ * Trigger a manual override run for the specified summary.
+ * The reason is logged for auditing purposes.
+ */
+export async function postOverrideRun(
+  token: string,
+  summaryId: string,
+  reason: string
+) {
+  const response = await apiClient.post(
+    `/admin/journal-summaries/${summaryId}/override`,
+    { reason },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
 // Retrieve the current user's referral code
 export async function getReferralCode(token: string) {
   // Notes: Send GET request to the referral code endpoint

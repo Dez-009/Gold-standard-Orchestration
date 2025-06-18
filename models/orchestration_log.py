@@ -48,7 +48,12 @@ class OrchestrationLog(Base):
 
 
 class OrchestrationPerformanceLog(Base):
-    """Track performance metrics for each orchestration run."""
+    """Track performance metrics for each orchestration run.
+
+    The override fields capture when an administrator manually triggers
+    an agent execution outside the normal flow.  This helps maintain
+    an audit trail of interventions.
+    """
 
     __tablename__ = "orchestration_performance_logs"
 
@@ -74,5 +79,9 @@ class OrchestrationPerformanceLog(Base):
     retries = Column(Integer, default=0)
     # Notes: Optional message describing the last encountered error
     error_message = Column(Text, nullable=True)
+    # Notes: Flag denoting when an admin manually re-ran the agent
+    override_triggered = Column(Boolean, default=False)
+    # Notes: Optional free form text describing why the override occurred
+    override_reason = Column(Text, nullable=True)
     # Notes: When the orchestration completed
     timestamp = Column(DateTime, default=datetime.utcnow)
