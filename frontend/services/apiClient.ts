@@ -1729,6 +1729,15 @@ export async function getPersonaToken(token: string, user_id: number) {
   return response.data;
 }
 
+// Retrieve a user's persona snapshot via the admin API
+// Notes: Returns list of traits and last updated timestamp
+export async function getUserPersonaSnapshot(userId: string, token: string) {
+  const response = await apiClient.get(`/admin/persona/${userId}/snapshot`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data as { traits: string[]; last_updated: string };
+}
+
 // Retrieve all persona presets via the admin API
 // Notes: Fetch all persona presets for the admin dashboard
 export async function getPersonaPresets(token: string) {

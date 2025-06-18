@@ -69,6 +69,7 @@ from .conflict_flag import ConflictFlag, ConflictType
 from .persona_token import PersonaToken
 # Notes: Import model defining persona presets
 from .persona_preset import PersonaPreset
+from .user_persona import UserPersona
 from .prompt_version import PromptVersion
 
 __all__ = [
@@ -123,6 +124,7 @@ __all__ = [
     "ReflectionPrompt",
     "ConflictFlag",
     "ConflictType",
+    "UserPersona",
     "PersonaToken",
     "PersonaPreset",
     "PromptVersion",

@@ -65,6 +65,7 @@ from routes.admin_agent import router as admin_agent_query_router
 from routes.admin.user_personality_admin import (
     router as admin_user_personality_router,
 )
+from routes.admin_persona import router as admin_persona_router
 # Notes: Import router handling analytics event submissions
 from routes.analytics import router as analytics_router
 # Notes: Import router exposing agent personality assignment endpoints
@@ -195,6 +196,7 @@ app.include_router(admin_summarized_journals_router)
 app.include_router(admin_journal_rerun_router)
 app.include_router(admin_agent_failures_router)
 app.include_router(admin_user_personality_router)
+app.include_router(admin_persona_router)
 app.include_router(admin_notifications_router)
 app.include_router(admin_model_logging_router)
 app.include_router(admin_orchestration_monitor_router)
