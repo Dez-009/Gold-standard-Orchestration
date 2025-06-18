@@ -96,6 +96,8 @@ from routes.admin_summarized_journals import router as admin_summarized_journals
 # Notes: Import routers handling user feedback
 from routes.feedback import router as feedback_router
 from routes.admin_feedback import router as admin_feedback_router
+# Notes: Import router exposing feedback alerts
+from routes.admin_feedback_alerts import router as admin_feedback_alerts_router
 
 # Notes: Import router exposing personality CRUD endpoints
 from routes.personality import router as personality_router
@@ -192,5 +194,6 @@ app.include_router(admin_sessions_router)
 app.include_router(admin_churn_router)
 # Register admin route for reviewing user feedback
 app.include_router(admin_feedback_router)
+app.include_router(admin_feedback_alerts_router)
 
 # Footnote: Main application configuring all API routes and middleware.
