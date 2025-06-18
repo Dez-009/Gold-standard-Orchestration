@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 # Notes: ORM models used for retrieval and persistence
 from models.journal_entry import JournalEntry
 from models.summarized_journal import SummarizedJournal
+from services.summary_moderation_service import flag_summary_if_needed
 
 # Notes: Import the reflection booster agent and services
 from agents.reflection_booster_agent import generate_reflection_prompt
@@ -69,6 +70,9 @@ def summarize_journal_entries(user_id: int, db: Session) -> str:
     db.add(record)
     db.commit()
     db.refresh(record)
+
+    # Notes: Flag the summary when it fails moderation
+    flag_summary_if_needed(db, record, user_id)
 
     # Notes: Ask the language model to self-assess confidence in the summary
     try:
