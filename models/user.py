@@ -119,4 +119,9 @@ class User(Base):
         "ConflictFlag", back_populates="user", cascade="all, delete"
     )
 
+    # Notes: Persona tokens assigned to modify agent behavior
+    persona_tokens = relationship(
+        "PersonaToken", back_populates="user", cascade="all, delete"
+    )
+
 # Footnote: Defines the User ORM model and relationships.
