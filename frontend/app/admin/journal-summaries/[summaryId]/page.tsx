@@ -6,7 +6,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getToken, isTokenExpired, isAdmin } from '../../../../services/authUtils';
 import { downloadSummaryPDF, retryAgent } from '../../../../services/apiClient';
-import { fetchSummary, provideNotes, triggerRerun } from '../../../../services/adminJournalSummaryService';
+import {
+  fetchSummary,
+  provideNotes,
+  triggerRerun,
+  markFlag,
+  removeFlag
+} from '../../../../services/adminJournalSummaryService';
 import { showError, showSuccess } from '../../../../components/ToastProvider';
 import { FiRefreshCw } from 'react-icons/fi';
 
@@ -20,6 +26,10 @@ export default function AdminSummaryDownload({
   const [saving, setSaving] = useState(false); // Notes: Save button state
   const [summary, setSummary] = useState(''); // Notes: Fetched summary text
   const [notes, setNotes] = useState(''); // Notes: Admin notes textarea value
+  const [flagged, setFlagged] = useState(false); // Notes: Current flag status
+  const [flagReason, setFlagReason] = useState(''); // Notes: Stored flag reason
+  const [flagText, setFlagText] = useState(''); // Notes: Textarea for flag reason
+  const [showFlagBox, setShowFlagBox] = useState(false); // Notes: Show flag input
   const [showModal, setShowModal] = useState(false); // Notes: Confirmation modal visibility
   const [retryLoading, setRetryLoading] = useState(false); // Notes: Retry button state
   const [agent, setAgent] = useState('JournalSummarizationAgent'); // Notes: Selected agent for retry
@@ -39,6 +49,8 @@ export default function AdminSummaryDownload({
         const data = await fetchSummary(params.summaryId);
         setSummary(data.summary_text);
         setNotes(data.admin_notes || '');
+        setFlagged(!!data.flagged);
+        setFlagReason(data.flag_reason || '');
       } catch {
         showError('Failed to load summary');
       }
@@ -82,6 +94,8 @@ export default function AdminSummaryDownload({
       await triggerRerun(params.summaryId);
       const data = await fetchSummary(params.summaryId);
       setSummary(data.summary_text);
+      setFlagged(!!data.flagged);
+      setFlagReason(data.flag_reason || '');
     } catch {
       // Error toast displayed in service
     } finally {
@@ -104,6 +118,30 @@ export default function AdminSummaryDownload({
     }
   };
 
+  // Flag the summary with reason text
+  const handleFlag = async () => {
+    try {
+      await markFlag(params.summaryId, flagText);
+      setFlagged(true);
+      setFlagReason(flagText);
+      setShowFlagBox(false);
+      setFlagText('');
+    } catch {
+      /* toast handled in service */
+    }
+  };
+
+  // Remove an existing flag
+  const handleUnflag = async () => {
+    try {
+      await removeFlag(params.summaryId);
+      setFlagged(false);
+      setFlagReason('');
+    } catch {
+      /* toast handled in service */
+    }
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
       {/* Back link to the summary list */}
@@ -115,10 +153,21 @@ export default function AdminSummaryDownload({
       </Link>
       {/* Heading */}
       <h1 className="text-2xl font-bold">Summary Detail</h1>
+      {flagged ? (
+        <span className="px-2 py-1 text-sm bg-red-600 text-white rounded">Flagged</span>
+      ) : (
+        <span className="px-2 py-1 text-sm bg-green-600 text-white rounded">Not Flagged</span>
+      )}
       {/* Summary text */}
       <p className="border p-4 rounded bg-gray-50 max-w-2xl whitespace-pre-line">
         {summary}
       </p>
+      {flagged && (
+        <div className="bg-red-100 text-red-700 p-2 rounded max-w-2xl">
+          <p className="font-semibold">Flag Reason:</p>
+          <p className="whitespace-pre-line">{flagReason}</p>
+        </div>
+      )}
       {/* Download button */}
       <button
         onClick={handleDownload}
@@ -156,6 +205,36 @@ export default function AdminSummaryDownload({
           {retryLoading ? 'Retrying...' : 'Retry Agent'}
         </button>
       </div>
+      {/* Moderation controls */}
+      {!flagged && !showFlagBox && (
+        <button onClick={() => setShowFlagBox(true)} className="px-3 py-1 border rounded">
+          Flag Summary
+        </button>
+      )}
+      {showFlagBox && (
+        <div className="flex flex-col items-start w-full max-w-2xl space-y-2">
+          <textarea
+            value={flagText}
+            onChange={(e) => setFlagText(e.target.value)}
+            placeholder="Flag Reason"
+            className="border rounded w-full p-2"
+            rows={3}
+          />
+          <div className="flex gap-2">
+            <button onClick={handleFlag} className="px-3 py-1 bg-red-600 text-white rounded">
+              Submit Flag
+            </button>
+            <button onClick={() => setShowFlagBox(false)} className="px-3 py-1 border rounded">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+      {flagged && (
+        <button onClick={handleUnflag} className="px-3 py-1 border rounded">
+          Remove Flag
+        </button>
+      )}
       {/* Admin notes textarea */}
       <textarea
         value={notes}

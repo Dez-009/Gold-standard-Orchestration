@@ -82,6 +82,7 @@ from .admin.persona_token_admin import router as admin_persona_token_router
 # Notes: Import router providing persona preset CRUD endpoints
 from .admin_persona_presets import router as admin_persona_preset_router
 from .admin_prompt_versions import router as admin_prompt_versions_router
+from .admin_flagged_summaries import router as admin_flagged_summaries_router
 # Notes: Import router providing user personalization endpoints
 from .account_personalization import router as account_personalization_router
 # Notes: Import router providing summary PDF exports
@@ -140,6 +141,8 @@ router.include_router(admin_agent_lifecycle_router)
 # Notes: Register summarized journal admin routes
 router.include_router(admin_summarized_journals_router)
 router.include_router(admin_journals_router)
+# Notes: Register flag/unflag moderation routes
+router.include_router(admin_flagged_summaries_router)
 # Notes: Register the admin rerun route for journal summaries
 router.include_router(admin_journal_rerun_router)
 # Notes: Register the admin audit log routes

@@ -5,7 +5,9 @@ import {
   getSummarizedJournals,
   getAdminJournalSummary,
   updateAdminNotes,
-  rerunSummary
+  rerunSummary,
+  flagSummary,
+  unflagSummary
 } from './apiClient';
 import { showError, showSuccess } from '../components/ToastProvider';
 
@@ -15,6 +17,8 @@ export interface SummarizedJournalRecord {
   summary_text: string;
   created_at: string;
   admin_notes?: string;
+  flagged?: boolean;
+  flag_reason?: string | null;
 }
 
 // Fetch summarized journals optionally filtered by user id
@@ -76,6 +80,38 @@ export async function triggerRerun(summaryId: string) {
   try {
     await rerunSummary(token, summaryId);
     showSuccess('Agent rerun complete');
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Flag a summary with the provided reason
+export async function markFlag(summaryId: string, reason: string) {
+  const token = getToken();
+  if (!token || !isAdmin()) {
+    showError('Something went wrong');
+    throw new Error('User not authenticated');
+  }
+  try {
+    await flagSummary(summaryId, reason, token);
+    showSuccess('Summary flagged');
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Remove a flag from a summary
+export async function removeFlag(summaryId: string) {
+  const token = getToken();
+  if (!token || !isAdmin()) {
+    showError('Something went wrong');
+    throw new Error('User not authenticated');
+  }
+  try {
+    await unflagSummary(summaryId, token);
+    showSuccess('Flag removed');
   } catch (err) {
     showError('Something went wrong');
     throw err;

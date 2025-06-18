@@ -1439,6 +1439,30 @@ export async function rerunSummary(token: string, summaryId: string) {
   return response.data;
 }
 
+// Flag a summary for moderation
+export async function flagSummary(
+  summaryId: string,
+  reason: string,
+  token: string
+) {
+  const response = await apiClient.post(
+    `/admin/summaries/${summaryId}/flag`,
+    { reason },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+// Remove a moderation flag from a summary
+export async function unflagSummary(summaryId: string, token: string) {
+  const response = await apiClient.post(
+    `/admin/summaries/${summaryId}/unflag`,
+    {},
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
 /**
  * Retry a specific agent for the given summary.
  * Returns the new output string or throws on failure.
