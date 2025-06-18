@@ -682,6 +682,16 @@ export async function getSystemLogs(token: string) {
   return response.data;
 }
 
+// Check whether debug banners should be displayed in the admin UI
+export async function getDebugMode(token: string): Promise<{ debug: boolean }> {
+  // Send GET request to the debug status endpoint with auth header
+  const response = await apiClient.get('/admin/system/debug-status', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Notes: Response includes a boolean flag `debug`
+  return response.data as { debug: boolean };
+}
+
 // Retrieve AI model performance logs for administrators
 // Notes: Sends GET request to the /admin/model-logs endpoint
 export async function getModelLogs(token: string) {
