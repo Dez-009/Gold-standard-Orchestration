@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from config import AGENT_MAX_RETRIES, AGENT_TIMEOUT_SECONDS
 from services.orchestration_log_service import log_agent_run
-from services import agent_toggle_service
+from services import agent_toggle_service, user_service, agent_access_service
 from utils.logger import get_logger
 
 logger = get_logger()
@@ -55,6 +55,27 @@ async def execute_agent(
             },
         )
         logger.info("Agent %s skipped due to admin toggle", agent_name)
+        return AgentOutput(text="", retry_count=0, timeout_occurred=False)
+
+    # Notes: Enforce subscription tier access policy
+    user = user_service.get_user(db, user_id)
+    if user and not agent_access_service.is_agent_enabled_for_user(db, agent_name, user):
+        log_agent_run(
+            db,
+            agent_name,
+            user_id,
+            {
+                "execution_time_ms": 0,
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "status": "disabled_by_plan",
+                "fallback_triggered": False,
+                "timeout_occurred": False,
+                "retries": 0,
+                "error_message": "Disabled by plan",
+            },
+        )
+        logger.info("Agent %s blocked for user %s due to plan", agent_name, user_id)
         return AgentOutput(text="", retry_count=0, timeout_occurred=False)
 
     # Notes: Track timing and diagnostic info

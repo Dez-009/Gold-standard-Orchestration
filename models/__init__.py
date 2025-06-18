@@ -73,6 +73,7 @@ from .persona_token import PersonaToken
 from .persona_preset import PersonaPreset
 from .user_persona import UserPersona
 from .prompt_version import PromptVersion
+from .agent_access_policy import AgentAccessPolicy, SubscriptionTier
 
 __all__ = [
     "User",
@@ -131,6 +132,8 @@ __all__ = [
     "PersonaToken",
     "PersonaPreset",
     "PromptVersion",
+    "AgentAccessPolicy",
+    "SubscriptionTier",
 ]
 
 # Footnote: Model package exposes all ORM models for import.
