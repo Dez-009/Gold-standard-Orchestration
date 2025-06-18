@@ -1560,6 +1560,25 @@ export async function updateAgentToggle(
   return response.data;
 }
 
+// Assign a persona token to a user via the admin API
+export async function postPersonaToken(
+  token: string,
+  payload: { user_id: number; token_name: string }
+) {
+  const response = await apiClient.post('/admin/persona-tokens', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Retrieve a user's persona token using the admin API
+export async function getPersonaToken(token: string, user_id: number) {
+  const response = await apiClient.get(`/admin/persona-tokens/${user_id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

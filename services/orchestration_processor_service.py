@@ -28,6 +28,7 @@ from services.agent_prompt_builder import build_personalized_prompt
 from services.conversation_memory_service import build_memory_context
 # Notes: Import prompt assembly helper for building agent requests
 from services.prompt_assembly_service import build_agent_prompt
+from orchestration.injector import apply_persona_token
 # Notes: Utility to check if an agent is currently active
 # Notes: Import utilities for loading and checking agent state context
 from services.agent_context_loader import load_agent_context, is_agent_active
@@ -123,6 +124,10 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
                 memory_context,
                 personalized_prompt,
             )
+            # Notes: Inject persona token context when available
+            messages = apply_persona_token(
+                db, user_id, assignment.domain, messages
+            )
             # Notes: Execute the agent using the assembled message payload
             result_text = processor(messages)
             success = True
@@ -191,6 +196,8 @@ def run_parallel_agents(
         # Notes: Build personalized memory context for the user and agent
         memory = build_memory_context(db, user_id, [agent_name], user_prompt)
         prompt = build_agent_prompt(agent_name, memory, user_prompt)
+        # Notes: Attach persona token details to the prompt
+        prompt = apply_persona_token(db, user_id, agent_name, prompt)
         start = time.perf_counter()
         try:
             # Notes: Enforce timeout on the blocking LLM call

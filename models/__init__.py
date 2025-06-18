@@ -60,6 +60,8 @@ from .device_sync import DeviceSyncLog
 from .habit_sync import HabitSyncData, HabitDataSource
 from .reflection_prompt import ReflectionPrompt
 from .conflict_flag import ConflictFlag, ConflictType
+# Notes: Import model storing persona token assignments
+from .persona_token import PersonaToken
 
 __all__ = [
     "User",
@@ -107,6 +109,7 @@ __all__ = [
     "ReflectionPrompt",
     "ConflictFlag",
     "ConflictType",
+    "PersonaToken",
 ]
 
 # Footnote: Model package exposes all ORM models for import.

@@ -11,9 +11,13 @@ from orchestration.executor import execute_agent
 from services.user_service import create_user
 from tests.conftest import TestingSessionLocal
 import orchestration.executor as executor
+from database.base import Base
+from tests.conftest import engine
 
 
 def test_execute_agent_retry_success(monkeypatch):
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     user = create_user(
         db,
@@ -40,9 +44,13 @@ def test_execute_agent_retry_success(monkeypatch):
     result = asyncio.run(execute_agent(db, "TestAgent", user.id, call))
     assert result == "ok"
     db.close()
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
 
 def test_execute_agent_retry_failure(monkeypatch):
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     user = create_user(
         db,
@@ -65,3 +73,5 @@ def test_execute_agent_retry_failure(monkeypatch):
     result = asyncio.run(execute_agent(db, "TestAgent", user.id, call))
     assert result == ""
     db.close()
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
