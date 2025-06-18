@@ -47,6 +47,7 @@ from routes.action_plan import router as action_plan_router
 # Notes: Import billing webhook router
 from routes.billing import router as billing_router
 from routes.admin.system_tasks import router as admin_system_router
+from routes.admin_system import router as admin_system_status_router
 from routes.admin.billing_admin import router as admin_billing_router
 from routes.admin.webhooks import router as admin_webhook_router
 from routes.admin.subscription_history import (
@@ -178,6 +179,7 @@ app.include_router(admin_metrics_router)
 app.include_router(admin_revenue_router)
 app.include_router(admin_billing_router)
 app.include_router(admin_system_router)
+app.include_router(admin_system_status_router)
 app.include_router(admin_webhook_router)
 app.include_router(admin_subscription_history_router)
 app.include_router(admin_impersonation_router)

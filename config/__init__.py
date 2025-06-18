@@ -65,6 +65,9 @@ class Settings(BaseSettings):
     # Notes: Toggles whether the admin API allows modifying features at runtime
     ALLOW_FEATURE_TOGGLE: bool = False
 
+    DEBUG_MODE: bool = True
+    """Global toggle for displaying debug banners in admin UI."""
+
     class Config:
         env_file = ".env"
 

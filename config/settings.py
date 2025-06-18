@@ -17,6 +17,9 @@ class AppSettings(BaseSettings):
     MAX_AGENT_RETRIES: int = 2
     """Max retry attempts before agent failure is logged."""
 
+    DEBUG_MODE: bool = True
+    """Global toggle for displaying debug banners in admin UI."""
+
     class Config:
         env_file = ".env"
         extra = "ignore"
