@@ -1341,6 +1341,14 @@ export async function getAdminFeedback(
   return response.data;
 }
 
+// Retrieve aggregated user feedback metrics for admin dashboard
+export async function getFeedbackSummary(token: string) {
+  const response = await apiClient.get('/admin/feedback/summary', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Retrieve summarized journal entries for admin review
 export async function getSummarizedJournals(
   token: string,
@@ -1390,6 +1398,29 @@ export async function updateAdminNotes(
     { headers: { Authorization: `Bearer ${token}` } }
   );
   // Notes: Return the updated summary payload
+  return response.data;
+}
+
+// Retrieve the full note timeline for a summary
+export async function getSummaryNotes(token: string, summaryId: string) {
+  const response = await apiClient.get(
+    `/admin/summaries/${summaryId}/notes`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
+// Append a new note to the summary
+export async function addSummaryNote(
+  token: string,
+  summaryId: string,
+  content: string
+) {
+  const response = await apiClient.post(
+    `/admin/summaries/${summaryId}/notes`,
+    { content },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
   return response.data;
 }
 
@@ -1463,6 +1494,7 @@ export async function retryAgent(
   }
 }
 
+ codex/implement-admin-audit-trail-viewer
 /**
  * Retrieve the audit trail for a specific journal summary.
  */
@@ -1486,6 +1518,20 @@ export async function getSummaryAuditTrail(
     console.error(err);
     return [];
   }
+
+// ---------------------------------------------------------------------------
+// Admin summary diff endpoint
+// ---------------------------------------------------------------------------
+
+/**
+ * Retrieve an HTML diff showing changes between summary versions.
+ */
+export async function getSummaryDiff(summaryId: string, token: string) {
+  const response = await apiClient.get(`/admin/summaries/${summaryId}/diff`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data as { summary_id: string; diff: string };
+ main
 }
 
 // Retrieve the current user's referral code
