@@ -78,6 +78,7 @@ from .user_persona import UserPersona
 from .prompt_version import PromptVersion
 from .agent_access_policy import AgentAccessPolicy, SubscriptionTier
 from .admin_summary_note import AdminSummaryNote
+from .admin_prompt_override import AdminPromptOverride
 from .flag_reason import FlagReason
 
 __all__ = [
@@ -140,6 +141,7 @@ __all__ = [
     "PromptVersion",
     "AgentAccessPolicy",
     "SubscriptionTier",
+    "AdminPromptOverride",
     "AdminSummaryNote",
     "FlagReason",
 ]
