@@ -1797,6 +1797,24 @@ export async function getFeedbackAlerts(token: string) {
   return response.data;
 }
 
+// Retrieve agent output flags pending review
+export async function getAgentFlags(token: string) {
+  const response = await apiClient.get('/admin/agent-flags', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Mark a flag entry as reviewed
+export async function reviewAgentFlag(token: string, flagId: string) {
+  const response = await apiClient.post(
+    '/admin/agent-flags/review',
+    { flag_id: flagId },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
 // Assign a persona token to a user via the admin API
 export async function postPersonaToken(
   token: string,

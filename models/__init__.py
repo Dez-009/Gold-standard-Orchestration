@@ -51,7 +51,10 @@ from .agent_self_score import AgentSelfScore
 # Notes: Import model capturing user reactions to agent summaries
 from .agent_feedback import AgentFeedback
 # Notes: Import model storing low rating alerts for admin review
+# Notes: Import model storing low rating alerts for admin review
 from .agent_feedback_alert import AgentFeedbackAlert
+# Notes: Import model capturing AI outputs flagged for moderation
+from .agent_output_flag import AgentOutputFlag
 # Notes: Import model storing admin toggles per agent
 from .agent_settings import AgentToggle
 # Notes: Include the user feedback model for collecting suggestions
@@ -117,6 +120,7 @@ __all__ = [
     "AgentSelfScore",
     "AgentFeedback",
     "AgentFeedbackAlert",
+    "AgentOutputFlag",
     "AgentToggle",
     "DeviceSyncLog",
     "HabitSyncData",
