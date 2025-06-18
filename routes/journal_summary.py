@@ -14,6 +14,8 @@ from database.utils import get_db
 from models.user import User
 from services.ai_processor import generate_journal_summary
 from schemas.journal_summary import JournalSummaryResponse
+from orchestration.executor import execute_agent
+import asyncio
 
 # Notes: Router configured under the /ai prefix
 router = APIRouter(prefix="/ai", tags=["ai"])
@@ -21,13 +23,21 @@ router = APIRouter(prefix="/ai", tags=["ai"])
 
 @router.get("/journal-summary", response_model=JournalSummaryResponse)
 # Notes: Endpoint returning the latest journal summary for the user
-def get_journal_summary(
+async def get_journal_summary(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> JournalSummaryResponse:
     """Return an AI-generated summary of recent journals."""
 
-    # Notes: Delegate to the AI processor which also persists the summary
-    summary = generate_journal_summary(db, current_user.id)
-    # Notes: Wrap the summary text in the response schema
-    return JournalSummaryResponse(summary=summary)
+    async def _call() -> str:
+        # Notes: Run blocking generation in a thread to avoid blocking event loop
+        return await asyncio.to_thread(generate_journal_summary, db, current_user.id)
+
+    # Notes: Execute with retry and timeout monitoring
+    result = await execute_agent(db, "JournalSummary", current_user.id, _call)
+    # Notes: Wrap text and metadata in the response model
+    return JournalSummaryResponse(
+        summary=result.text,
+        retry_count=result.retry_count,
+        timeout_occurred=result.timeout_occurred,
+    )

@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import time
 from typing import Awaitable, Callable
+from dataclasses import dataclass
 
 from sqlalchemy.orm import Session
 
@@ -16,12 +17,24 @@ from utils.logger import get_logger
 logger = get_logger()
 
 
+@dataclass
+class AgentOutput:
+    """Container returned by ``execute_agent`` including diagnostic flags."""
+
+    # Notes: Final text produced by the agent or empty when failed
+    text: str
+    # Notes: Total number of retries performed before success or giving up
+    retry_count: int
+    # Notes: Whether any attempt exceeded the timeout threshold
+    timeout_occurred: bool
+
+
 async def execute_agent(
     db: Session,
     agent_name: str,
     user_id: int,
     agent_call: Callable[[], Awaitable[str]],
-) -> str:
+) -> AgentOutput:
     """Run ``agent_call`` with timeout and retry handling."""
 
     # Notes: Bypass execution when admin disabled the agent
@@ -42,7 +55,7 @@ async def execute_agent(
             },
         )
         logger.info("Agent %s skipped due to admin toggle", agent_name)
-        return ""
+        return AgentOutput(text="", retry_count=0, timeout_occurred=False)
 
     # Notes: Track timing and diagnostic info
     start = time.perf_counter()
@@ -50,6 +63,7 @@ async def execute_agent(
     error_message: str | None = None
     retries = 0
     status = "success"
+    result = ""
 
     for attempt in range(AGENT_MAX_RETRIES + 1):
         try:
@@ -99,5 +113,9 @@ async def execute_agent(
             "error_message": error_message,
         },
     )
-    return result
+    return AgentOutput(
+        text=result,
+        retry_count=retries,
+        timeout_occurred=timeout_occurred,
+    )
 

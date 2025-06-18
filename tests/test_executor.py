@@ -33,7 +33,8 @@ def test_execute_agent_retry_success(monkeypatch):
     async def call():
         attempts["count"] += 1
         if attempts["count"] == 1:
-            await asyncio.sleep(0.02)
+            # Notes: First invocation simulates a timeout error
+            raise asyncio.TimeoutError()
         return "ok"
 
     monkeypatch.setattr(executor, "AGENT_TIMEOUT_SECONDS", 0.01)
@@ -42,7 +43,10 @@ def test_execute_agent_retry_success(monkeypatch):
     monkeypatch.setattr(executor.asyncio, "sleep", lambda *_: real_sleep(0))
 
     result = asyncio.run(execute_agent(db, "TestAgent", user.id, call))
-    assert result == "ok"
+    # Notes: Should return final text along with retry metadata
+    assert result.text == "ok"
+    assert result.retry_count == 1
+    assert result.timeout_occurred is True
     db.close()
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
@@ -62,8 +66,9 @@ def test_execute_agent_retry_failure(monkeypatch):
     )
 
     async def call():
-        await asyncio.sleep(0.02)
-        raise ValueError("boom")
+        # Notes: Always timeout then raise an error to force retry
+        await asyncio.sleep(0)
+        raise asyncio.TimeoutError()
 
     monkeypatch.setattr(executor, "AGENT_TIMEOUT_SECONDS", 0.01)
     monkeypatch.setattr(executor, "AGENT_MAX_RETRIES", 1)
@@ -71,7 +76,10 @@ def test_execute_agent_retry_failure(monkeypatch):
     monkeypatch.setattr(executor.asyncio, "sleep", lambda *_: real_sleep(0))
 
     result = asyncio.run(execute_agent(db, "TestAgent", user.id, call))
-    assert result == ""
+    # Notes: Expect empty text after retries exhausted
+    assert result.text == ""
+    assert result.retry_count == 1
+    assert result.timeout_occurred is True
     db.close()
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
