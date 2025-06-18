@@ -495,6 +495,31 @@ export async function getOrchestrationLogs(
   return response.data;
 }
 
+// Notes: Retrieve orchestration logs using advanced filters
+export async function getFilteredOrchestrationLogs(
+  token: string,
+  filters: Record<string, unknown>
+) {
+  const response = await apiClient.get('/admin/orchestration-logs', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters
+  });
+  return response.data;
+}
+
+// Notes: Export orchestration logs as CSV with the same filters
+export async function exportOrchestrationLogsCSV(
+  token: string,
+  filters: Record<string, unknown>
+) {
+  const response = await apiClient.get('/admin/orchestration-logs/export', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters,
+    responseType: 'blob'
+  });
+  return response.data as Blob;
+}
+
 // Notes: Retrieve agent lifecycle logs with optional filters
 export async function getAgentLifecycleLogs(
   token: string,

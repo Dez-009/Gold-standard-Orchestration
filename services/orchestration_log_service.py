@@ -91,3 +91,87 @@ def get_override_history(
     )
 
 # Footnote: Provides simple create and read operations for orchestration metrics.
+
+
+def filter_logs(db: Session, filters: dict) -> list[OrchestrationPerformanceLog]:
+    """Return logs filtered by the provided criteria."""
+
+    query = db.query(OrchestrationPerformanceLog).order_by(
+        OrchestrationPerformanceLog.timestamp.desc()
+    )
+
+    # Notes: Allow filtering by agent name for future agent additions
+    if agent := filters.get("agent_name"):
+        query = query.filter(OrchestrationPerformanceLog.agent_name == agent)
+
+    if status := filters.get("status"):
+        query = query.filter(OrchestrationPerformanceLog.status == status)
+
+    # Notes: Filter runs that used fallback handling
+    if (fallback := filters.get("fallback_used")) is not None:
+        query = query.filter(OrchestrationPerformanceLog.fallback_triggered == fallback)
+
+    # Notes: Only return logs flagged by moderation when requested
+    if filters.get("flagged_only"):
+        query = query.filter(OrchestrationPerformanceLog.moderation_triggered.is_(True))
+
+    if date_range := filters.get("date_range"):
+        try:
+            start, end = [d.strip() for d in date_range.split(",", 1)]
+            query = query.filter(
+                OrchestrationPerformanceLog.timestamp >= start,
+                OrchestrationPerformanceLog.timestamp <= end,
+            )
+        except ValueError:
+            # Notes: Ignore malformed date ranges
+            pass
+
+    if limit := filters.get("limit"):
+        query = query.limit(int(limit))
+    if offset := filters.get("skip"):
+        query = query.offset(int(offset))
+
+    return query.all()
+
+
+def export_logs_to_csv(db: Session, filters: dict) -> str:
+    """Serialize filtered logs to CSV for download."""
+
+    logs = filter_logs(db, filters)
+
+    import csv
+    from io import StringIO
+
+    output = StringIO()
+    writer = csv.writer(output)
+
+    writer.writerow(
+        [
+            "id",
+            "agent_name",
+            "user_id",
+            "execution_time_ms",
+            "input_tokens",
+            "output_tokens",
+            "status",
+            "fallback_triggered",
+            "timestamp",
+        ]
+    )
+
+    for log in logs:
+        writer.writerow(
+            [
+                str(log.id),
+                log.agent_name,
+                log.user_id,
+                log.execution_time_ms,
+                log.input_tokens,
+                log.output_tokens,
+                log.status,
+                log.fallback_triggered,
+                log.timestamp.isoformat(),
+            ]
+        )
+
+    return output.getvalue()

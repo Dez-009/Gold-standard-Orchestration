@@ -9,7 +9,12 @@ from database.utils import get_db
 from models.user import User
 
 # Notes: Service responsible for persisting and retrieving log data
-from services.orchestration_log_service import fetch_logs, get_override_history
+from services.orchestration_log_service import (
+    fetch_logs,
+    get_override_history,
+    filter_logs,
+    export_logs_to_csv,
+)
 
 # Notes: Prefix matches other admin routes
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -20,12 +25,29 @@ def get_orchestration_logs(
     skip: int = 0,
     limit: int = 100,
     override: bool | None = None,
+    agent_name: str | None = None,
+    date_range: str | None = None,
+    status: str | None = None,
+    flagged_only: bool | None = None,
+    fallback_used: bool | None = None,
     _: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db),
 ) -> list[dict]:
     """Return orchestration performance logs for administrator dashboards."""
 
-    logs = fetch_logs(db, skip=skip, limit=limit, override=override)
+    if any([agent_name, date_range, status, flagged_only, fallback_used]):
+        filters = {
+            "skip": skip,
+            "limit": limit,
+            "agent_name": agent_name,
+            "date_range": date_range,
+            "status": status,
+            "flagged_only": flagged_only,
+            "fallback_used": fallback_used,
+        }
+        logs = filter_logs(db, filters)
+    else:
+        logs = fetch_logs(db, skip=skip, limit=limit, override=override)
     # Notes: Convert ORM objects to simple dictionaries for JSON response
     return [
         {
@@ -64,5 +86,37 @@ def override_history(
         }
         for r in records
     ]
+
+
+@router.get("/orchestration-logs/export")
+def export_orchestration_logs(
+    agent_name: str | None = None,
+    date_range: str | None = None,
+    status: str | None = None,
+    flagged_only: bool | None = None,
+    fallback_used: bool | None = None,
+    _: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+):
+    """Return filtered orchestration logs as a CSV download."""
+
+    csv_data = export_logs_to_csv(
+        db,
+        {
+            "agent_name": agent_name,
+            "date_range": date_range,
+            "status": status,
+            "flagged_only": flagged_only,
+            "fallback_used": fallback_used,
+        },
+    )
+
+    from fastapi.responses import Response
+
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=orchestration_logs.csv"},
+    )
 
 # Footnote: Allows admins to inspect orchestration latency and token counts.
