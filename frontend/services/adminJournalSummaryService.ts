@@ -4,7 +4,8 @@ import { getToken, isAdmin } from './authUtils';
 import {
   getSummarizedJournals,
   getAdminJournalSummary,
-  updateAdminNotes
+  updateAdminNotes,
+  rerunSummary
 } from './apiClient';
 import { showError, showSuccess } from '../components/ToastProvider';
 
@@ -58,6 +59,23 @@ export async function provideNotes(summaryId: string, notes: string) {
   try {
     await updateAdminNotes(token, summaryId, notes);
     showSuccess('Notes saved');
+  } catch (err) {
+    showError('Something went wrong');
+    throw err;
+  }
+}
+
+// Trigger a rerun of the summarization agent for the specified record
+// Usage: await triggerRerun(summaryId)
+export async function triggerRerun(summaryId: string) {
+  const token = getToken();
+  if (!token || !isAdmin()) {
+    showError('Something went wrong');
+    throw new Error('User not authenticated');
+  }
+  try {
+    await rerunSummary(token, summaryId);
+    showSuccess('Agent rerun complete');
   } catch (err) {
     showError('Something went wrong');
     throw err;
