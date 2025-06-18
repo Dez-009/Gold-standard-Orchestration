@@ -1579,6 +1579,14 @@ export async function getAgentTimeouts(token: string, limit = 100) {
   return response.data;
 }
 
+// Retrieve aggregated agent token costs for dashboards
+export async function getAgentCostTotals(token: string) {
+  const response = await apiClient.get('/admin/agents/costs', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Trigger goal recommendations for a user segment
 export async function triggerGoalRecommendations(
   token: string,

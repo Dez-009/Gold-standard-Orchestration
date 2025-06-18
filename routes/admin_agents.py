@@ -13,6 +13,7 @@ from models.user import User
 # Notes: Service method that performs the retry
 from services.agent_orchestration import retry_agent_run
 from services.agent_failure_log import get_failures
+from services.agent_cost_service import aggregate_agent_costs
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -66,5 +67,15 @@ def list_agent_failures(
         "offset": offset,
         "count": len(entries),
     }
+
+
+@router.get("/agents/costs")
+def agent_cost_totals(
+    _: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Return aggregated token costs for admin dashboards."""
+
+    return aggregate_agent_costs(db)
 
 # Footnote: Fully admin protected endpoint for manual agent retry operations.
