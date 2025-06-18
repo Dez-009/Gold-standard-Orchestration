@@ -84,6 +84,7 @@ from routes.admin_orchestration_monitor import (
 from routes.admin_orchestration_replay import router as admin_orchestration_replay_router
 # Notes: Import router providing aggregated behavioral insights
 from routes.admin_insights import router as admin_insights_router
+from routes.admin_global_insights import router as admin_global_insights_router
 # Notes: Import router serving aggregated analytics summaries
 from routes.admin_analytics import router as admin_analytics_router
 from routes.admin_sessions import router as admin_sessions_router
@@ -222,6 +223,7 @@ app.include_router(admin_orchestration_replay_router)
 app.include_router(admin_behavioral_insight_router)
 # Notes: Register the aggregated behavioral insights endpoint
 app.include_router(admin_insights_router)
+app.include_router(admin_global_insights_router)
 app.include_router(admin_analytics_router)
 app.include_router(admin_sessions_router)
 app.include_router(admin_churn_router)
