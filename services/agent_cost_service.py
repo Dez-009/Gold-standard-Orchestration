@@ -3,10 +3,16 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
+from config.settings import get_settings
+
 from models.orchestration_log import OrchestrationPerformanceLog
 
-# Assumed flat pricing per 1K tokens
-COST_PER_THOUSAND_TOKENS = 0.002
+
+def get_cost_estimate(tokens: int, model: str = "default") -> float:
+    """Return estimated cost for ``tokens`` using configured pricing."""
+    pricing = get_settings().model_pricing
+    rate = pricing.get(model, pricing.get("default", 0.002))
+    return round(tokens / 1000 * rate, 4)
 
 
 def _date_functions(db: Session):
@@ -45,7 +51,7 @@ def aggregate_agent_costs(db: Session) -> dict:
         {
             "period": str(p),
             "tokens": t or 0,
-            "cost": round((t or 0) / 1000 * COST_PER_THOUSAND_TOKENS, 4),
+            "cost": get_cost_estimate(t or 0),
         }
         for p, t in daily_rows
     ]
@@ -53,12 +59,12 @@ def aggregate_agent_costs(db: Session) -> dict:
         {
             "period": str(p),
             "tokens": t or 0,
-            "cost": round((t or 0) / 1000 * COST_PER_THOUSAND_TOKENS, 4),
+            "cost": get_cost_estimate(t or 0),
         }
         for p, t in weekly_rows
     ]
     total_tokens = sum(d["tokens"] for d in daily)
-    total_cost = round(total_tokens / 1000 * COST_PER_THOUSAND_TOKENS, 4)
+    total_cost = get_cost_estimate(total_tokens)
     return {
         "total_tokens": total_tokens,
         "total_cost": total_cost,

@@ -2,6 +2,9 @@
 
 # Notes: lru_cache ensures settings are instantiated once
 from functools import lru_cache
+from pathlib import Path
+import json
+import yaml
 
 # Notes: BaseSettings parses environment variables into attributes
 from pydantic_settings import BaseSettings
@@ -19,6 +22,30 @@ class AppSettings(BaseSettings):
 
     DEBUG_MODE: bool = True
     """Global toggle for displaying debug banners in admin UI."""
+
+    # Path to YAML/JSON file containing model pricing
+    MODEL_PRICING_FILE: str = "config/model_pricing.yaml"
+    """Filesystem path to the model pricing configuration file."""
+
+    model_pricing: dict[str, float] = {}
+    """Mapping of model name to cost per thousand tokens."""
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.model_pricing = self._load_model_pricing()
+
+    def _load_model_pricing(self) -> dict[str, float]:
+        """Load pricing data from YAML/JSON file."""
+        path = Path(self.MODEL_PRICING_FILE)
+        if path.exists():
+            try:
+                with path.open("r") as fh:
+                    if path.suffix in {".yaml", ".yml"}:
+                        return yaml.safe_load(fh) or {}
+                    return json.load(fh)
+            except Exception:  # pragma: no cover - use defaults on failure
+                pass
+        return {"default": 0.002}
 
     class Config:
         env_file = ".env"

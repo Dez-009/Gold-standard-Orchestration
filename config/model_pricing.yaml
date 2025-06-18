@@ -1,0 +1,4 @@
+default: 0.002
+gpt-4o: 0.005
+gpt-4.1-mini: 0.003
+claude-3: 0.004
