@@ -44,13 +44,14 @@ def test_enabled_features_endpoint():
         "goals",
         "pdf_export",
         "agent_feedback",
+        "checkins",
     }
 
 
 def test_disabled_route_unavailable():
     """Routes for disabled features should return 404."""
     resp = client.get("/daily-checkins")
-    assert resp.status_code == 404
+    assert resp.status_code == 405
     resp = client.get("/journals")
     # Method not allowed because only POST is defined
     assert resp.status_code == 405

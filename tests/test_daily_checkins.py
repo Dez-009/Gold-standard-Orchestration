@@ -9,6 +9,12 @@ from fastapi.testclient import TestClient
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 os.environ.setdefault("OPENAI_API_KEY", "test")
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
+os.environ.setdefault(
+    "ENABLED_FEATURES",
+    '["journal","goals","pdf_export","agent_feedback","checkins"]',
+)
+from config import get_settings
+get_settings.cache_clear()
 
 from main import app
 from auth.auth_utils import create_access_token
