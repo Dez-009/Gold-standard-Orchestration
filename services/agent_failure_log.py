@@ -24,4 +24,18 @@ def log_final_failure(
     db.refresh(entry)
     return entry
 
+
+def get_failures(db: Session, limit: int = 50, offset: int = 0) -> list[AgentFailureLog]:
+    """Return recent agent failure logs for admin dashboards."""
+
+    # Notes: Query ordered by newest first with pagination
+    entries = (
+        db.query(AgentFailureLog)
+        .order_by(AgentFailureLog.failed_at.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+    return entries
+
 # Footnote: Future revision may notify administrators when logged.

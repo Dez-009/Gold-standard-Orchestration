@@ -1510,13 +1510,26 @@ export async function evaluateSegment(segmentId: string, token: string) {
   return response.data;
 }
 
-// Notes: Retrieve queued agent failures for administrators
-export async function getAgentFailures(token: string) {
-  // Notes: Perform GET request to the admin agent-failures endpoint
-  const response = await apiClient.get('/admin/agent-failures', {
-    headers: { Authorization: `Bearer ${token}` }
+/**
+ * Retrieve recent agent failure logs for administrative dashboards.
+ * Optional limit and offset parameters support pagination of results.
+ */
+export async function getAgentFailures(
+  token: string,
+  limit?: number,
+  offset?: number
+) {
+  // Notes: Build query parameters only when provided
+  const params: Record<string, number> = {};
+  if (limit !== undefined) params.limit = limit;
+  if (offset !== undefined) params.offset = offset;
+
+  // Notes: Perform GET request to the new admin failures endpoint
+  const response = await apiClient.get('/admin/agents/failures', {
+    headers: { Authorization: `Bearer ${token}` },
+    params
   });
-  // Notes: Return the list of queue records
+  // Notes: Return the parsed JSON payload of failures
   return response.data;
 }
 
