@@ -36,6 +36,10 @@ def log_agent_run(
         override_triggered=metrics.get("override_triggered", False),
         # Notes: Persist any reason provided for the override
         override_reason=metrics.get("override_reason"),
+        # Notes: Flag if auto moderation was triggered
+        moderation_triggered=metrics.get("moderation_triggered", False),
+        # Notes: Type of trigger that caused the moderation event
+        trigger_type=metrics.get("trigger_type"),
     )
     # Notes: Commit the new record to the database
     db.add(log_entry)
