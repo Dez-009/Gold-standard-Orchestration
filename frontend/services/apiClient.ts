@@ -1416,6 +1416,30 @@ export async function rerunSummary(token: string, summaryId: string) {
   return response.data;
 }
 
+/**
+ * Retry a specific agent for the given summary.
+ * Returns the new output string or throws on failure.
+ */
+export async function retryAgent(
+  summaryId: string,
+  agentName: string,
+  token: string
+) {
+  try {
+    const response = await apiClient.post(
+      '/admin/agents/retry',
+      { summary_id: summaryId, agent_name: agentName },
+      { headers: { Authorization: `Bearer ${token}` }, timeout: 15000 }
+    );
+    return response.data as { output: string };
+  } catch (err: any) {
+    if (err.code === 'ECONNABORTED') {
+      throw new Error('Request timed out');
+    }
+    throw err;
+  }
+}
+
 // Retrieve the current user's referral code
 export async function getReferralCode(token: string) {
   // Notes: Send GET request to the referral code endpoint
