@@ -26,3 +26,13 @@ def test_set_and_get_feature_flag():
     feature_flag_service.set_feature_flag(db, "pdf_export", "pro", False)
     assert not feature_flag_service.get_feature_flag(db, "pdf_export", "pro")
     db.close()
+
+
+def test_set_feature_flag():
+    """Validate that set_feature_flag returns the updated object."""
+    db = TestingSessionLocal()
+    flag = feature_flag_service.set_feature_flag(db, "analytics", "admin", False)
+    assert flag.feature_key == "analytics"
+    assert flag.access_tier.value == "admin"
+    assert not flag.enabled
+    db.close()
