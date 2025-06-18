@@ -9,6 +9,7 @@ import {
   exportOrchestrationLogsCSV
 } from '../../../services/apiClient';
 import { getOverrideHistory } from '../../../services/apiClient';
+import { replayOrchestration } from '../../../services/apiClient';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
 
@@ -46,6 +47,7 @@ export default function OrchestrationPerformancePage() {
   // Notes: Pagination parameters
   const [skip, setSkip] = useState(0);
   const [historyModal, setHistoryModal] = useState<PerfLog[] | null>(null);
+  const [replayModal, setReplayModal] = useState<any | null>(null);
   const limit = 20;
 
   // Notes: Load logs when page mounts or pagination changes
@@ -219,6 +221,7 @@ export default function OrchestrationPerformancePage() {
                 <th className="px-4 py-2">Timeout</th>
                 <th className="px-4 py-2">Retries</th>
                 <th className="px-4 py-2">Override</th>
+                <th className="px-4 py-2">Replay</th>
               </tr>
             </thead>
             <tbody>
@@ -263,10 +266,23 @@ export default function OrchestrationPerformancePage() {
                       setHistoryModal(hist as PerfLog[]);
                     }}
                   >
-                    {log.override_triggered ? 'Yes' : 'No'}
-                  </td>
-                </tr>
-              ))}
+                {log.override_triggered ? 'Yes' : 'No'}
+              </td>
+              <td className="border px-2 py-1">
+                <button
+                  className="text-blue-600 underline"
+                  onClick={async () => {
+                    const token = getToken();
+                    if (!token) return;
+                    const data = await replayOrchestration(token, log.id);
+                    setReplayModal(data);
+                  }}
+                >
+                  Replay
+                </button>
+              </td>
+            </tr>
+          ))}
             </tbody>
           </table>
         </div>
@@ -311,6 +327,32 @@ export default function OrchestrationPerformancePage() {
             <button className="px-3 py-1 border rounded" onClick={() => setHistoryModal(null)}>
               Close
             </button>
+          </div>
+        </div>
+      )}
+      {replayModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+          <div className="bg-white p-4 rounded shadow max-w-md space-y-2">
+            <h2 className="text-lg font-bold">Replay Output</h2>
+            <pre className="whitespace-pre-wrap border p-2 rounded max-h-60 overflow-auto">
+              {replayModal.outputs.summary}\n\n{replayModal.outputs.reflection}
+            </pre>
+            <p className="text-sm">Runtime: {replayModal.meta.runtime_ms} ms</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${replayModal.outputs.summary}\n${replayModal.outputs.reflection}`
+                  );
+                }}
+                className="px-3 py-1 border rounded"
+              >
+                Copy
+              </button>
+              <button onClick={() => setReplayModal(null)} className="px-3 py-1 border rounded">
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
