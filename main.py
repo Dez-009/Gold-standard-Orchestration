@@ -35,6 +35,8 @@ from routes.journal_trends import router as journal_trends_router
 from routes.account import router as account_router
 from routes.account_personalization import router as account_personalization_router
 from routes.pdf_export import router as pdf_export_router
+from routes.settings import router as settings_router
+from routes.admin_features import router as admin_features_router
 from routes.vida import router as vida_router
 from routes.root import router as root_router
 from routes.health import router as health_router
@@ -119,6 +121,7 @@ settings = get_settings()
 app = FastAPI(title=settings.project_name, version="0.1.0")
 
 # Register middleware components on the app instance
+
 init_middlewares(app)
 
 # Register routers for the various application features
@@ -126,13 +129,17 @@ app.include_router(user_router)
 app.include_router(auth_router)
 app.include_router(protected_router)
 app.include_router(session_router)
-app.include_router(journal_router)
-app.include_router(pdf_export_router)
+if "journal" in settings.ENABLED_FEATURES:
+    app.include_router(journal_router)
+if "pdf_export" in settings.ENABLED_FEATURES:
+    app.include_router(pdf_export_router)
 app.include_router(notification_router)
-app.include_router(goal_router)
-app.include_router(task_router)
-app.include_router(daily_checkin_router)
-app.include_router(checkins_router)
+if "goals" in settings.ENABLED_FEATURES:
+    app.include_router(goal_router)
+    app.include_router(task_router)
+if "checkins" in settings.ENABLED_FEATURES:
+    app.include_router(daily_checkin_router)
+    app.include_router(checkins_router)
 app.include_router(habit_sync_router)
 app.include_router(user_wearable_router)
 app.include_router(account_router)
@@ -141,8 +148,9 @@ app.include_router(reporting_router)
 app.include_router(personality_router)
 app.include_router(agent_personality_router)
 app.include_router(vida_router)
-# Register feedback submission route for users
-app.include_router(feedback_router)
+# Register feedback submission route for users when enabled
+if "agent_feedback" in settings.ENABLED_FEATURES:
+    app.include_router(feedback_router)
 # Register billing routes for webhook handling
 app.include_router(billing_router)
 # Register AI coach router to expose AI-powered coaching endpoints
@@ -197,5 +205,10 @@ app.include_router(admin_churn_router)
 # Register admin route for reviewing user feedback
 app.include_router(admin_feedback_router)
 app.include_router(admin_feedback_alerts_router)
+# Provide endpoint for the frontend to query feature flags
+app.include_router(settings_router)
+# Expose admin feature editing when allowed by config
+if settings.ALLOW_FEATURE_TOGGLE:
+    app.include_router(admin_features_router)
 
 # Footnote: Main application configuring all API routes and middleware.

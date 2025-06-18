@@ -1721,6 +1721,23 @@ export async function deletePersonaPreset(token: string, id: string) {
   return response.data;
 }
 
+// Retrieve the list of enabled features for the logged-in user
+// The UI queries this to decide which modules should be shown
+export async function getEnabledFeatures(token: string) {
+  const response = await apiClient.get('/api/settings/enabled-features', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Update the enabled features via the admin API
+export async function updateFeatures(token: string, payload: { features: string[] }) {
+  const response = await apiClient.post('/admin/features', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Retrieve prompt versions for a specific agent
 export async function getPromptVersions(token: string, agentName: string) {
   const response = await apiClient.get('/admin/prompt-versions', {
