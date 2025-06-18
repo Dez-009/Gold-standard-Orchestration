@@ -63,6 +63,7 @@ from .pdf_export import router as pdf_export_router
 from .reflection_prompt import router as reflection_prompt_router
 from .conflict_flag import router as conflict_flag_router
 from .habit_sync import router as habit_sync_router
+from .user_wearable import router as user_wearable_router
 
 router = APIRouter()
 
@@ -84,6 +85,7 @@ router.include_router(reporting_router)
 router.include_router(personality_router)
 router.include_router(agent_personality_router)
 router.include_router(habit_sync_router)
+router.include_router(user_wearable_router)
 router.include_router(health_router)
 router.include_router(audit_log_router)
 # Notes: Register action plan routes with the main router

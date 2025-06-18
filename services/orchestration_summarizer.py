@@ -72,6 +72,8 @@ def summarize_journal_entries(user_id: int, db: Session) -> str:
             combined_text,
             mood=None,
             goals=[],
+            db=db,
+            user_id=user_id,
         )
         # Notes: Persist the generated prompt linked to the newest journal entry
         if entries:
