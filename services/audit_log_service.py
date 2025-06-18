@@ -1,7 +1,31 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 from models.audit_log import AuditLog
+
+
+def log_event(
+    db: Session,
+    summary_id: str | UUID,
+    event_type: str,
+    metadata: dict,
+) -> AuditLog:
+    """Persist an audit event tied to a journal summary."""
+
+    # Normalize summary id as string for storage
+    sid = str(summary_id)
+
+    log_data = {
+        "user_id": metadata.get("user_id"),
+        "action": event_type,
+        "detail": None,
+        "summary_id": sid,
+        "event_type": event_type,
+        "metadata_json": metadata,
+        "timestamp": datetime.utcnow(),
+    }
+    return create_audit_log(db, log_data)
 
 
 def create_audit_log(db: Session, log_data: dict) -> AuditLog:
@@ -12,6 +36,18 @@ def create_audit_log(db: Session, log_data: dict) -> AuditLog:
     db.commit()
     db.refresh(new_log)
     return new_log
+
+
+def get_summary_audit_trail(db: Session, summary_id: str | UUID) -> list[AuditLog]:
+    """Return audit events linked to a specific summary."""
+
+    sid = str(summary_id)
+    return (
+        db.query(AuditLog)
+        .filter(AuditLog.summary_id == sid)
+        .order_by(AuditLog.timestamp.desc())
+        .all()
+    )
 
 
 def get_audit_logs_by_user(db: Session, user_id: int) -> list[AuditLog]:

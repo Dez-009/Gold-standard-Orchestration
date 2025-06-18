@@ -1494,6 +1494,31 @@ export async function retryAgent(
   }
 }
 
+ codex/implement-admin-audit-trail-viewer
+/**
+ * Retrieve the audit trail for a specific journal summary.
+ */
+export async function getSummaryAuditTrail(
+  summaryId: string,
+  token: string
+) {
+  try {
+    const response = await apiClient.get(
+      `/admin/summaries/${summaryId}/audit`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data as Array<{
+      timestamp: string;
+      event_type: string;
+      actor: string | null;
+      metadata: Record<string, unknown>;
+    }>;
+  } catch (err) {
+    // Notes: Provide a fallback empty list on error
+    console.error(err);
+    return [];
+  }
+
 // ---------------------------------------------------------------------------
 // Admin summary diff endpoint
 // ---------------------------------------------------------------------------
@@ -1506,6 +1531,7 @@ export async function getSummaryDiff(summaryId: string, token: string) {
     headers: { Authorization: `Bearer ${token}` }
   });
   return response.data as { summary_id: string; diff: string };
+ main
 }
 
 // Retrieve the current user's referral code
