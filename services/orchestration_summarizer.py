@@ -20,6 +20,7 @@ from services import (
     reflection_prompt_service,
     orchestration_audit_service,
     conflict_resolution_service,
+    orchestration_service,
 )
 
 # Notes: Adapter used to call the LLM summarization agent
@@ -73,6 +74,8 @@ def summarize_journal_entries(user_id: int, db: Session) -> str:
 
     # Notes: Flag the summary when it fails moderation
     flag_summary_if_needed(db, record, user_id)
+    # Notes: Run automated moderation heuristics and log the attempt
+    orchestration_service.handle_summary_moderation(db, record)
 
     # Notes: Ask the language model to self-assess confidence in the summary
     try:

@@ -173,7 +173,16 @@ export default function AdminSummaryDownload({
       <div className="flex items-center gap-2">
         <h1 className="text-2xl font-bold">Summary Detail</h1>
         {flagged ? (
-          <span className="bg-red-100 text-red-800 px-2 py-1 rounded">Flagged</span>
+          flagReason.startsWith('Auto-flagged') ? (
+            <span className="relative group bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+              Auto-Flagged
+              <span className="absolute hidden group-hover:block bg-gray-700 text-white text-xs rounded px-1 py-0.5 -top-6 left-1/2 -translate-x-1/2">
+                This summary was flagged by automated moderation logic
+              </span>
+            </span>
+          ) : (
+            <span className="bg-red-100 text-red-800 px-2 py-1 rounded">Flagged</span>
+          )
         ) : (
           <span className="bg-green-100 text-green-800 px-2 py-1 rounded">Not Flagged</span>
         )}

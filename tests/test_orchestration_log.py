@@ -8,7 +8,9 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 
 from services.orchestration_log_service import log_agent_run, fetch_logs
 from services.user_service import create_user
+from services import orchestration_service
 from models.orchestration_log import OrchestrationPerformanceLog
+from models.summarized_journal import SummarizedJournal
 from tests.conftest import TestingSessionLocal, engine
 from database.base import Base
 
@@ -69,3 +71,25 @@ def test_fetch_logs_pagination():
     subset = fetch_logs(db, skip=5, limit=3)
     assert len(subset) == 3
     db.close()
+
+
+def test_auto_flag_integration():
+    """Auto flag should record moderation info in the log."""
+    db = TestingSessionLocal()
+    user = create_user(
+        db,
+        {
+            "email": "perf3@example.com",
+            "phone_number": str(int(uuid.uuid4().int % 10_000_000_000)).zfill(10),
+            "hashed_password": "pwd",
+        },
+    )
+    summary = SummarizedJournal(user_id=user.id, summary_text="bad kill text")
+    db.add(summary)
+    db.commit()
+    db.refresh(summary)
+
+    orchestration_service.handle_summary_moderation(db, summary)
+    log = db.query(OrchestrationPerformanceLog).first()
+    assert log.moderation_triggered is True
+    assert log.trigger_type == "keyword"

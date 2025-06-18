@@ -85,5 +85,9 @@ class OrchestrationPerformanceLog(Base):
     override_triggered = Column(Boolean, default=False)
     # Notes: Optional free form text describing why the override occurred
     override_reason = Column(Text, nullable=True)
+    # Notes: True when automated moderation flagged the output
+    moderation_triggered = Column(Boolean, default=False)
+    # Notes: Description of what triggered the moderation check
+    trigger_type = Column(String, nullable=True)
     # Notes: When the orchestration completed
     timestamp = Column(DateTime, default=datetime.utcnow)

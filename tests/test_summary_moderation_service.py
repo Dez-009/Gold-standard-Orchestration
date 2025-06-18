@@ -10,6 +10,7 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 
 from services import summary_moderation_service, user_service
 from models.journal_summary import JournalSummary
+from models.summarized_journal import SummarizedJournal
 from models.agent_output_flag import AgentOutputFlag
 from tests.conftest import TestingSessionLocal
 
@@ -43,4 +44,21 @@ def test_flag_summary_when_moderation_fails():
     assert any(f.summary_id == summary_id for f in flags)
     assert summary.flagged is True
     assert summary.flag_reason == "moderation_violation"
+
+
+def test_auto_flag_summary():
+    """Keyword triggers should auto flag the summary and log an event."""
+    db = TestingSessionLocal()
+    user_id = create_user(db)
+    summary = SummarizedJournal(user_id=user_id, summary_text="I want to kill")
+    db.add(summary)
+    db.commit()
+    db.refresh(summary)
+
+    flagged, trigger = summary_moderation_service.auto_flag_summary(db, summary.id, summary.summary_text)
+    db.refresh(summary)
+    assert flagged is True
+    assert trigger == "keyword"
+    assert summary.flagged is True
+    assert summary.flag_reason.startswith("Auto-flagged")
 
