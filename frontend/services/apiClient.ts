@@ -495,6 +495,7 @@ export async function getOrchestrationLogs(
   return response.data;
 }
 
+ codex/implement-orchestration-replay-tool
 // Notes: Replay a historical orchestration run by log id
 export async function replayOrchestration(token: string, logId: string) {
   const response = await apiClient.post(
@@ -508,6 +509,31 @@ export async function replayOrchestration(token: string, logId: string) {
     outputs: { summary: string; reflection: string };
     meta: { runtime_ms: number; error: string | null };
   };
+
+// Notes: Retrieve orchestration logs using advanced filters
+export async function getFilteredOrchestrationLogs(
+  token: string,
+  filters: Record<string, unknown>
+) {
+  const response = await apiClient.get('/admin/orchestration-logs', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters
+  });
+  return response.data;
+}
+
+// Notes: Export orchestration logs as CSV with the same filters
+export async function exportOrchestrationLogsCSV(
+  token: string,
+  filters: Record<string, unknown>
+) {
+  const response = await apiClient.get('/admin/orchestration-logs/export', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters,
+    responseType: 'blob'
+  });
+  return response.data as Blob;
+ main
 }
 
 // Notes: Retrieve agent lifecycle logs with optional filters
@@ -1926,6 +1952,19 @@ export async function deleteFlagReason(token: string, id: string) {
     headers: { Authorization: `Bearer ${token}` }
   });
   return response.data;
+}
+
+// Retrieve aggregated flag reason usage statistics
+export async function getFlagReasonAnalytics(
+  token: string,
+  startDate?: string,
+  endDate?: string
+) {
+  const response = await apiClient.get('/admin/flag-reason-analytics', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { start: startDate, end: endDate }
+  });
+  return response.data as Array<{ reason: string; count: number }>;
 }
 
 // Retrieve summaries that have been flagged for moderation

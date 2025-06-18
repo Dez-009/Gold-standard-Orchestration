@@ -4,7 +4,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { getOrchestrationLogs } from '../../../services/apiClient';
+import {
+  getFilteredOrchestrationLogs,
+  exportOrchestrationLogsCSV
+} from '../../../services/apiClient';
 import { getOverrideHistory } from '../../../services/apiClient';
 import { replayOrchestration } from '../../../services/apiClient';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
@@ -36,6 +39,11 @@ export default function OrchestrationPerformancePage() {
   const [sortAsc, setSortAsc] = useState(false);
   const [agentFilter, setAgentFilter] = useState('');
   const [overrideFilter, setOverrideFilter] = useState('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [fallbackFilter, setFallbackFilter] = useState('all');
+  const [flaggedOnly, setFlaggedOnly] = useState(false);
   // Notes: Pagination parameters
   const [skip, setSkip] = useState(0);
   const [historyModal, setHistoryModal] = useState<PerfLog[] | null>(null);
@@ -57,7 +65,17 @@ export default function OrchestrationPerformancePage() {
       try {
         const overrideParam =
           overrideFilter === 'yes' ? true : overrideFilter === 'no' ? false : undefined;
-        const data = await getOrchestrationLogs(token, limit, skip, overrideParam);
+        const filters: Record<string, unknown> = {
+          skip,
+          limit,
+          agent_name: agentFilter || undefined,
+          status: statusFilter || undefined,
+          date_range: startDate && endDate ? `${startDate},${endDate}` : undefined,
+          flagged_only: flaggedOnly || undefined,
+          fallback_used: fallbackFilter === 'all' ? undefined : fallbackFilter === 'yes',
+          override: overrideParam
+        };
+        const data = await getFilteredOrchestrationLogs(token, filters);
         setLogs(data);
       } catch {
         setError('Failed to load logs');
@@ -66,7 +84,7 @@ export default function OrchestrationPerformancePage() {
       }
     };
     load();
-  }, [router, skip, overrideFilter]);
+  }, [router, skip, overrideFilter, agentFilter, statusFilter, startDate, endDate, fallbackFilter, flaggedOnly]);
 
   const fmt = (iso: string) => new Date(iso).toLocaleString();
   const sorted = [...logs]
@@ -124,6 +142,24 @@ export default function OrchestrationPerformancePage() {
             placeholder="Filter by agent"
             className="border p-1 mb-2 rounded"
           />
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border p-1 mb-2 rounded ml-2"
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border p-1 mb-2 rounded ml-2"
+          />
+          <input
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            placeholder="Status"
+            className="border p-1 mb-2 rounded ml-2"
+          />
           <select
             value={overrideFilter}
             onChange={(e) => setOverrideFilter(e.target.value)}
@@ -133,6 +169,45 @@ export default function OrchestrationPerformancePage() {
             <option value="yes">Overrides</option>
             <option value="no">Normal</option>
           </select>
+          <select
+            value={fallbackFilter}
+            onChange={(e) => setFallbackFilter(e.target.value)}
+            className="border p-1 mb-2 rounded ml-2"
+          >
+            <option value="all">Fallback?</option>
+            <option value="yes">Used</option>
+            <option value="no">Not Used</option>
+          </select>
+          <label className="ml-2 text-sm">
+            <input
+              type="checkbox"
+              checked={flaggedOnly}
+              onChange={(e) => setFlaggedOnly(e.target.checked)}
+              className="mr-1"
+            />
+            Flagged
+          </label>
+          <button
+            onClick={async () => {
+              const token = getToken();
+              if (!token) return;
+              const data = await exportOrchestrationLogsCSV(token, {
+                agent_name: agentFilter || undefined,
+                status: statusFilter || undefined,
+                date_range: startDate && endDate ? `${startDate},${endDate}` : undefined,
+                flagged_only: flaggedOnly || undefined,
+                fallback_used: fallbackFilter === 'all' ? undefined : fallbackFilter === 'yes'
+              });
+              const url = window.URL.createObjectURL(data);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'orchestration_logs.csv';
+              a.click();
+            }}
+            className="px-3 py-1 border rounded ml-2"
+          >
+            Export CSV
+          </button>
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead>
               <tr>

@@ -4,7 +4,7 @@ import OrchestrationPerformancePage from '../../frontend/app/admin/orchestration
 
 // Mock the API client used to fetch logs
 jest.mock('../../frontend/services/apiClient', () => ({
-  getOrchestrationLogs: jest.fn(() =>
+  getFilteredOrchestrationLogs: jest.fn(() =>
     Promise.resolve([
       {
         id: '1',
@@ -23,12 +23,12 @@ jest.mock('../../frontend/services/apiClient', () => ({
   )
 }));
 
-const { getOrchestrationLogs } = require('../../frontend/services/apiClient');
+const { getFilteredOrchestrationLogs } = require('../../frontend/services/apiClient');
 
 test('renders orchestration performance logs', async () => {
   render(<OrchestrationPerformancePage />);
   await waitFor(() => screen.getByText('JournalSummarizationAgent'));
-  expect(getOrchestrationLogs).toHaveBeenCalled();
+  expect(getFilteredOrchestrationLogs).toHaveBeenCalled();
   expect(screen.getByText('JournalSummarizationAgent')).toBeInTheDocument();
   expect(screen.getByText('1')).toBeInTheDocument();
 });
