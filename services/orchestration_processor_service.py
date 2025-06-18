@@ -37,7 +37,10 @@ from services.orchestration_decision_service import determine_agent_flow
 # Notes: Import the aggregator used after parallel execution
 from services.response_aggregation_service import aggregate_agent_responses
 from services.agent_scoring_service import score_agent_responses
-from services.agent_access_control import is_agent_accessible
+from services.agent_access_control_service import (
+    is_agent_allowed,
+    AgentAccessDenied,
+)
 from services.user_service import get_user
 from utils.logger import get_logger
 
@@ -98,13 +101,19 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
         if not active_agents and not is_agent_active(db, user_id, assignment.domain):
             continue
 
-        # Notes: Skip execution when the user's role does not permit this agent
-        if not is_agent_accessible(assignment.domain, user):
+        # Notes: Enforce role-based access before running the agent
+        try:
+            if not is_agent_allowed(db, user.role, assignment.domain):
+                raise AgentAccessDenied()
+        except AgentAccessDenied:
             logger.info(
                 "User %s with role %s blocked from agent %s",
                 user_id,
                 user.role,
                 assignment.domain,
+            )
+            responses.append(
+                {"agent": assignment.domain, "blocked": True, "reason": "Upgrade required"}
             )
             continue
 
@@ -181,9 +190,11 @@ def run_parallel_agents(
     # Notes: Filter the agent list based on role access rules
     allowed_agents: list[str] = []
     for name in agent_list:
-        if is_agent_accessible(name, user):
+        try:
+            if not is_agent_allowed(db, user.role, name):
+                raise AgentAccessDenied()
             allowed_agents.append(name)
-        else:
+        except AgentAccessDenied:
             logger.info(
                 "User %s with role %s blocked from agent %s",
                 user_id,

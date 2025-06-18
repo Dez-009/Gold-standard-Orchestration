@@ -5,18 +5,18 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  fetchAccessPolicies,
-  saveAccessPolicy,
-  AccessPolicy
+  fetchAccessConfig,
+  saveAccessTier,
+  AccessConfig
 } from '../../../services/agentAccessService';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import { showError, showSuccess } from '../../../components/ToastProvider';
 
-const TIERS = ['free', 'basic', 'premium'];
+const TIERS = ['free', 'plus', 'pro', 'admin'];
 
 export default function AgentAccessMatrixPage() {
   const router = useRouter();
-  const [policies, setPolicies] = useState<AccessPolicy[]>([]);
+  const [configs, setConfigs] = useState<AccessConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -32,8 +32,8 @@ export default function AgentAccessMatrixPage() {
       setLoading(true);
       setError('');
       try {
-        const data = await fetchAccessPolicies();
-        setPolicies(data);
+        const data = await fetchAccessConfig();
+        setConfigs(data);
       } catch {
         setError('Failed to load access policies');
       } finally {
@@ -43,27 +43,17 @@ export default function AgentAccessMatrixPage() {
     load();
   }, [router]);
 
-  const grouped = policies.reduce<Record<string, Record<string, boolean>>>(
-    (acc, p) => {
-      if (!acc[p.agent_name]) acc[p.agent_name] = {} as Record<string, boolean>;
-      acc[p.agent_name][p.subscription_tier] = p.is_enabled;
-      return acc;
-    },
-    {}
-  );
+  const grouped = configs.reduce<Record<string, string>>((acc, c) => {
+    acc[c.agent_name] = c.access_tier;
+    return acc;
+  }, {});
 
-  const handleToggle = async (
-    agent: string,
-    tier: string,
-    value: boolean
-  ) => {
+  const handleUpdate = async (agent: string, tier: string) => {
     try {
-      await saveAccessPolicy(agent, tier, value);
-      setPolicies((prev) =>
+      await saveAccessTier(agent, tier);
+      setConfigs((prev) =>
         prev.map((p) =>
-          p.agent_name === agent && p.subscription_tier === tier
-            ? { ...p, is_enabled: value }
-            : p
+          p.agent_name === agent ? { ...p, access_tier: tier } : p
         )
       );
       showSuccess('Policy updated');
@@ -89,26 +79,26 @@ export default function AgentAccessMatrixPage() {
           <thead>
             <tr>
               <th className="px-4 py-2">Agent</th>
-              {TIERS.map((t) => (
-                <th key={t} className="px-4 py-2 capitalize">
-                  {t}
-                </th>
-              ))}
+              <th className="px-4 py-2">Required Tier</th>
             </tr>
           </thead>
           <tbody>
             {agents.map((a) => (
               <tr key={a} className="odd:bg-gray-100 text-center">
                 <td className="border px-2 py-1">{a}</td>
-                {TIERS.map((t) => (
-                  <td key={t} className="border px-2 py-1">
-                    <input
-                      type="checkbox"
-                      checked={grouped[a]?.[t] || false}
-                      onChange={(e) => handleToggle(a, t, e.target.checked)}
-                    />
-                  </td>
-                ))}
+                <td className="border px-2 py-1">
+                  <select
+                    value={grouped[a]}
+                    onChange={(e) => handleUpdate(a, e.target.value)}
+                    className="border p-1 rounded"
+                  >
+                    {TIERS.map((t) => (
+                      <option key={t} value={t} className="capitalize">
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </td>
               </tr>
             ))}
           </tbody>

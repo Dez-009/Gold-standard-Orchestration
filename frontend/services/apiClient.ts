@@ -1890,6 +1890,25 @@ export async function getAgentAccess(token: string) {
   return response.data;
 }
 
+// Retrieve agent tier configuration
+export async function getAgentAccessConfig(token: string) {
+  const response = await apiClient.get('/admin/agent-access', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Update the required tier for a specific agent
+export async function updateAgentAccessTier(
+  token: string,
+  payload: { agent_name: string; access_tier: string }
+) {
+  const response = await apiClient.post('/admin/agent-access/update', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Update a single access policy entry
 export async function updateAgentAccess(
   token: string,

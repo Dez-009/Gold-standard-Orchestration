@@ -27,6 +27,15 @@ class AgentStateStatus(str, Enum):
     RETIRED = "retired"
 
 
+class AgentAccessTier(str, Enum):
+    """Role tiers required to run a given agent."""
+
+    free = "free"
+    plus = "plus"
+    pro = "pro"
+    admin = "admin"
+
+
 class AgentState(Base):
     """Represents the current state of an orchestration agent."""
 
@@ -40,6 +49,10 @@ class AgentState(Base):
     agent_name = Column(String, nullable=False)
     # Notes: Current lifecycle state for the agent
     state = Column(PgEnum(AgentStateStatus), nullable=False)
+    # Notes: Minimum subscription tier required to run this agent
+    access_tier = Column(
+        PgEnum(AgentAccessTier), default=AgentAccessTier.free, nullable=False
+    )
     # Notes: Timestamp when the state was created
     created_at = Column(DateTime, default=datetime.utcnow)
     # Notes: Timestamp when the state was last updated
