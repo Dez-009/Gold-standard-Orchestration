@@ -1553,6 +1553,29 @@ export async function getDeviceSyncLogs(
   }>;
 }
 
+// Retrieve wearable sync logs for admin audit pages
+export async function getWearableSyncLogs(
+  token: string,
+  limit = 100,
+  offset = 0
+) {
+  // Notes: Perform GET request with pagination
+  const response = await apiClient.get('/admin/wearables/sync-logs', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { limit, offset }
+  });
+  // Notes: Returns list of log objects with id, user_id, device_type, etc.
+  // The endpoint supports standard limit/offset pagination
+  return response.data as Array<{
+    id: string;
+    user_id: number;
+    device_type: string;
+    sync_status: string;
+    synced_at: string;
+    raw_data_url: string | null;
+  }>;
+}
+
 // Retrieve reflection prompts generated for the given user
 export async function getReflectionPrompts(userId: string, token: string) {
   // Notes: Issue GET request to the new reflection prompts endpoint
