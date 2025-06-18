@@ -1886,6 +1886,33 @@ export async function reviewAgentFlag(token: string, flagId: string) {
   return response.data;
 }
 
+// Retrieve all admin flag reasons
+export async function getFlagReasons(token: string) {
+  const response = await apiClient.get('/admin/flag-reasons', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Create a new flag reason record
+export async function createFlagReason(
+  token: string,
+  payload: { label: string; category?: string }
+) {
+  const response = await apiClient.post('/admin/flag-reasons', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Delete an existing flag reason by id
+export async function deleteFlagReason(token: string, id: string) {
+  const response = await apiClient.delete(`/admin/flag-reasons/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Retrieve summaries that have been flagged for moderation
 export async function getFlaggedSummaries(
   token: string,

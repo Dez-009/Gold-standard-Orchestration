@@ -11,11 +11,19 @@ import {
   flagSummary,
   unflagSummary,
   getSummaryNotes,
-  addSummaryNote
+  addSummaryNote,
+  getFlagReasons
 } from '../../../../services/apiClient';
 import { fetchSummary, triggerRerun } from '../../../../services/adminJournalSummaryService';
 import { showError, showSuccess } from '../../../../components/ToastProvider';
 import { FiRefreshCw } from 'react-icons/fi';
+
+interface ReasonRow {
+  id: string;
+  label: string;
+  category?: string | null;
+  created_at: string;
+}
 
 export default function AdminSummaryDownload({
   params
@@ -35,7 +43,9 @@ export default function AdminSummaryDownload({
   const [flagged, setFlagged] = useState(false); // Notes: Current flag state
   const [flagReason, setFlagReason] = useState(''); // Notes: Existing flag reason
   const [showFlag, setShowFlag] = useState(false); // Notes: Flag modal visibility
-  const [flagInput, setFlagInput] = useState(''); // Notes: Flag reason textarea
+  const [flagReasons, setFlagReasons] = useState<ReasonRow[]>([]); // Notes: Reason options
+  const [selectedReason, setSelectedReason] = useState(''); // Notes: Chosen reason
+  const [flagNotes, setFlagNotes] = useState(''); // Notes: Additional notes
   const [flagLoading, setFlagLoading] = useState(false); // Notes: Flag API state
 
   // Notes: Ensure the user is authenticated and has admin rights
@@ -55,6 +65,11 @@ export default function AdminSummaryDownload({
         setFlagReason(data.flag_reason || '');
         const notes = await getSummaryNotes(token, params.summaryId);
         setTimeline(notes);
+        const reasons = await getFlagReasons(token);
+        setFlagReasons(reasons);
+        if (reasons.length > 0) {
+          setSelectedReason(reasons[0].label);
+        }
       } catch {
         showError('Failed to load summary');
       }
@@ -124,17 +139,18 @@ export default function AdminSummaryDownload({
     }
   };
 
-  // Notes: send a flag request with provided reason
+  // Notes: send a flag request with selected reason and notes
   const handleFlag = async () => {
     const token = getToken();
     if (!token) return;
     setFlagLoading(true);
     try {
-      await flagSummary(params.summaryId, flagInput, token);
+      const reasonText = selectedReason + (flagNotes ? `: ${flagNotes}` : '');
+      await flagSummary(params.summaryId, reasonText, token);
       showSuccess('Summary flagged');
       setFlagged(true);
-      setFlagReason(flagInput);
-      setFlagInput('');
+      setFlagReason(reasonText);
+      setFlagNotes('');
       setShowFlag(false);
     } catch {
       showError('Failed to flag summary');
@@ -306,10 +322,21 @@ export default function AdminSummaryDownload({
       {showFlag && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-4 rounded space-y-4 w-80">
+            <select
+              value={selectedReason}
+              onChange={(e) => setSelectedReason(e.target.value)}
+              className="border rounded w-full p-2"
+            >
+              {flagReasons.map((r) => (
+                <option key={r.id} value={r.label}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
             <textarea
-              value={flagInput}
-              onChange={(e) => setFlagInput(e.target.value)}
-              placeholder="Flag reason"
+              value={flagNotes}
+              onChange={(e) => setFlagNotes(e.target.value)}
+              placeholder="Additional notes (optional)"
               className="border rounded w-full p-2"
               rows={3}
             />
