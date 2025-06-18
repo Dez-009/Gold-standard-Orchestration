@@ -45,6 +45,7 @@ from .agent_execution_log import AgentExecutionLog
 from .agent_personalization import AgentPersonalization
 # Notes: Import model capturing scoring metrics for agent outputs
 from .agent_score import AgentScore
+from .agent_self_score import AgentSelfScore
 # Notes: Import model capturing user reactions to agent summaries
 from .agent_feedback import AgentFeedback
 # Notes: Import model storing low rating alerts for admin review
@@ -106,6 +107,7 @@ __all__ = [
     "AgentExecutionLog",
     "AgentPersonalization",
     "AgentScore",
+    "AgentSelfScore",
     "AgentFeedback",
     "AgentFeedbackAlert",
     "AgentToggle",

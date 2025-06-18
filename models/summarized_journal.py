@@ -34,6 +34,12 @@ class SummarizedJournal(Base):
 
     # Notes: Relationship back to the user
     user = relationship("User", back_populates="summarized_journals")
+    # Notes: Relationship containing any agent self scored evaluations
+    self_scores = relationship(
+        "AgentSelfScore",
+        back_populates="summary",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self) -> str:
         """Return debug representation including id and user."""

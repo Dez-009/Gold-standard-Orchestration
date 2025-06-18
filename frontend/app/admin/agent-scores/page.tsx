@@ -1,28 +1,22 @@
 'use client';
-// Admin page listing agent scoring results with filters and pagination
+// Admin page showing self reported scores from agents
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchAgentScores, AgentScoreRecord } from '../../../services/agentScoringService';
+import { fetchSelfScores, SelfScoreRecord } from '../../../services/agentScoreService';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
 
-export default function AgentScoresPage() {
+export default function AgentSelfScorePage() {
   const router = useRouter();
-  // Table data and UI states
-  const [scores, setScores] = useState<AgentScoreRecord[]>([]);
+  // Notes: table rows and loading state
+  const [scores, setScores] = useState<SelfScoreRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  // Filter inputs
-  const [agentName, setAgentName] = useState('');
-  const [userId, setUserId] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [offset, setOffset] = useState(0);
-  const limit = 20;
+  const [sortField, setSortField] = useState<'agent_name' | 'created_at' | 'self_score'>('created_at');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
-  // Load scores whenever filters or pagination change
+  // Notes: load scores on mount with auth checks
   useEffect(() => {
     const token = getToken();
     if (!token || isTokenExpired(token) || !isAdmin()) {
@@ -33,122 +27,98 @@ export default function AgentScoresPage() {
     }
     const load = async () => {
       setLoading(true);
-      setError('');
       try {
-        const data = await fetchAgentScores({
-          agent_name: agentName || undefined,
-          user_id: userId ? Number(userId) : undefined,
-          start_date: startDate || undefined,
-          end_date: endDate || undefined,
-          limit,
-          offset
-        });
+        const data = await fetchSelfScores();
         setScores(data);
       } catch {
-        setError('Failed to load scores');
+        showError('Failed to load scores');
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, [router, agentName, userId, startDate, endDate, offset]);
+  }, [router]);
 
-  // Helper to format timestamps
+  // Notes: update sorting state and reorder rows
+  const sortBy = (field: 'agent_name' | 'created_at' | 'self_score') => {
+    const dir = field === sortField && sortDir === 'asc' ? 'desc' : 'asc';
+    setSortField(field);
+    setSortDir(dir);
+    setScores(prev => {
+      return [...prev].sort((a, b) => {
+        const aVal = (a as any)[field];
+        const bVal = (b as any)[field];
+        if (aVal < bVal) return dir === 'asc' ? -1 : 1;
+        if (aVal > bVal) return dir === 'asc' ? 1 : -1;
+        return 0;
+      });
+    });
+  };
+
+  // Notes: compute averages per agent for quick reference
+  const averages: Record<string, number> = {};
+  scores.forEach((r) => {
+    averages[r.agent_name] = ((averages[r.agent_name] || 0) + r.self_score);
+  });
+  Object.keys(averages).forEach((k) => {
+    const count = scores.filter(r => r.agent_name === k).length;
+    averages[k] = averages[k] / count;
+  });
+
+  // Notes: helper to format times for display
   const fmt = (iso: string) => new Date(iso).toLocaleString();
 
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
-      {/* Navigation back to dashboard */}
       <Link href="/dashboard" className="self-start text-blue-600 underline">
         Back to Dashboard
       </Link>
-      {/* Heading */}
-      <h1 className="text-2xl font-bold">Agent Scoring Results</h1>
-      {/* Filter controls */}
-      <div className="flex flex-wrap gap-2">
-        <input
-          value={agentName}
-          onChange={(e) => setAgentName(e.target.value)}
-          placeholder="Agent"
-          className="border p-1 rounded"
-        />
-        <input
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          placeholder="User ID"
-          className="border p-1 rounded w-24"
-        />
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="border p-1 rounded"
-        />
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="border p-1 rounded"
-        />
-        <button onClick={() => setOffset(0)} className="px-3 py-1 border rounded">
-          Apply
-        </button>
-      </div>
-      {/* Loading and error states */}
+      <h1 className="text-2xl font-bold">Agent Self Scores</h1>
       {loading && (
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-      )}
-      {error && <p className="text-red-600">{error}</p>}
-      {!loading && !error && scores.length === 0 && <p>No scores found.</p>}
-      {/* Data table */}
-      {!loading && !error && scores.length > 0 && (
-        <div className="overflow-x-auto w-full">
-          <table className="min-w-full border divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-4 py-2">Timestamp</th>
-                <th className="px-4 py-2">User ID</th>
-                <th className="px-4 py-2">Agent</th>
-                <th className="px-4 py-2">Completeness</th>
-                <th className="px-4 py-2">Clarity</th>
-                <th className="px-4 py-2">Relevance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scores.map((row) => (
-                <tr key={row.id} className="odd:bg-gray-100">
-                  <td className="border px-4 py-2">{fmt(row.created_at)}</td>
-                  <td className="border px-4 py-2">{row.user_id}</td>
-                  <td className="border px-4 py-2">{row.agent_name}</td>
-                  <td className="border px-4 py-2 text-center">{row.completeness_score.toFixed(2)}</td>
-                  <td className="border px-4 py-2 text-center">{row.clarity_score.toFixed(2)}</td>
-                  <td className="border px-4 py-2 text-center">{row.relevance_score.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="w-full space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="animate-pulse h-6 bg-gray-300 rounded" />
+          ))}
         </div>
       )}
-      {/* Pagination controls */}
-      {!loading && !error && (
-        <div className="flex space-x-4">
-          <button
-            onClick={() => setOffset(Math.max(0, offset - limit))}
-            disabled={offset === 0}
-            className="px-3 py-1 border rounded disabled:opacity-50"
-          >
-            Prev
-          </button>
-          <button
-            onClick={() => setOffset(offset + limit)}
-            className="px-3 py-1 border rounded"
-          >
-            Next
-          </button>
+      {!loading && (
+        <div className="w-full space-y-4">
+          <div className="space-y-1">
+            {Object.entries(averages).map(([name, val]) => (
+              <div key={name}>{name}: {val.toFixed(2)}</div>
+            ))}
+          </div>
+          <div className="overflow-x-auto w-full">
+            <table className="min-w-full border divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 cursor-pointer" onClick={() => sortBy('agent_name')}>Agent</th>
+                  <th className="px-4 py-2">Summary</th>
+                  <th className="px-4 py-2 cursor-pointer" onClick={() => sortBy('self_score')}>Score</th>
+                  <th className="px-4 py-2 cursor-pointer" onClick={() => sortBy('created_at')}>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scores.map(row => (
+                  <tr key={row.id} className="odd:bg-gray-100">
+                    <td className="border px-4 py-2">{row.agent_name}</td>
+                    <td className="border px-4 py-2">
+                      <Link href={`/admin/journal-summaries/${row.summary_id}`} className="underline text-blue-600">
+                        View
+                      </Link>
+                    </td>
+                    <td className="border px-4 py-2 text-center">{row.self_score.toFixed(2)}</td>
+                    <td className="border px-4 py-2">{fmt(row.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-// Footnote: Admin interface for evaluating agent scoring metrics.
+// Footnote: Displays confidence ratings submitted by each agent.
+
