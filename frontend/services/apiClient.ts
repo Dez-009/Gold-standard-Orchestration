@@ -1341,6 +1341,14 @@ export async function getAdminFeedback(
   return response.data;
 }
 
+// Retrieve aggregated user feedback metrics for admin dashboard
+export async function getFeedbackSummary(token: string) {
+  const response = await apiClient.get('/admin/feedback/summary', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Retrieve summarized journal entries for admin review
 export async function getSummarizedJournals(
   token: string,

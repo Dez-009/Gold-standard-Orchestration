@@ -7,6 +7,7 @@ from auth.dependencies import get_current_admin_user
 from database.utils import get_db
 from models.user import User
 from services.feedback_service import list_feedback
+from services.feedback_analytics_service import get_feedback_summary
 from models.user_feedback import FeedbackType
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -36,4 +37,16 @@ def admin_list_feedback(
         }
         for r in records
     ]
+
+
+@router.get("/feedback/summary")
+def feedback_summary(
+    _: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Return aggregated feedback metrics by agent."""
+
+    summary = get_feedback_summary(db)
+    # Notes: Only return per-agent portion for the API response
+    return summary["agents"]
 
