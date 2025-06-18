@@ -1770,6 +1770,25 @@ export async function updateAgentToggle(
   return response.data;
 }
 
+// Retrieve agent access policy matrix
+export async function getAgentAccess(token: string) {
+  const response = await apiClient.get('/admin/agent-access', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Update a single access policy entry
+export async function updateAgentAccess(
+  token: string,
+  payload: { agent_name: string; subscription_tier: string; is_enabled: boolean }
+) {
+  const response = await apiClient.post('/admin/agent-access/update', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Retrieve recent low rating alerts for admins
 export async function getFeedbackAlerts(token: string) {
   const response = await apiClient.get('/admin/feedback-alerts', {

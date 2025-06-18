@@ -62,6 +62,7 @@ from .admin_agent_self_scores import router as admin_agent_self_scores_router
 from .admin_device_sync import router as admin_device_sync_router
 from .admin_wearables import router as admin_wearables_router
 from .admin_agent_toggles import router as admin_agent_toggles_router
+from .admin_agent_access import router as admin_agent_access_router
 # Notes: Import router exposing feedback alert logs
 # Notes: Import router exposing feedback alert logs
 from .admin_feedback_alerts import router as admin_feedback_alerts_router
@@ -156,6 +157,7 @@ router.include_router(account_personalization_router)
 router.include_router(admin_device_sync_router)
 router.include_router(admin_wearables_router)
 router.include_router(admin_agent_toggles_router)
+router.include_router(admin_agent_access_router)
 # Notes: Admin feedback alerts are not feature gated
 router.include_router(admin_feedback_alerts_router)
 router.include_router(admin_persona_token_router)
