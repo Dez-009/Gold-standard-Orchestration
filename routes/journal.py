@@ -14,8 +14,13 @@ from schemas.journal_schemas import JournalEntryCreate, JournalEntryResponse
 from schemas.journal_tagging_schemas import JournalTagsResponse
 from auth.dependencies import get_current_user
 from models.user import User
+from middleware.feature_gate import feature_gate
 
-router = APIRouter(prefix="/journals", tags=["journals"])
+router = APIRouter(
+    prefix="/journals",
+    tags=["journals"],
+    dependencies=[Depends(feature_gate("journal"))],
+)
 
 
 @router.post("/", response_model=JournalEntryResponse, status_code=status.HTTP_201_CREATED)
