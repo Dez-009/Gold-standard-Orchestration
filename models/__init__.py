@@ -68,6 +68,7 @@ from .conflict_flag import ConflictFlag, ConflictType
 from .persona_token import PersonaToken
 # Notes: Import model defining persona presets
 from .persona_preset import PersonaPreset
+from .prompt_version import PromptVersion
 
 __all__ = [
     "User",
@@ -121,6 +122,7 @@ __all__ = [
     "ConflictType",
     "PersonaToken",
     "PersonaPreset",
+    "PromptVersion",
 ]
 
 # Footnote: Model package exposes all ORM models for import.

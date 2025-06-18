@@ -65,6 +65,7 @@ from .admin_feedback_alerts import router as admin_feedback_alerts_router
 from .admin.persona_token_admin import router as admin_persona_token_router
 # Notes: Import router providing persona preset CRUD endpoints
 from .admin_persona_presets import router as admin_persona_preset_router
+from .admin_prompt_versions import router as admin_prompt_versions_router
 # Notes: Import router providing user personalization endpoints
 from .account_personalization import router as account_personalization_router
 # Notes: Import router providing summary PDF exports
@@ -134,5 +135,6 @@ router.include_router(admin_agent_toggles_router)
 router.include_router(admin_feedback_alerts_router)
 router.include_router(admin_persona_token_router)
 router.include_router(admin_persona_preset_router)
+router.include_router(admin_prompt_versions_router)
 
 # Footnote: Aggregates and registers all route modules.

@@ -1721,6 +1721,26 @@ export async function deletePersonaPreset(token: string, id: string) {
   return response.data;
 }
 
+// Retrieve prompt versions for a specific agent
+export async function getPromptVersions(token: string, agentName: string) {
+  const response = await apiClient.get('/admin/prompt-versions', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { agent_name: agentName }
+  });
+  return response.data;
+}
+
+// Create a new prompt version record
+export async function postPromptVersion(
+  token: string,
+  payload: { agentName: string; version: string; template: string; metadata?: any }
+) {
+  const response = await apiClient.post('/admin/prompt-versions', payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;
