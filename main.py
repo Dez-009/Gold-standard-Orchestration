@@ -111,6 +111,9 @@ from routes.admin_feedback import router as admin_feedback_router
 from routes.admin_feedback_alerts import router as admin_feedback_alerts_router
 from routes.admin_flagged_summaries import router as admin_flagged_summaries_router
 from routes.admin_flag_reasons import router as admin_flag_reasons_router
+from routes.admin_flag_reason_analytics import (
+    router as admin_flag_reason_analytics_router,
+)
 
 # Notes: Import router exposing personality CRUD endpoints
 from routes.personality import router as personality_router
@@ -223,6 +226,7 @@ app.include_router(admin_churn_router)
 app.include_router(admin_feedback_router)
 app.include_router(admin_feedback_alerts_router)
 app.include_router(admin_flag_reasons_router)
+app.include_router(admin_flag_reason_analytics_router)
 app.include_router(admin_flagged_summaries_router)
 # Provide endpoint for the frontend to query feature flags
 app.include_router(settings_router)
