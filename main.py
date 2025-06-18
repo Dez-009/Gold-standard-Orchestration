@@ -99,6 +99,7 @@ from routes.admin_wearables import router as admin_wearables_router
 # Notes: Import router exposing summarized journals for review
 from routes.admin_summarized_journals import router as admin_summarized_journals_router
 from routes.admin_journal_rerun import router as admin_journal_rerun_router
+from routes.admin_summary_notes import router as admin_summary_notes_router
 from routes.admin_agents import router as admin_agents_router
 from routes.admin_summary_diff import router as admin_summary_diff_router
 # Notes: Import routers handling user feedback
@@ -197,6 +198,7 @@ app.include_router(admin_agent_scores_router)
 app.include_router(admin_device_sync_router)
 app.include_router(admin_wearables_router)
 app.include_router(admin_summarized_journals_router)
+app.include_router(admin_summary_notes_router)
 app.include_router(admin_journal_rerun_router)
 app.include_router(admin_summary_diff_router)
 app.include_router(admin_agents_router)
