@@ -16,3 +16,6 @@ stripe==9.7.0
 reportlab==4.1.0
 watchfiles==1.1.0  # provides auto-reload capability
 pyyaml==6.0.1
+
+black==23.9.1
+flake8==6.1.0

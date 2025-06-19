@@ -46,6 +46,17 @@ cd frontend
 npm run test:unit
 ```
 
+## Makefile Commands
+
+The repository includes a simple Makefile for common tasks:
+
+```bash
+make dev   # run backend and frontend together
+make test  # run backend tests
+make build # build Docker image
+make lint  # run black and flake8
+```
+
 ## Additional Docs
 
 - [Agent Architecture](AGENTS.md)
