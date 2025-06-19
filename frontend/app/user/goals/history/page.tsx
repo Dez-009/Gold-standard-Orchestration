@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchCompletedGoals } from '../../../services/goalHistoryService';
 import { getToken, isTokenExpired } from '../../../services/authUtils';
-import { showError } from '../../../components/ToastProvider';
+import { showError } from '../../../../components/ToastProvider';
 
 // Notes: Type definition describing a completed goal record
 interface CompletedGoal {
@@ -62,7 +62,7 @@ export default function GoalHistoryPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
       {/* Navigation back to dashboard */}
-      <Link href="/goals" className="self-start text-blue-600 underline">
+      <Link href="/user/goals" className="self-start text-blue-600 underline">
         Back to Goals
       </Link>
 

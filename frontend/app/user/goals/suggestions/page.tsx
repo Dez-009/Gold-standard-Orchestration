@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchGoalSuggestions } from '../../../services/goalSuggestionService';
 import { getToken, isTokenExpired } from '../../../services/authUtils';
-import { showError } from '../../../components/ToastProvider';
+import { showError } from '../../../../components/ToastProvider';
 
 // Notes: Shape of a suggestion returned by the backend service
 interface GoalSuggestion {

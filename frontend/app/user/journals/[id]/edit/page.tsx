@@ -8,12 +8,12 @@ import { useRouter } from 'next/navigation';
 import {
   fetchJournalById,
   updateJournal
-} from '../../../../services/journalService';
-import { fetchGoals } from '../../../../services/goalService';
+} from '../../../services/journalService';
+import { fetchGoals } from '../../../services/goalService';
 // Notes: Reusable component for picking a mood value
-import MoodSelector from '../../../../components/MoodSelector';
-import { getToken, isTokenExpired } from '../../../../services/authUtils';
-import { showError, showSuccess } from '../../../../components/ToastProvider';
+import MoodSelector from '../../../../../components/MoodSelector';
+import { getToken, isTokenExpired } from '../../../services/authUtils';
+import { showError, showSuccess } from '../../../../../components/ToastProvider';
 
 // Shape describing the journal entry record
 interface Entry {
@@ -102,7 +102,7 @@ export default function EditJournalPage({
       if (linkedGoal) payload['linked_goal_id'] = Number(linkedGoal);
       await updateJournal(params.id, payload);
       showSuccess('Journal updated!');
-      router.push(`/journals/${params.id}`);
+      router.push(`/user/journals/${params.id}`);
     } catch {
       setError('Failed to update journal');
     } finally {
@@ -113,7 +113,7 @@ export default function EditJournalPage({
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
       {/* Link back to the journal entry details */}
-      <Link href={`/journals/${params.id}`} className="self-start text-blue-600 underline">
+      <Link href={`/user/journals/${params.id}`} className="self-start text-blue-600 underline">
         Back to Entry
       </Link>
 

@@ -131,11 +131,11 @@ export default function DashboardPage() {
         <Link href="/orchestration" className="text-blue-600 underline">
           Vida Coach (Orchestration Demo)
         </Link>
-        <Link href="/goals" className="text-blue-600 underline">
+        <Link href="/user/goals" className="text-blue-600 underline">
           Goals
         </Link>
         {/* Link to the goal progress tracker */}
-        <Link href="/goals/progress" className="text-blue-600 underline">
+        <Link href="/user/goals/progress" className="text-blue-600 underline">
           Goal Progress
         </Link>
         {/* Link to the journal history page */}
@@ -170,7 +170,7 @@ export default function DashboardPage() {
           Suggestions
         </Link>
         {/* Link to the new goal suggestions page */}
-        <Link href="/goals/suggestions" className="text-blue-600 underline">
+        <Link href="/user/goals/suggestions" className="text-blue-600 underline">
           Goal Suggestions
         </Link>
         {/* Link to the coaching session history page */}
