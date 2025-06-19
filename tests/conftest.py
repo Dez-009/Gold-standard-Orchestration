@@ -13,6 +13,7 @@ os.environ.setdefault(
     "ENABLED_FEATURES",
     '["journal","goals","pdf_export","agent_feedback","checkins"]',
 )
+os.environ.setdefault("TESTING", "true")
 from main import app
 from database.utils import get_db
 from fastapi.testclient import TestClient
@@ -81,3 +82,38 @@ def unique_user_data():
         return data
 
     return _factory
+
+
+@pytest.fixture
+def test_user(db_session, unique_user_data):
+    """Create and return a persisted user object."""
+    from services import user_service
+
+    user = user_service.create_user(db_session, unique_user_data())
+    return user
+
+
+@pytest.fixture
+def authorized_client(client, test_user):
+    """Test client with JWT credentials for the created user."""
+    from auth.auth_utils import create_access_token
+
+    token = create_access_token({"user_id": test_user.id})
+    client.headers.update({"Authorization": f"Bearer {token}"})
+    return client
+
+
+@pytest.fixture(autouse=True)
+def seed_roles(db_session):
+    """Ensure required roles exist before each test."""
+    try:
+        from models.role import Role  # type: ignore
+    except Exception:
+        yield
+        return
+
+    for name in ("admin", "pro"):
+        if not db_session.query(Role).filter_by(name=name).first():
+            db_session.add(Role(name=name))
+    db_session.commit()
+    yield

@@ -5,6 +5,7 @@ from functools import lru_cache
 from pathlib import Path
 import json
 import yaml
+import os
 
 # Notes: BaseSettings parses environment variables into attributes
 from pydantic_settings import BaseSettings
@@ -37,18 +38,18 @@ class AppSettings(BaseSettings):
     def _load_model_pricing(self) -> dict[str, float]:
         """Load pricing data from YAML/JSON file."""
         path = Path(self.MODEL_PRICING_FILE)
-        if path.exists():
-            try:
-                with path.open("r") as fh:
-                    if path.suffix in {".yaml", ".yml"}:
-                        return yaml.safe_load(fh) or {}
-                    return json.load(fh)
-            except Exception:  # pragma: no cover - use defaults on failure
-                pass
-        return {"default": 0.002}
+        if not path.exists():
+            return {"default": 0.002}
+        try:
+            with path.open("r") as fh:
+                if path.suffix in {".yaml", ".yml"}:
+                    return yaml.safe_load(fh) or {}
+                return json.load(fh)
+        except Exception:  # pragma: no cover - use defaults on failure
+            return {"default": 0.002}
 
     class Config:
-        env_file = ".env"
+        env_file = ".env.test" if os.getenv("TESTING") == "true" else ".env"
         extra = "ignore"
 
 

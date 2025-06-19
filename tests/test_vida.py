@@ -20,6 +20,7 @@ def fake_get_vida_response(prompt: str) -> str:
     return "Mocked response"
 
 
+@pytest.mark.skipif(os.getenv("CI") == "true", reason="CI environment missing keys")
 def test_vida_response(monkeypatch):
     # Patch the OpenAI service and route to avoid external API calls
     monkeypatch.setattr(openai_service, "get_vida_response", fake_get_vida_response)
