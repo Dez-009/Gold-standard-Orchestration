@@ -112,9 +112,7 @@ def process_user_prompt(db: Session, user_id: int, user_prompt: str) -> list[dic
                 user.role,
                 assignment.domain,
             )
-            responses.append(
-                {"agent": assignment.domain, "blocked": True, "reason": "Upgrade required"}
-            )
+            # When user lacks permission simply skip logging a response
             continue
 
         processor = AGENT_PROCESSORS.get(assignment.domain)
