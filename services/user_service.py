@@ -9,8 +9,9 @@ from services import referral_service
 def create_user(db: Session, user_data: dict) -> User:
     """Create a new user and save it to the database."""
     # Hash the plain text password before storing it
-    hashed_pw = hash_password(user_data["hashed_password"])
+    hashed_pw = hash_password(user_data["password"])
     user_data["hashed_password"] = hashed_pw
+    user_data.pop("password", None)
 
     # Persist the new user in the database
     new_user = User(**user_data)

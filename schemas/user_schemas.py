@@ -6,7 +6,7 @@ class UserCreate(BaseModel):
 
     email: str
     phone_number: str | None = None
-    hashed_password: str
+    password: str
     full_name: str | None = None
     age: int | None = None
     sex: str | None = None
