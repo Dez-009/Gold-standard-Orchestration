@@ -6,6 +6,7 @@ from typing import List
 
 # Notes: Base class for environment driven settings
 from pydantic_settings import BaseSettings
+import os
 
 # Notes: Additional settings loaded from ``config/settings.py``
 from .settings import get_settings as get_timeout_settings
@@ -39,16 +40,23 @@ VERSION = "1.0.0"
 
 class Settings(BaseSettings):
     project_name: str = "Vida Coach API"
-    openai_api_key: str
+    openai_api_key: str = "test"
     environment: str = "development"
     port: int = 8000
-    database_url: str
+    # Provide defaults when running under pytest
+    database_url: str = (
+        "sqlite:///:memory:" if os.getenv("TESTING") == "true" else ""
+    )
     RATE_LIMIT: str = "100/minute"
     # Notes: Secrets used for Stripe integration
-    stripe_secret_key: str
-    stripe_webhook_secret: str
+    stripe_secret_key: str = (
+        "sk_test" if os.getenv("TESTING") == "true" else ""
+    )
+    stripe_webhook_secret: str = (
+        "whsec_test" if os.getenv("TESTING") == "true" else ""
+    )
     # Notes: Secret key for JWT token generation
-    secret_key: str
+    secret_key: str = "test" if os.getenv("TESTING") == "true" else ""
     # Notes: Allows enabling/disabling major app modules for modular deployments
     ENABLED_FEATURES: List[str] = [
         "journal",
@@ -69,7 +77,7 @@ class Settings(BaseSettings):
     """Global toggle for displaying debug banners in admin UI."""
 
     class Config:
-        env_file = ".env"
+        env_file = ".env.test" if os.getenv("TESTING") == "true" else ".env"
 
 
 # Notes: Use lru_cache so configuration is loaded from environment only once
