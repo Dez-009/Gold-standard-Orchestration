@@ -24,7 +24,6 @@ from routes.ai_coach import router as ai_coach_router
 # Notes: Import router providing additional AI utilities
 from routes.ai_routes import router as ai_routes_router
 # Notes: Import router powering multi-agent orchestration
-from routes.ai_orchestration import router as ai_orchestration_router
 from routes.orchestration_journal_summary import (
     router as orchestration_journal_summary_router,
 )
@@ -177,8 +176,6 @@ app.include_router(ai_routes_router)
 app.include_router(journal_summary_router)
 app.include_router(orchestration_journal_summary_router)
 app.include_router(journal_trends_router)
-# Register new multi-agent orchestration route
-app.include_router(ai_orchestration_router)
 # Notes: Include routes that generate action plans for user goals
 app.include_router(action_plan_router)
 app.include_router(root_router)

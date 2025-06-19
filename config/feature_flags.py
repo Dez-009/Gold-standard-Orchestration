@@ -18,6 +18,7 @@ class FeatureFlags(BaseSettings):
         env_prefix = "FEATURE_"
         env_file = ".env.test" if os.getenv("TESTING") == "true" else ".env"
         case_sensitive = False
+        extra = "ignore"
 
 
 @lru_cache()
