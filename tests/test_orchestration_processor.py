@@ -188,11 +188,10 @@ def test_orchestrator_blocks_disallowed_agent(monkeypatch):
     monkeypatch.setattr(orchestrator, "build_agent_prompt", lambda *a: [])
     monkeypatch.setitem(orchestrator.AGENT_PROCESSORS, "career", lambda _m: "r")
 
-    from services import agent_access_control
-    monkeypatch.setitem(agent_access_control.AGENT_ROLE_REQUIREMENTS, "career", ["admin"])
+    monkeypatch.setattr(orchestrator, "is_agent_allowed", lambda *_: False)
 
     result = orchestrator.process_user_prompt(db, user.id, "test")
-    assert result == []
+    assert result == [{"agent": "career", "blocked": True, "reason": "Upgrade required"}]
     db.close()
 
 
@@ -215,8 +214,7 @@ def test_parallel_agents_respects_role(monkeypatch):
     import services.llm_call_service as llm_service
     monkeypatch.setattr(llm_service, "call_llm", lambda *_: "reply")
 
-    from services import agent_access_control
-    monkeypatch.setitem(agent_access_control.AGENT_ROLE_REQUIREMENTS, "career", ["admin"])
+    monkeypatch.setattr(orchestrator, "is_agent_allowed", lambda db, role, agent: agent != "career")
 
     result = orchestrator.run_parallel_agents(
         user.id,

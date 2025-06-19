@@ -14,12 +14,20 @@ class FeatureFlags(BaseSettings):
     pdf_export: bool = True
     device_sync: bool = False
 
+ codex/clean-up-legacy-code-and-confirm-tests
+    class Config:
+        env_prefix = "FEATURE_"
+        env_file = ".env.test" if os.getenv("TESTING") == "true" else ".env"
+        case_sensitive = False
+        extra = "ignore"
+=======
     model_config = SettingsConfigDict(
         env_prefix="FEATURE_",
         env_file=".env.test" if os.getenv("TESTING") == "true" else ".env",
         case_sensitive=False,
         extra="ignore",
     )
+ main
 
 
 @lru_cache()
