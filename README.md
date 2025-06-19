@@ -25,6 +25,8 @@ Vida Coach is an AI-powered life improvement platform built with FastAPI and Nex
 uvicorn main:app --reload
 ```
 
+OpenAPI documentation is available at `http://localhost:8000/docs` when running locally.
+
 ## Running the Frontend
 
 ```bash
