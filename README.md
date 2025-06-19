@@ -1,27 +1,55 @@
-# Vida Coach Backend
+# Vida Coach
 
-This API powers the Vida Coach application. To run the backend locally:
+[![CI](https://github.com/my-org/vida-coach/actions/workflows/test.yml/badge.svg)](https://github.com/my-org/vida-coach/actions/workflows/test.yml)
+[![Coverage Status](https://codecov.io/gh/my-org/vida-coach/branch/main/graph/badge.svg)](https://codecov.io/gh/my-org/vida-coach)
 
-1. Install dependencies using `pip install -r requirements.txt`.
-2. Copy `.env` and adjust environment variables as needed.
-3. Start the server with `uvicorn main:app`.
+Vida Coach is an AI-powered life improvement platform built with FastAPI and Next.js. This repository contains both the backend API and the Next.js frontend.
 
-The new `Personality` table is created automatically at startup. No Alembic
-migrations are required; simply restart the server or run the tests to apply
-the schema changes.
+## Project Setup
 
-Run the test suite with `pytest` to verify functionality, including the new
-personality endpoints. Before running tests, install dependencies using
-`pip install -r requirements.txt`.
+1. Clone the repository and install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Copy `.env.example` to `.env` and fill in the required environment variables.
+3. Ensure PostgreSQL (or SQLite for local dev) is running and accessible via `DATABASE_URL`.
+4. (Optional) Build and run with Docker:
+   ```bash
+   docker build -t vida-coach .
+   docker run -p 8000:8000 vida-coach
+   ```
 
-See [docs/model_pricing.md](docs/model_pricing.md) for adjusting model pricing without modifying code.
+## Running the Backend
 
-## Status
-* ✅ Phase 7: Admin Tools Complete
-* ✅ CLI + Admin UI Feature Toggles
-* ✅ Agent Summary Feedback & Replay
+```bash
+uvicorn main:app --reload
+```
 
-## Docs
-* [Agent Guide](docs/agent.md)
-* [DevOps Feature Toggle](docs/devops_feature_toggle.md)
-* [Testing Notes](docs/testing_notes.md)
+## Running the Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Running Tests
+
+Backend tests:
+```bash
+pytest -q
+```
+
+Frontend unit tests:
+```bash
+cd frontend
+npm run test:unit
+```
+
+## Additional Docs
+
+- [Agent Architecture](AGENTS.md)
+- [Full Documentation](docs/README.md)
+- [Changelog](changelog.md)
+
+See [docs/agent.md](docs/agent.md) for detailed agent pipelines.
