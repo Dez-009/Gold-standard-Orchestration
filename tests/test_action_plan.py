@@ -1,3 +1,4 @@
+from tests.utils import skip_if_ci
 """Integration tests for the action plan endpoint."""
 
 # Notes: Standard library imports for environment configuration
@@ -5,7 +6,7 @@ import os
 import sys
 from uuid import uuid4
 import pytest
-from fastapi.testclient import TestClient
+from factories.user_factory import create_user
 
 # Notes: Ensure the project root is importable and environment variables are set
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -16,30 +17,20 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 from main import app
 from auth.auth_utils import create_access_token
 
-# Notes: Instantiate the TestClient
-client = TestClient(app)
 
 
-# Notes: Helper function to create a user and return auth token
-def register_and_login() -> tuple[int, str]:
-    email = f"action_plan_{uuid4().hex}@example.com"
-    user_data = {
-        "email": email,
-        "phone_number": str(int(uuid4().int % 10_000_000_000)).zfill(10),
-        "hashed_password": "password123",
-    }
-    resp = client.post("/users/", json=user_data)
-    assert resp.status_code in (200, 201)
-    user_id = resp.json()["id"]
-    token = create_access_token({"user_id": user_id})
-    return user_id, token
+def register_and_login(db):
+    """Create a user via factory and return auth token."""
+    user = create_user(db)
+    token = create_access_token({"user_id": user.id})
+    return user.id, token
 
 
 # Notes: Verify the generate action plan route returns the mocked plan
-@pytest.mark.skipif(os.getenv("CI") == "true", reason="CI environment missing keys")
-def test_generate_action_plan(monkeypatch):
+@pytest.mark.skipif(skip_if_ci(), reason="CI environment missing keys")
+def test_generate_action_plan(client, db_session, monkeypatch):
     # Notes: Register a test user and obtain an auth token
-    user_id, token = register_and_login()
+    user_id, token = register_and_login(db_session)
 
     # Notes: Patch the service layer to avoid calling OpenAI during the test
     import routes.action_plan as action_routes
@@ -63,9 +54,9 @@ def test_generate_action_plan(monkeypatch):
 
 
 # Notes: Ensure a validation error occurs when the goal is missing
-def test_action_plan_missing_goal(monkeypatch):
+def test_action_plan_missing_goal(client, db_session, monkeypatch):
     # Notes: Register a user and acquire an auth token
-    _, token = register_and_login()
+    _, token = register_and_login(db_session)
 
     # Notes: Patch service so no external call happens even though it won't run
     import routes.action_plan as action_routes

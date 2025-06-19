@@ -13,6 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy entire project into container
 COPY . .
 
+ENV TESTING=true
+RUN pytest -q
+
 # Expose port FastAPI will run on
 EXPOSE 8000
 

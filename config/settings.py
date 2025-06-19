@@ -6,6 +6,7 @@ from pathlib import Path
 import json
 import yaml
 import os
+from utils.logger import get_logger
 
 # Notes: BaseSettings parses environment variables into attributes
 from pydantic_settings import BaseSettings
@@ -35,10 +36,13 @@ class AppSettings(BaseSettings):
         super().__init__(**data)
         self.model_pricing = self._load_model_pricing()
 
+    _logger = get_logger()
+
     def _load_model_pricing(self) -> dict[str, float]:
         """Load pricing data from YAML/JSON file."""
         path = Path(self.MODEL_PRICING_FILE)
         if not path.exists():
+            self._logger.warning("model_pricing file %s missing; using defaults", path)
             return {"default": 0.002}
         try:
             with path.open("r") as fh:
@@ -46,6 +50,7 @@ class AppSettings(BaseSettings):
                     return yaml.safe_load(fh) or {}
                 return json.load(fh)
         except Exception:  # pragma: no cover - use defaults on failure
+            self._logger.warning("Failed to load pricing file %s", path)
             return {"default": 0.002}
 
     class Config:
