@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib
 import pkgutil
+import os
 from typing import Dict, Type
 
 from agents.base import BaseAgent
@@ -43,6 +44,10 @@ def load_plugins(agent_names: list[str] | None = None) -> Dict[str, BaseAgent]:
 
     loaded: Dict[str, BaseAgent] = {}
     names = agent_names or list(REGISTERED_AGENTS.keys())
+    # Notes: include MockAgent automatically when running tests
+    if os.getenv("TESTING") == "true" and "mock" in REGISTERED_AGENTS:
+        if "mock" not in names:
+            names.append("mock")
     for name in names:
         cls = REGISTERED_AGENTS.get(name)
         if not cls:

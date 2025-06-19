@@ -1,3 +1,4 @@
+from tests.utils import skip_if_ci
 """Unit tests for the analyze_journal_trends function."""
 
 # Notes: Ensure project modules can be imported and env vars are set
@@ -76,7 +77,7 @@ def test_analyze_journal_trends_creates_record(monkeypatch):
 
 
 # Notes: Verify OpenAI API is invoked with the expected model name
-@pytest.mark.skipif(os.getenv("CI") == "true", reason="CI environment missing keys")
+@pytest.mark.skipif(skip_if_ci(), reason="CI environment missing keys")
 def test_analyze_journal_trends_calls_openai(monkeypatch):
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)

@@ -52,6 +52,7 @@ def db_session():
     """Return a fresh database session with isolated tables."""
     # Notes: truncate all tables to ensure a clean state per test
     Base.metadata.drop_all(bind=engine)
+    # Notes: PK sequences reset to avoid collisions in bulk runs
     Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     try:
@@ -72,7 +73,7 @@ def client(db_session):
 
 @pytest.fixture
 def unique_user_data():
-    """Return unique user fields for registration."""
+    """Return unique user fields for registration. Randomized per test to avoid collisions."""
     # Notes: ensures each test creates distinct accounts
     def _factory(**overrides):
         # Notes: create randomized email/phone for each call

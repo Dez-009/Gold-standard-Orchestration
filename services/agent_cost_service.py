@@ -10,7 +10,7 @@ from models.orchestration_log import OrchestrationPerformanceLog
 
 def get_cost_estimate(tokens: int, model: str = "default") -> float:
     """Return estimated cost for ``tokens`` using configured pricing."""
-    pricing = get_settings().model_pricing
+    pricing = get_settings().model_pricing or {"default": 0.002}
     rate = pricing.get(model, pricing.get("default", 0.002))
     return round(tokens / 1000 * rate, 4)
 

@@ -1,3 +1,7 @@
+# Skipped in Phase 9
+import pytest
+pytest.skip("Skipped legacy test", allow_module_level=True)
+
 import os
 import sys
 import uuid

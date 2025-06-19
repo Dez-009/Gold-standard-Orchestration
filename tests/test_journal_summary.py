@@ -3,7 +3,8 @@
 # Notes: Configure environment and imports before loading the app
 import os
 import sys
-from fastapi.testclient import TestClient
+from factories.user_factory import create_user
+from factories.journal_factory import create_journal
 
 # Notes: Ensure the project root is importable and env vars are set
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -13,39 +14,26 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 from main import app
 from auth.auth_utils import create_access_token
 
-# Notes: Instantiate TestClient for making requests
-client = TestClient(app)
 
 
 # Notes: Helper to register a user and return id with auth token
-def register_and_login() -> tuple[int, str]:
-    import uuid
-
-    email = f"journal_summary_{uuid.uuid4().hex}@example.com"
-    user_data = {
-        "email": email,
-        "phone_number": str(int(uuid.uuid4().int % 10_000_000_000)).zfill(10),
-        "hashed_password": "password123",
-    }
-    resp = client.post("/users/", json=user_data)
-    assert resp.status_code in (200, 201)
-    user_id = resp.json()["id"]
-    token = create_access_token({"user_id": user_id})
-    return user_id, token
+def register_and_login(db):
+    """Create a test user using factories and return auth token."""
+    user = create_user(db)
+    token = create_access_token({"user_id": user.id})
+    return user.id, token
 
 
 # Notes: Validate that the journal summary endpoint returns a summary string
 
-def test_journal_summary(monkeypatch):
+def test_journal_summary(client, db_session, monkeypatch):
     # Notes: Register a user and obtain token
-    user_id, token = register_and_login()
+    user_id, token = register_and_login(db_session)
     headers = {"Authorization": f"Bearer {token}"}
 
     # Notes: Create sample journal entries for the user
-    for i in range(2):
-        entry = {"user_id": user_id, "content": f"Entry {i}"}
-        resp = client.post("/journals/", json=entry, headers=headers)
-        assert resp.status_code in (200, 201)
+    for _ in range(2):
+        create_journal(db_session, user_id)
 
     # Notes: Patch the summarization service to avoid calling OpenAI
     import services.ai_processor as ai_processor
