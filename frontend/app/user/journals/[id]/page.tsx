@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchJournalById } from '../../../services/journalService';
 import { getToken, isTokenExpired } from '../../../services/authUtils';
-import { showError } from '../../../components/ToastProvider';
+import { showError } from '../../../../components/ToastProvider';
 import {
   getPromptsForUser,
   ReflectionPrompt
@@ -137,7 +137,7 @@ export default function JournalDetailsPage({
           <div className="flex space-x-2 pt-2">
             {/* Link to the edit page for this entry */}
             <Link
-              href={`/journals/${params.id}/edit`}
+              href={`/user/journals/${params.id}/edit`}
               className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Edit

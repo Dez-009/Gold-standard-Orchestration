@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { exportJournals } from '../../../services/journalService';
 import { getToken, isTokenExpired } from '../../../services/authUtils';
-import { showError } from '../../../components/ToastProvider';
+import { showError } from '../../../../components/ToastProvider';
 
 export default function JournalExportPage() {
   // Notes: Router used to redirect on authentication failure

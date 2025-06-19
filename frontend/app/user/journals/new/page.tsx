@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { createJournalEntry } from '../../../services/journalService';
 import { fetchGoals } from '../../../services/goalService';
 import { getToken, isTokenExpired } from '../../../services/authUtils';
-import { showError, showSuccess } from '../../../components/ToastProvider';
+import { showError, showSuccess } from '../../../../components/ToastProvider';
 
 // Shape describing a goal returned by the backend
 interface Goal {

@@ -13,6 +13,7 @@ from config import AGENT_MAX_RETRIES, AGENT_TIMEOUT_SECONDS
 from services.orchestration_log_service import log_agent_run
 from services import agent_toggle_service, user_service, agent_access_service
 from utils.logger import get_logger
+from monitoring.logger import log_performance
 
 logger = get_logger()
 
@@ -134,6 +135,8 @@ async def execute_agent(
             "error_message": error_message,
         },
     )
+    if elapsed_ms > 1000:
+        log_performance("agent_latency_ms", float(elapsed_ms), {"agent": agent_name, "user_id": user_id})
     return AgentOutput(
         text=result,
         retry_count=retries,

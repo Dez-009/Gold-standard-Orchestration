@@ -5,9 +5,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { saveGoal, fetchGoals } from '../../services/goalService';
-import { getToken, isTokenExpired } from '../../services/authUtils';
-import { showError } from '../../components/ToastProvider';
+import { saveGoal, fetchGoals } from '../../../services/goalService';
+import { getToken, isTokenExpired } from '../../../services/authUtils';
+import { showError } from '../../../components/ToastProvider';
 
 interface Goal {
   id: number;
@@ -82,7 +82,7 @@ export default function GoalsPage() {
       <h1 className="text-2xl font-bold">Your Goals</h1>
 
       {/* Link to view completed goals history */}
-      <Link href="/goals/history" className="text-blue-600 underline">
+      <Link href="/user/goals/history" className="text-blue-600 underline">
         View Completed Goals
       </Link>
 

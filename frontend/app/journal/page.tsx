@@ -67,7 +67,7 @@ export default function JournalPage() {
         {entries.map((entry) => (
           <li key={entry.id} className="border rounded p-4 bg-gray-100">
             {/* Link to the new journal details page */}
-            <Link href={`/journals/${entry.id}`} className="block space-y-1">
+            <Link href={`/user/journals/${entry.id}`} className="block space-y-1">
               <p>{entry.content}</p>
               <p className="text-sm text-gray-600">{formatDate(entry.created_at)}</p>
             </Link>

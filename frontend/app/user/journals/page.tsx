@@ -4,9 +4,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchAllJournals } from '../../services/journalService';
-import { getToken, isTokenExpired } from '../../services/authUtils';
-import { showError } from '../../components/ToastProvider';
+import { fetchAllJournals } from '../../../services/journalService';
+import { getToken, isTokenExpired } from '../../../services/authUtils';
+import { showError } from '../../../components/ToastProvider';
 
 // Shape representing a journal entry returned by the backend
 interface Journal {
@@ -87,13 +87,13 @@ export default function JournalsPage() {
             <p className="mb-4">{preview(j.content)}</p>
             <div className="flex space-x-2">
               <Link
-                href={`/journals/${j.id}`}
+                href={`/user/journals/${j.id}`}
                 className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
                 View
               </Link>
               <Link
-                href={`/journals/${j.id}/edit`}
+                href={`/user/journals/${j.id}/edit`}
                 className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
               >
                 Edit
