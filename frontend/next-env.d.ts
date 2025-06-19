@@ -1,4 +1,3 @@
-// Next.js TypeScript environment definitions
 /// <reference types="next" />
 /// <reference types="next/image-types/global" />
 
