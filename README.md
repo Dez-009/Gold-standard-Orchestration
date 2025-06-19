@@ -15,3 +15,13 @@ personality endpoints. Before running tests, install dependencies using
 `pip install -r requirements.txt`.
 
 See [docs/model_pricing.md](docs/model_pricing.md) for adjusting model pricing without modifying code.
+
+## Status
+* ✅ Phase 7: Admin Tools Complete
+* ✅ CLI + Admin UI Feature Toggles
+* ✅ Agent Summary Feedback & Replay
+
+## Docs
+* [Agent Guide](docs/agent.md)
+* [DevOps Feature Toggle](docs/devops_feature_toggle.md)
+* [Testing Notes](docs/testing_notes.md)
