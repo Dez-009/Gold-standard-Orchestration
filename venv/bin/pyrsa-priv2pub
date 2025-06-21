@@ -1,4 +1,4 @@
-#!/Users/mac_d/Documents/project/vida-coach-backend-main/venv/bin/python
+#!/Users/mac_d/Documents/project/vida-coach-backend-main/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

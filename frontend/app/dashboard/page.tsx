@@ -105,6 +105,7 @@ export default function DashboardPage() {
     } finally {
       setPortalLoading(false);
     }
+  };
 
   // Notes: Helper to render a colored badge for the subscription status
   const badge = (s: string) => {

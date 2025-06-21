@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { fetchCompletedGoals } from '../../../services/goalHistoryService';
 import { getToken, isTokenExpired } from '../../../services/authUtils';
 import { showError } from '../../../../components/ToastProvider';
+import FusionBackground from '../../../../components/FusionBackground';
 
 // Notes: Type definition describing a completed goal record
 interface CompletedGoal {
@@ -60,43 +61,65 @@ export default function GoalHistoryPage() {
   const formatDate = (iso: string) => iso.split('T')[0];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
-      {/* Navigation back to dashboard */}
-      <Link href="/user/goals" className="self-start text-blue-600 underline">
-        Back to Goals
-      </Link>
+    <FusionBackground>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-6">
+        {/* Navigation back to dashboard */}
+        <Link 
+          href="/user/goals" 
+          className="self-start text-white hover:text-blue-200 transition-colors duration-200 underline"
+        >
+          ← Back to Goals
+        </Link>
 
-      {/* Page heading */}
-      <h1 className="text-2xl font-bold">Completed Goals</h1>
+        {/* Page heading */}
+        <h1 className="text-4xl font-bold text-white text-center mb-8">
+          Completed Goals
+        </h1>
 
-      {/* Conditional states for loading, error and empty list */}
-      {loading && (
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-      )}
-      {error && <p className="text-red-600">{error}</p>}
-      {!loading && goals.length === 0 && <p>No completed goals found.</p>}
+        {/* Conditional states for loading, error and empty list */}
+        {loading && (
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+        )}
+        
+        {error && (
+          <p className="text-red-200 bg-red-500/20 backdrop-blur-sm px-4 py-2 rounded-lg">
+            {error}
+          </p>
+        )}
+        
+        {!loading && goals.length === 0 && (
+          <p className="text-white/80 text-lg">No completed goals found.</p>
+        )}
 
-      {/* Table listing each completed goal */}
-      <table className="w-full max-w-2xl table-auto border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-4 py-2 text-left">Title</th>
-            <th className="px-4 py-2 text-left">Category</th>
-            <th className="px-4 py-2 text-left">Completed</th>
-            <th className="px-4 py-2 text-left">Notes</th>
-          </tr>
-        </thead>
-        <tbody>
-          {goals.map((goal) => (
-            <tr key={goal.id} className="border-t">
-              <td className="px-4 py-2">{goal.title}</td>
-              <td className="px-4 py-2">{goal.category}</td>
-              <td className="px-4 py-2">{formatDate(goal.completed_at)}</td>
-              <td className="px-4 py-2">{goal.notes || '-'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        {/* Table listing each completed goal */}
+        <div className="w-full max-w-4xl overflow-x-auto">
+          <div className="glass-card rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-white/10">
+                  <th className="px-6 py-4 text-left text-white font-semibold">Title</th>
+                  <th className="px-6 py-4 text-left text-white font-semibold">Category</th>
+                  <th className="px-6 py-4 text-left text-white font-semibold">Completed</th>
+                  <th className="px-6 py-4 text-left text-white font-semibold">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {goals.map((goal, index) => (
+                  <tr 
+                    key={goal.id} 
+                    className={`${index % 2 === 0 ? 'bg-white/5' : 'bg-white/10'} hover:bg-white/15 transition-colors duration-200`}
+                  >
+                    <td className="px-6 py-4 text-white">{goal.title}</td>
+                    <td className="px-6 py-4 text-white/80">{goal.category}</td>
+                    <td className="px-6 py-4 text-white/80">{formatDate(goal.completed_at)}</td>
+                    <td className="px-6 py-4 text-white/70">{goal.notes || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </FusionBackground>
   );
 }

@@ -1,42 +1,30 @@
- codex/add-makefile-commands
-.PHONY: dev test build lint
+.PHONY: install run test dev docker-build docker-run lint
 
-# run full stack in development mode
-# uses script to start backend and frontend concurrently
-
-dev:
-	bash scripts/dev.sh
-
-# run backend tests
-
-test:
-	pytest -q
-
-# build Docker image
-
-build:
-	docker build -t vida-coach .
-
-# format and lint python code
-
-lint:
-	black . && flake8 .
-=======
-.PHONY: install run test docker-build docker-run
-
+# Install dependencies
 install:
 	pip install -r requirements.txt
 	cd frontend && npm install
 
+# Run backend with auto-reload
 run:
 	uvicorn main:app --reload
 
+# Run full stack in development mode
+dev:
+	bash scripts/dev.sh
+
+# Run backend tests
+test:
+	pytest -q
+
+# Build Docker image
 docker-build:
 	docker build -t vida-coach .
 
+# Run Docker container
 docker-run:
 	docker run -p 8000:8000 --env-file .env vida-coach
 
-test:
-	pytest -q
- main
+# Format and lint python code
+lint:
+	black . && flake8 .

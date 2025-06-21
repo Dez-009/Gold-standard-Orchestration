@@ -21,12 +21,21 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Notes: Trigger logout when backend reports unauthorized access
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
+    const status = error.response?.status;
+    const errMsg = error.response?.data?.error;
+
+    if (status === 401 && typeof window !== 'undefined') {
       localStorage.removeItem('token');
       showError('Session expired. Please login again.');
       window.location.href = '/login';
+    } else if (errMsg?.includes('timeout')) {
+      showError('The request timed out. Please try again.');
+    } else if (status === 500) {
+      showError('Server error. Please try again later.');
+    } else if (status === 404) {
+      showError('Resource not found.');
     }
+
     return Promise.reject(error);
   }
 );
@@ -166,13 +175,11 @@ export async function exportJournals(token: string) {
 
 // Download a single journal summary as a PDF
 // Notes: Returns the Blob so the caller can trigger a file download
-export async function downloadSummaryPDF(token: string, summaryId: string) {
-  // Issue the GET request to the new export route
-  const response = await apiClient.get(`/summaries/${summaryId}/export-pdf`, {
+export async function downloadSummaryPDF(token: string, id: string) {
+  const response = await apiClient.get(`/summaries/${id}/export-pdf`, {
     headers: { Authorization: `Bearer ${token}` },
     responseType: 'blob'
   });
-  // Notes: Provide the raw PDF blob back to the caller
   return response.data as Blob;
 }
 
@@ -495,7 +502,7 @@ export async function getOrchestrationLogs(
   return response.data;
 }
 
- codex/implement-orchestration-replay-tool
+
 // Notes: Replay a historical orchestration run by log id
 export async function replayOrchestration(token: string, logId: string) {
   const response = await apiClient.post(
@@ -509,7 +516,7 @@ export async function replayOrchestration(token: string, logId: string) {
     outputs: { summary: string; reflection: string };
     meta: { runtime_ms: number; error: string | null };
   };
-
+}
 // Notes: Retrieve orchestration logs using advanced filters
 export async function getFilteredOrchestrationLogs(
   token: string,
@@ -533,7 +540,7 @@ export async function exportOrchestrationLogsCSV(
     responseType: 'blob'
   });
   return response.data as Blob;
- main
+
 }
 
 // Notes: Retrieve agent lifecycle logs with optional filters
@@ -1283,18 +1290,24 @@ export async function postAnalyticsEvent(
   eventType: string,
   payload: Record<string, unknown>
 ) {
-  // Notes: Build headers only when a token is provided
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
-  const response = await apiClient.post(
-    '/analytics/event',
-    {
-      event_type: eventType,
-      event_payload: payload
-    },
-    { headers }
-  );
-  // Notes: Return the stored event record
-  return response.data;
+  try {
+    // Notes: Build headers only when a token is provided
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const response = await apiClient.post(
+      '/analytics/event',
+      {
+        event_type: eventType,
+        event_payload: payload
+      },
+      { headers }
+    );
+    // Notes: Return the stored event record
+    return response.data;
+  } catch (error: any) {
+    console.error('Failed to send analytics event:', error?.response?.data || error?.message);
+    // Optional: You could also show a toast or send to an error reporting service
+    return null;
+  }
 }
 
 // Permanently delete the authenticated user's account
@@ -1413,11 +1426,10 @@ export async function getSummarizedJournals(
 }
 
 // Retrieve a single summarized journal for admin view
-export async function getAdminJournalSummary(token: string, summaryId: string) {
-  const response = await apiClient.get(
-    `/admin/journal-summaries/${summaryId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+export async function getAdminJournalSummary(token: string, id: string) {
+  const response = await apiClient.get(`/admin/journal-summaries/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   // Notes: Return the summary object including admin notes
   return response.data;
 }
@@ -1436,40 +1448,11 @@ export async function getAdminJournals(
 }
 
 // Update admin notes associated with a summary
-export async function updateAdminNotes(
-  token: string,
-  summaryId: string,
-  notes: string
-) {
-  const response = await apiClient.patch(
-    `/admin/journal-summaries/${summaryId}/notes`,
-    { notes },
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+export async function updateAdminNotes(token: string, id: string, notes: string) {
+  const response = await apiClient.post(`/admin/journal-summaries/${id}/notes`, { notes }, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   // Notes: Return the updated summary payload
-  return response.data;
-}
-
-// Retrieve the full note timeline for a summary
-export async function getSummaryNotes(token: string, summaryId: string) {
-  const response = await apiClient.get(
-    `/admin/summaries/${summaryId}/notes`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-  return response.data;
-}
-
-// Append a new note to the summary
-export async function addSummaryNote(
-  token: string,
-  summaryId: string,
-  content: string
-) {
-  const response = await apiClient.post(
-    `/admin/summaries/${summaryId}/notes`,
-    { content },
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
   return response.data;
 }
 
@@ -1493,16 +1476,10 @@ export async function getOverrideHistory(
  * Trigger a manual override run for the specified summary.
  * The reason is logged for auditing purposes.
  */
-export async function postOverrideRun(
-  token: string,
-  summaryId: string,
-  reason: string
-) {
-  const response = await apiClient.post(
-    `/admin/journal-summaries/${summaryId}/override`,
-    { reason },
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+export async function postOverrideRun(token: string, id: string, reason: string) {
+  const response = await apiClient.post(`/admin/journal-summaries/${id}/override`, { reason }, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   return response.data;
 }
 
@@ -1510,106 +1487,66 @@ export async function postOverrideRun(
  * Trigger a rerun of the summarization agent for the specified summary.
  * Returns the updated summary record from the backend.
  */
-export async function rerunSummary(token: string, summaryId: string) {
-  const response = await apiClient.post(
-    `/admin/journal-summaries/${summaryId}/rerun`,
-    {},
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+export async function rerunSummary(token: string, id: string) {
+  const response = await apiClient.post(`/admin/journal-summaries/${id}/rerun`, {}, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   return response.data;
 }
 
 /**
- * Retry a specific agent for the given summary.
- * Returns the new output string or throws on failure.
+ * Retry an agent for a specific summary
  */
-export async function retryAgent(
-  summaryId: string,
-  agentName: string,
-  token: string
-) {
-  try {
-    const response = await apiClient.post(
-      '/admin/agents/retry',
-      { summary_id: summaryId, agent_name: agentName },
-      { headers: { Authorization: `Bearer ${token}` }, timeout: 15000 }
-    );
-    return response.data as { output: string };
-  } catch (err: any) {
-    if (err.code === 'ECONNABORTED') {
-      throw new Error('Request timed out');
-    }
-    throw err;
-  }
-}
-
- codex/implement-admin-audit-trail-viewer
-/**
- * Retrieve the audit trail for a specific journal summary.
- */
-export async function getSummaryAuditTrail(
-  summaryId: string,
-  token: string
-) {
-  try {
-    const response = await apiClient.get(
-      `/admin/summaries/${summaryId}/audit`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    return response.data as Array<{
-      timestamp: string;
-      event_type: string;
-      actor: string | null;
-      metadata: Record<string, unknown>;
-    }>;
-  } catch (err) {
-    // Notes: Provide a fallback empty list on error
-    console.error(err);
-    return [];
-  }
-
-// ---------------------------------------------------------------------------
-// Admin summary diff endpoint
-// ---------------------------------------------------------------------------
-
-/**
- * Retrieve an HTML diff showing changes between summary versions.
- */
-export async function getSummaryDiff(summaryId: string, token: string) {
-  const response = await apiClient.get(`/admin/summaries/${summaryId}/diff`, {
+export async function retryAgent(id: string, agentName: string, token: string) {
+  const response = await apiClient.post(`/admin/summaries/${id}/retry`, { agent_name: agentName }, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  return response.data as { summary_id: string; diff: string };
- main
-}
-
-// Retrieve the current user's referral code
-export async function getReferralCode(token: string) {
-  // Notes: Send GET request to the referral code endpoint
-  const response = await apiClient.get('/referral/code', {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  // Notes: The backend returns an object with the code string
-  return response.data as { referral_code: string };
-}
-
-// Redeem a referral code for the authenticated user
-export async function submitReferralCode(code: string, token: string) {
-  // Notes: POST the code to the referral redemption endpoint
-  const response = await apiClient.post(
-    '/referral/use',
-    code,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-  // Notes: Return the backend confirmation payload
   return response.data;
 }
 
-// ---------------------------------------------------------------------------
-// Segment management endpoints used by the admin interface
-// ---------------------------------------------------------------------------
+/**
+ * Flag a summary for moderation
+ */
+export async function flagSummary(id: string, reason: string, token: string) {
+  const response = await apiClient.post(`/admin/summaries/${id}/flag`, { reason }, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
 
-// Retrieve all user segments defined in the backend
+/**
+ * Unflag a summary from moderation
+ */
+export async function unflagSummary(id: string, token: string) {
+  const response = await apiClient.post(`/admin/summaries/${id}/unflag`, {}, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+/**
+ * Get notes for a summary
+ */
+export async function getSummaryNotes(token: string, id: string) {
+  const response = await apiClient.get(`/admin/summaries/${id}/notes`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+/**
+ * Add a note to a summary
+ */
+export async function addSummaryNote(token: string, id: string, content: string) {
+  const response = await apiClient.post(`/admin/summaries/${id}/notes`, { content }, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+/**
+ * Retrieve all user segments defined in the backend
+ */
 export async function getSegments(token: string) {
   const response = await apiClient.get('/admin/segments', {
     headers: { Authorization: `Bearer ${token}` }
@@ -1617,7 +1554,9 @@ export async function getSegments(token: string) {
   return response.data;
 }
 
-// Create a new segment using the provided definition
+/**
+ * Create a new segment using the provided definition
+ */
 export async function createSegment(data: Record<string, unknown>, token: string) {
   const response = await apiClient.post('/admin/segments', data, {
     headers: { Authorization: `Bearer ${token}` }
@@ -1625,7 +1564,9 @@ export async function createSegment(data: Record<string, unknown>, token: string
   return response.data;
 }
 
-// Update an existing segment by id
+/**
+ * Update an existing segment by id
+ */
 export async function updateSegment(
   segmentId: string,
   data: Record<string, unknown>,
@@ -1637,7 +1578,9 @@ export async function updateSegment(
   return response.data;
 }
 
-// Delete a segment by id
+/**
+ * Delete a segment by id
+ */
 export async function deleteSegment(segmentId: string, token: string) {
   const response = await apiClient.delete(`/admin/segments/${segmentId}`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -1645,7 +1588,9 @@ export async function deleteSegment(segmentId: string, token: string) {
   return response.data;
 }
 
-// Evaluate a segment and return matching users
+/**
+ * Evaluate a segment and return matching users
+ */
 export async function evaluateSegment(segmentId: string, token: string) {
   const response = await apiClient.get(`/admin/segments/${segmentId}/evaluate`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -2003,30 +1948,6 @@ export async function getFlaggedSummaries(
     headers: { Authorization: `Bearer ${token}` },
     params: filters
   });
-  return response.data;
-}
-
-// Flag a summary via the admin API
-export async function flagSummary(
-  summaryId: string,
-  reason: string,
-  token: string
-) {
-  const response = await apiClient.post(
-    `/admin/summaries/${summaryId}/flag`,
-    { reason },
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-  return response.data;
-}
-
-// Remove a moderation flag from a summary
-export async function unflagSummary(summaryId: string, token: string) {
-  const response = await apiClient.post(
-    `/admin/summaries/${summaryId}/unflag`,
-    {},
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
   return response.data;
 }
 

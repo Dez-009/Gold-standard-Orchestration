@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 import urllib.parse
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from database.utils import get_db
 from services import user_service, user_session_service
@@ -12,14 +13,15 @@ from models.user import User
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
 @router.post("/login")
-async def login(request: Request, db: Session = Depends(get_db)):
+async def login(input: LoginRequest, request: Request, db: Session = Depends(get_db)):
     """Authenticate user and return an access token."""
-    # Read the request body and parse form data
-    body = await request.body()
-    form_data = dict(urllib.parse.parse_qsl(body.decode()))
-    username = form_data.get("username")
-    password = form_data.get("password")
+    username = input.username
+    password = input.password
 
     # Ensure required credentials are provided
     if not username or not password:

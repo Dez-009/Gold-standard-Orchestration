@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { saveGoal, fetchGoals } from '../../../services/goalService';
 import { getToken, isTokenExpired } from '../../../services/authUtils';
 import { showError } from '../../../components/ToastProvider';
+import FusionBackground from '../../../components/FusionBackground';
 
 interface Goal {
   id: number;
@@ -72,53 +73,68 @@ export default function GoalsPage() {
   const formatDate = (iso: string) => iso.split('T')[0];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-4">
-      {/* Navigation back to dashboard */}
-      <Link href="/dashboard" className="self-start text-blue-600 underline">
-        Back to Dashboard
-      </Link>
-
-      {/* Heading for the page */}
-      <h1 className="text-2xl font-bold">Your Goals</h1>
-
-      {/* Link to view completed goals history */}
-      <Link href="/user/goals/history" className="text-blue-600 underline">
-        View Completed Goals
-      </Link>
-
-      {/* Form for adding a new goal */}
-      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-2">
-        <input
-          type="text"
-          value={newGoal}
-          onChange={(e) => setNewGoal(e.target.value)}
-          placeholder="Enter a new goal"
-          className="border rounded w-full p-2"
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+    <FusionBackground>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 space-y-6">
+        {/* Navigation back to dashboard */}
+        <Link 
+          href="/dashboard" 
+          className="self-start text-white hover:text-blue-200 transition-colors duration-200 underline"
         >
-          Add Goal
-        </button>
-      </form>
+          ← Back to Dashboard
+        </Link>
 
-      {/* Display spinner while loading data */}
-      {loading && (
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-      )}
-      {/* Display error message when something goes wrong */}
-      {error && <p className="text-red-600">{error}</p>}
+        {/* Heading for the page */}
+        <h1 className="text-4xl font-bold text-white text-center mb-8">
+          Your Goals
+        </h1>
 
-      {/* List of existing goals */}
-      <ul className="w-full max-w-md space-y-2">
-        {goals.map((goal) => (
-          <li key={goal.id} className="border rounded p-4 bg-gray-100">
-            <p>{goal.content}</p>
-            <p className="text-sm text-gray-600 mt-2">{formatDate(goal.created_at)}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
+        {/* Link to view completed goals history */}
+        <Link 
+          href="/user/goals/history" 
+          className="text-white hover:text-blue-200 transition-colors duration-200 underline"
+        >
+          View Completed Goals
+        </Link>
+
+        {/* Form for adding a new goal */}
+        <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+          <input
+            type="text"
+            value={newGoal}
+            onChange={(e) => setNewGoal(e.target.value)}
+            placeholder="Enter a new goal"
+            className="w-full p-3 rounded-lg glass-card text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/50"
+          />
+          <button
+            type="submit"
+            className="w-full bg-white/20 backdrop-blur-sm text-white py-3 rounded-lg hover:bg-white/30 transition-all duration-200 font-semibold"
+          >
+            Add Goal
+          </button>
+        </form>
+
+        {/* Display spinner while loading data */}
+        {loading && (
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+        )}
+        
+        {/* Display error message when something goes wrong */}
+        {error && (
+          <p className="text-red-200 bg-red-500/20 backdrop-blur-sm px-4 py-2 rounded-lg">
+            {error}
+          </p>
+        )}
+
+        {/* List of existing goals */}
+        <ul className="w-full max-w-md space-y-4">
+          {goals.map((goal) => (
+            <li key={goal.id} className="glass-card rounded-lg p-6 text-white">
+              <p className="text-lg mb-2">{goal.content}</p>
+              <p className="text-sm text-white/70">{formatDate(goal.created_at)}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </FusionBackground>
   );
 }
