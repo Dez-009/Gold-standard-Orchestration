@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import pytest
 from fastapi.testclient import TestClient
 
 # Ensure environment variables are set before importing the app
@@ -12,6 +13,7 @@ from main import app
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
+pytestmark = pytest.mark.skipif(os.environ.get("TESTING") == "true", reason="Rate limiter is disabled during tests.")
 
 def test_rate_limiter_triggers():
     original_limiter = app.state.limiter

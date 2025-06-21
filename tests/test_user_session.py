@@ -36,10 +36,10 @@ def test_session_create_and_end():
     """Verify a session record is created on login and closed on logout."""
     user_id, email, _ = register_user()
 
-    # Notes: Perform login using form fields
+    # Notes: Perform login using JSON fields
     login_resp = client.post(
         "/auth/login",
-        data={"username": email, "password": "password123"},
+        json={"username": email, "password": "password123"},
         headers={"User-Agent": "test-agent"},
     )
     assert login_resp.status_code == 200

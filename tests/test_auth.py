@@ -39,7 +39,7 @@ def test_login_success(unique_user_data):
     user_data = unique_user_data()
     client.post("/users/", json=user_data)
     credentials = {"username": user_data["email"], "password": "password123"}
-    response = client.post("/auth/login", data=credentials)
+    response = client.post("/auth/login", json=credentials)
     assert response.status_code == 200
     data = response.json()
     assert "access_token" in data
@@ -47,5 +47,5 @@ def test_login_success(unique_user_data):
 
 def test_login_failure():
     credentials = {"username": "unknown@example.com", "password": "wrong"}
-    response = client.post("/auth/login", data=credentials)
+    response = client.post("/auth/login", json=credentials)
     assert response.status_code == 401
