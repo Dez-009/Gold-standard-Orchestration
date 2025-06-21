@@ -1,26 +1,50 @@
-# Use official Python base image
+# Multi-stage build for optimization
+FROM python:3.11-slim as builder
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Production stage
 FROM python:3.11-slim
 
-# Set working directory inside container
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Create app user
+RUN useradd --create-home --shell /bin/bash app
 WORKDIR /app
 
-# Copy requirements file first (for Docker caching efficiency)
-COPY requirements.txt .
-
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy entire project into container
+# Copy application code
 COPY . .
 
-ENV TESTING=true
-RUN pytest -q
+# Change ownership to app user
+RUN chown -R app:app /app
+USER app
 
-# Expose port FastAPI will run on
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health/ping || exit 1
+
+# Expose port
 EXPOSE 8000
 
-# Run the FastAPI app using uvicorn
-# The --reload flag is helpful during development because it watches for code
-# changes and automatically restarts the server. Remove this flag in production
-# images to avoid the overhead of file watching.
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Default command
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

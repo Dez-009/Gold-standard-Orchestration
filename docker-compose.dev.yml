@@ -12,18 +12,15 @@ services:
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-whsec_test}
       - SECRET_KEY=${SECRET_KEY:-test}
       - RATE_LIMIT=${RATE_LIMIT:-100/minute}
+      - TESTING=true
     depends_on:
       db:
         condition: service_healthy
     volumes:
+      - .:/app
       - ./logs:/app/logs
+    command: ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   db:
     image: postgres:15
@@ -40,16 +37,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
 volumes:
   postgres_data:
