@@ -76,8 +76,11 @@ class Settings(BaseSettings):
     DEBUG_MODE: bool = True
     """Global toggle for displaying debug banners in admin UI."""
 
-    class Config:
-        env_file = ".env.test" if os.getenv("TESTING") == "true" else ".env"
+    model_config = {
+        "protected_namespaces": ('settings_',),
+        "extra": "allow",
+        "env_file": ".env.test" if os.getenv("TESTING") == "true" else ".env"
+    }
 
 
 # Notes: Use lru_cache so configuration is loaded from environment only once
