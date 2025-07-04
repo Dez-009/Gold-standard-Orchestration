@@ -62,7 +62,8 @@ def auto_flag_summary(db: Session, summary_id: UUID, content: str) -> tuple[bool
 
     flagged = trigger_type is not None
 
-    summary = db.query(SummarizedJournal).get(summary_id)
+    # Notes: use session.get over deprecated Query.get
+    summary = db.get(SummarizedJournal, summary_id)
     if summary is None:
         return False, "none"
 

@@ -56,7 +56,8 @@ def create_notification(
 # Notes: Send a notification using simple logging for now
 def send_notification(db: Session, notification_id: int) -> Notification | None:
     """Deliver the specified notification and update its status."""
-    notif = db.query(Notification).get(notification_id)
+    # Notes: use session.get per SQLAlchemy 2.0
+    notif = db.get(Notification, notification_id)
     if notif is None:
         return None
     # Notes: Output the message to simulate external delivery

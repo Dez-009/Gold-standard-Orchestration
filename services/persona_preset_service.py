@@ -39,7 +39,8 @@ def create_preset(db: Session, data: dict) -> PersonaPreset:
 
 def update_preset(db: Session, preset_id: str, data: dict) -> PersonaPreset:
     """Update an existing preset by ``preset_id``."""
-    preset = db.query(PersonaPreset).get(UUID(preset_id))
+    # Notes: retrieve preset via session.get (SQLAlchemy 2.0)
+    preset = db.get(PersonaPreset, UUID(preset_id))
     if not preset:
         raise ValueError("Preset not found")
     if "name" in data:
@@ -56,7 +57,8 @@ def update_preset(db: Session, preset_id: str, data: dict) -> PersonaPreset:
 
 def delete_preset(db: Session, preset_id: str) -> None:
     """Remove the preset from the database."""
-    preset = db.query(PersonaPreset).get(UUID(preset_id))
+    # Notes: session.get avoids deprecation warning
+    preset = db.get(PersonaPreset, UUID(preset_id))
     if not preset:
         raise ValueError("Preset not found")
     db.delete(preset)

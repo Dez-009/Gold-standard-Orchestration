@@ -55,7 +55,8 @@ def flag_summary(db: Session, summary_id: UUID | str, reason: str) -> Optional[D
     """Mark a summary as flagged and persist the reason."""
 
     sid = UUID(str(summary_id)) if not isinstance(summary_id, UUID) else summary_id
-    summary = db.query(SummarizedJournal).get(sid)
+    # Notes: session.get avoids deprecated Query.get usage
+    summary = db.get(SummarizedJournal, sid)
     if summary is None:
         return None
     summary.flagged = True
@@ -76,7 +77,8 @@ def unflag_summary(db: Session, summary_id: UUID | str) -> Optional[Dict]:
     """Clear the flag status for the given summary."""
 
     sid = UUID(str(summary_id)) if not isinstance(summary_id, UUID) else summary_id
-    summary = db.query(SummarizedJournal).get(sid)
+    # Notes: session.get for retrieval to silence SQLAlchemy warnings
+    summary = db.get(SummarizedJournal, sid)
     if summary is None:
         return None
     summary.flagged = False

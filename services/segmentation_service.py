@@ -37,7 +37,8 @@ def create_segment(db: Session, data: dict) -> UserSegment:
 def update_segment(db: Session, segment_id: str | UUID, data: dict) -> UserSegment | None:
     """Update the stored definition of a segment."""
     seg_id = UUID(segment_id) if isinstance(segment_id, str) else segment_id
-    segment = db.query(UserSegment).get(seg_id)
+    # Notes: use session.get for updated SQLAlchemy API
+    segment = db.get(UserSegment, seg_id)
     if segment is None:
         return None
     segment.name = data.get("name", segment.name)
@@ -52,7 +53,8 @@ def update_segment(db: Session, segment_id: str | UUID, data: dict) -> UserSegme
 def delete_segment(db: Session, segment_id: str | UUID) -> bool:
     """Remove the given segment record."""
     seg_id = UUID(segment_id) if isinstance(segment_id, str) else segment_id
-    segment = db.query(UserSegment).get(seg_id)
+    # Notes: use session.get for retrieval
+    segment = db.get(UserSegment, seg_id)
     if segment is None:
         return False
     db.delete(segment)
@@ -144,7 +146,8 @@ def _apply_session_filter(query, db: Session, criteria: dict[str, Any]):
 def evaluate_segment(db: Session, segment_id: str | UUID) -> List[User]:
     """Return the users matching the segment criteria."""
     seg_id = UUID(segment_id) if isinstance(segment_id, str) else segment_id
-    segment = db.query(UserSegment).get(seg_id)
+    # Notes: session.get avoids deprecated Query.get
+    segment = db.get(UserSegment, seg_id)
     if segment is None:
         return []
 
