@@ -23,7 +23,8 @@ def rerun_summary(db: Session, summary_id: UUID) -> SummarizedJournal:
     """Re-execute the summarization agent and replace stored output."""
 
     # Notes: Retrieve the existing summary record and validate it exists
-    summary = db.query(SummarizedJournal).get(summary_id)
+    # Notes: prefer session.get to avoid legacy warning in SQLAlchemy 2.0
+    summary = db.get(SummarizedJournal, summary_id)
     if summary is None:
         raise ValueError("Summary not found")
 

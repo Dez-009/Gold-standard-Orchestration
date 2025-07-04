@@ -34,7 +34,8 @@ def rerun_summary_endpoint(
 
     # Notes: Ensure a valid UUID and locate the existing record
     sid = UUID(str(summary_id))
-    summary = db.query(SummarizedJournal).get(sid)
+    # Notes: session.get used to retrieve summary record
+    summary = db.get(SummarizedJournal, sid)
     if summary is None:
         raise HTTPException(status_code=404, detail="Summary not found")
 

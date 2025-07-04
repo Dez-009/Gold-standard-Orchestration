@@ -15,7 +15,8 @@ from agents.reflection_booster_agent import generate_reflection_prompt
 def replay_orchestration(db: Session, log_id: UUID) -> dict:
     """Replay a prior orchestration run and return fresh outputs."""
 
-    log = db.query(OrchestrationPerformanceLog).get(log_id)
+    # Notes: use SQLAlchemy 2.0 session.get instead of deprecated Query.get
+    log = db.get(OrchestrationPerformanceLog, log_id)
     if log is None:
         raise ValueError("Log not found")
 
