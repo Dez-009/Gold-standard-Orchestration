@@ -55,7 +55,8 @@ def get_summary_by_id(db: Session, summary_id: UUID | str) -> Optional[Dict]:
     """Return a single summary record serialized for API use."""
 
     sid = UUID(str(summary_id)) if not isinstance(summary_id, UUID) else summary_id
-    row = db.query(SummarizedJournal).get(sid)
+    # Notes: leverage session.get for SQLAlchemy 2.0 compliance
+    row = db.get(SummarizedJournal, sid)
     if row is None:
         return None
     return {
@@ -73,7 +74,8 @@ def update_admin_notes(db: Session, summary_id: UUID | str, notes: str) -> Optio
     """Update admin_notes field and return the updated record."""
 
     sid = UUID(str(summary_id)) if not isinstance(summary_id, UUID) else summary_id
-    summary = db.query(SummarizedJournal).get(sid)
+    # Notes: fetch with session.get to eliminate deprecation warnings
+    summary = db.get(SummarizedJournal, sid)
     if summary is None:
         return None
     summary.admin_notes = notes

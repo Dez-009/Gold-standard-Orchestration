@@ -51,7 +51,8 @@ def retry_agent_run(db: Session, summary_id: str, agent_name: str) -> str:
 
     # Notes: Look up the summary record and validate it exists
     sid = UUID(str(summary_id))
-    summary = db.query(SummarizedJournal).get(sid)
+    # Notes: switch to session.get for SQLAlchemy 2.0 API
+    summary = db.get(SummarizedJournal, sid)
     if summary is None:
         raise ValueError("Summary not found")
 

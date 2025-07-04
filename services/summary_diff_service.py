@@ -26,7 +26,8 @@ def generate_summary_diff(summary_id: UUID | str) -> str:
     sid = UUID(str(summary_id))
     db: Session = SessionLocal()
     try:
-        summary = db.query(SummarizedJournal).get(sid)
+        # Notes: use session.get for SQLAlchemy 2.0 compatibility
+        summary = db.get(SummarizedJournal, sid)
         if summary is None:
             raise ValueError("Summary not found")
 
