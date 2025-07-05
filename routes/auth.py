@@ -3,6 +3,8 @@ import urllib.parse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
+from schemas.user_schemas import UserCreate, UserResponse
+
 from database.utils import get_db
 from services import user_service, user_session_service
 from utils.password_utils import verify_password
@@ -16,6 +18,22 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 class LoginRequest(BaseModel):
     username: str
     password: str
+
+
+class RegisterRequest(UserCreate):
+    """Request model for new user registration."""
+    pass
+
+
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+def register(user: RegisterRequest, db: Session = Depends(get_db)) -> UserResponse:
+    """Create a new user and return the created record."""
+    existing = user_service.get_user_by_email(db, user.email)
+    if existing:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
+
+    new_user = user_service.create_user(db, user.model_dump())
+    return new_user
 
 @router.post("/login")
 async def login(input: LoginRequest, request: Request, db: Session = Depends(get_db)):

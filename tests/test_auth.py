@@ -49,3 +49,17 @@ def test_login_failure():
     credentials = {"username": "unknown@example.com", "password": "wrong"}
     response = client.post("/auth/login", json=credentials)
     assert response.status_code == 401
+
+
+def test_admin_register_and_login(unique_user_data):
+    """Verify admin user can register via auth endpoint and log in."""
+    user_data = unique_user_data(role="admin")
+    reg_resp = client.post("/auth/register", json=user_data)
+    assert reg_resp.status_code in (200, 201)
+
+    login_resp = client.post(
+        "/auth/login",
+        json={"username": user_data["email"], "password": "password123"},
+    )
+    assert login_resp.status_code == 200
+    assert "access_token" in login_resp.json()
