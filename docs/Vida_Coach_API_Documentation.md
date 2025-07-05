@@ -86,7 +86,7 @@ graph TD
 ```
 
 **Endpoints:**
-- `POST /auth/register` - Register new user
+- `POST /auth/register` - Register new user (supports optional `role` for admin signup)
 - `POST /auth/login` - User login
 - `POST /auth/logout` - User logout
 - `POST /auth/refresh` - Refresh access token
