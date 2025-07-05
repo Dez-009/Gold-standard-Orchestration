@@ -14,14 +14,25 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 class LoginRequest(BaseModel):
+    """Request body model for JSON-based login."""
+
     username: str
     password: str
 
 @router.post("/login")
-async def login(input: LoginRequest, request: Request, db: Session = Depends(get_db)):
-    """Authenticate user and return an access token."""
-    username = input.username
-    password = input.password
+async def login(request: Request, db: Session = Depends(get_db)):
+    """Authenticate user using JSON or form payload and issue a token."""
+
+    content_type = request.headers.get("content-type", "")
+    if content_type.startswith("application/x-www-form-urlencoded"):
+        form = await request.form()
+        username = form.get("username")
+        password = form.get("password")
+    else:
+        data = await request.json()
+        login_data = LoginRequest(**data)
+        username = login_data.username
+        password = login_data.password
 
     # Ensure required credentials are provided
     if not username or not password:
