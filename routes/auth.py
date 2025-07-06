@@ -51,7 +51,7 @@ async def login(input: LoginRequest, request: Request, db: Session = Depends(get
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     # Issue a signed access token
-    token = create_access_token({"user_id": user.id})
+    token = create_access_token({"user_id": user.id, "role": user.role})
 
     # Notes: Capture request context for the session record
     user_agent = request.headers.get("user-agent")

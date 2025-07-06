@@ -39,7 +39,7 @@ def get_current_admin_user(
     # Notes: Reuse the standard user retrieval logic
     user = get_current_user(token, db)
     # Notes: Reject the request if the user is not marked as an admin
-    if getattr(user, "role", "user") != "admin":
+    if getattr(user, "role", "user").strip().lower() != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required",
