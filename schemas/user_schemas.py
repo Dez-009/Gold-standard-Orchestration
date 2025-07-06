@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class UserCreate(BaseModel):
@@ -6,12 +6,16 @@ class UserCreate(BaseModel):
 
     email: str
     phone_number: str | None = None
-    hashed_password: str
+    # Accept plain password field but store internally as ``hashed_password``
+    hashed_password: str = Field(alias="password")
     full_name: str | None = None
     age: int | None = None
     sex: str | None = None
     # Notes: Optional role allows creation of admin users for testing
     role: str | None = None
+
+    # Allow using either ``password`` or ``hashed_password`` when instantiating
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class UserResponse(BaseModel):
