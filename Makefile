@@ -1,4 +1,4 @@
-.PHONY: install run test dev docker-build docker-run lint
+.PHONY: install run test dev docker-build docker-run docker-test lint
 
 # Install dependencies
 install:
@@ -23,7 +23,14 @@ docker-build:
 
 # Run Docker container
 docker-run:
-	docker run -p 8000:8000 --env-file .env vida-coach
+        docker run -p 8000:8000 --env-file .env vida-coach
+
+# Run backend and frontend tests using Docker
+docker-test:
+        docker-compose -f docker-compose.dev.yml up -d --build
+        docker-compose -f docker-compose.dev.yml run --rm web pytest -q
+        docker-compose -f docker-compose.dev.yml run --rm front npm test || true
+        docker-compose -f docker-compose.dev.yml down
 
 # Format and lint python code
 lint:
