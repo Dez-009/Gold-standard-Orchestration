@@ -1,14 +1,16 @@
 # 📚 Vida Coach Documentation
 
-Welcome to the Vida Coach documentation! This section contains detailed technical guides and information about the AI-powered life coaching platform.
+Welcome! This folder collects all documentation for the AI-powered **Vida Coach** platform. If you're new, start with the quick links below.
+
+## 📖 Quick Links
+- [Setup Guide](../SETUP.md) – install dependencies and start the app
+- [Main README](../README.md) – project overview and usage
+- [Authentication Guide](../AUTH_GUIDE.md) – login and accounts
+- [API Guide](../API_GUIDE.md) – list of endpoints
 
 ## 🚀 Quick Start Guides
 
-**New to Vida Coach?** Start here:
-- **[Setup Guide](../SETUP.md)** - Get up and running in 5 minutes
-- **[Main README](../README.md)** - Project overview and basic usage
-- **[Authentication Guide](../AUTH_GUIDE.md)** - User accounts and login system
-- **[API Guide](../API_GUIDE.md)** - Complete API reference
+**New to Vida Coach?** Start with the docs above.
 
 ## 🏗️ Architecture & Design
 
