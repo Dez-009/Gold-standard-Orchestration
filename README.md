@@ -14,8 +14,7 @@ cp .env.example .env
 # Edit .env with your settings
 
 # Start the backend server
-python main.py
-```
+vida-coach-backend && source venv/bin/activate && uvicorn main:app --reload --port 8000
 Backend runs on: `http://localhost:8000`
 
 ### 2. Setup Frontend
