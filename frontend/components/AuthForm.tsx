@@ -35,8 +35,56 @@ export default function AuthForm({ fields, submitText, onSubmit }: AuthFormProps
       await onSubmit(values); // Call provided handler
       setMessage('Success');
     } catch (error: any) {
-      // Display error message from backend or generic one
-      setMessage(error.response?.data?.detail || 'Something went wrong');
+      // Debug: Log the full error structure to console
+      console.error('Full error object:', error);
+      console.error('Error response:', error.response);
+      console.error('Error response data:', error.response?.data);
+      
+      // Extract error message from backend response
+      let errorMessage = 'Something went wrong';
+      
+      if (error.response?.data?.detail) {
+        const detail = error.response.data.detail;
+        console.error('Detail object:', detail);
+        
+        // Handle validation error array from FastAPI
+        if (Array.isArray(detail)) {
+          errorMessage = detail.map(err => {
+            console.error('Processing error item:', err);
+            if (typeof err === 'object' && err.msg) {
+              return err.msg;
+            }
+            return typeof err === 'string' ? err : 'Validation error';
+          }).join(', ');
+        }
+        // Handle validation error object
+        else if (typeof detail === 'object' && detail.msg) {
+          errorMessage = detail.msg;
+        }
+        // Handle string error message
+        else if (typeof detail === 'string') {
+          errorMessage = detail;
+        }
+        // Handle any other object by converting to string safely
+        else if (typeof detail === 'object') {
+          errorMessage = JSON.stringify(detail);
+        }
+      }
+      // Additional fallback for direct error messages
+      else if (error.response?.data?.message) {
+        errorMessage = String(error.response.data.message);
+      }
+      else if (error.message) {
+        errorMessage = String(error.message);
+      }
+      
+      // Ensure we always have a string
+      if (typeof errorMessage !== 'string') {
+        errorMessage = 'An error occurred';
+      }
+      
+      console.error('Final error message:', errorMessage);
+      setMessage(errorMessage);
     }
   };
 

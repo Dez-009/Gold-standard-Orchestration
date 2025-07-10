@@ -13,6 +13,8 @@ class UserCreate(BaseModel):
     sex: str | None = None
     # Notes: Optional role allows creation of admin users for testing
     role: str | None = None
+    # Notes: Access code required for admin registration
+    access_code: str | None = None
 
     # Allow using either ``password`` or ``hashed_password`` when instantiating
     model_config = ConfigDict(populate_by_name=True)

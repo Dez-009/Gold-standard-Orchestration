@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.openapi.utils import get_openapi
+from fastapi.middleware.cors import CORSMiddleware
 
 # Import middleware configuration utilities
 from middleware import init_middlewares
@@ -138,6 +139,22 @@ app = FastAPI(
     title=settings.project_name,
     version=VERSION,
     contact={"name": "Vida Coach Support", "email": "support@vidacoach.ai"},
+)
+
+# Add CORS middleware to handle cross-origin requests from frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # Next.js frontend
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",  # Next.js frontend (alternative port)
+        "http://127.0.0.1:3001",
+        "http://localhost:8000",  # Backend docs
+        "http://127.0.0.1:8000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE, OPTIONS, etc.)
+    allow_headers=["*"],  # Allow all headers including Authorization
 )
 
 # Register middleware components on the app instance

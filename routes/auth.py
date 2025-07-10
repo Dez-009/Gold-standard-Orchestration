@@ -32,7 +32,19 @@ def register(user: RegisterRequest, db: Session = Depends(get_db)) -> UserRespon
     if existing:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already exists")
 
-    new_user = user_service.create_user(db, user.model_dump())
+    # Validate admin access code if user is registering as admin
+    if user.role and user.role.lower() == "admin":
+        if not user.access_code or user.access_code != "VIDA_ADMIN_2025":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail="Invalid or missing admin access code"
+            )
+
+    # Remove access_code from user data before creating User object
+    user_data = user.model_dump()
+    user_data.pop('access_code', None)  # Remove access_code safely
+    
+    new_user = user_service.create_user(db, user_data)
     return new_user
 
 @router.post("/login")

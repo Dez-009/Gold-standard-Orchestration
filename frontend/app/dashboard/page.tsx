@@ -51,9 +51,10 @@ export default function DashboardPage() {
       return;
     }
     // Notes: Store parsed email and role in state
-    setUser(parseUserFromToken(token));
+    const userInfo = parseUserFromToken(token);
+    setUser(userInfo);
     // Notes: Log a page view analytics event
-    trackEvent('page_view', { page: 'dashboard' });
+    trackEvent('page_view', { page: 'dashboard', role: userInfo.role });
     // Notes: Retrieve account info to determine subscription tier
     const loadTier = async () => {
       try {
@@ -123,80 +124,96 @@ export default function DashboardPage() {
   // Render dashboard with simple styling and user information
   return (
     <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+      {/* Header with user info and logout */}
+      <div className="w-full max-w-6xl flex justify-between items-center p-4">
+        <div>
+          <h1 className="text-3xl font-bold">Welcome back to Vida Coach!</h1>
+          {user.email && <p className="text-lg text-gray-600">Logged in as {user.email}</p>}
+          <p className="text-sm text-gray-500">Role: {user.role || 'user'}</p>
+        </div>
+        <div className="flex items-center space-x-4">
+          {user.role === 'admin' && (
+            <Link 
+              href="/admin-dashboard" 
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            >
+              Admin Dashboard
+            </Link>
+          )}
+          <button
+            onClick={() => {
+              localStorage.removeItem('token');
+              router.push('/login');
+            }}
+            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
       {/* Simple navigation links to feature pages */}
-      <nav className="self-end mr-4 space-x-4">
-        <Link href="/coach" className="text-blue-600 underline">
-          AI Coach
-        </Link>
-        {/* Link to the multi-agent orchestration demo */}
-        <Link href="/orchestration" className="text-blue-600 underline">
-          Vida Coach (Orchestration Demo)
-        </Link>
-        <Link href="/user/goals" className="text-blue-600 underline">
-          Goals
-        </Link>
-        {/* Link to the goal progress tracker */}
-        <Link href="/user/goals/progress" className="text-blue-600 underline">
-          Goal Progress
-        </Link>
-        {/* Link to the journal history page */}
-        <Link href="/journal/history" className="text-blue-600 underline">
-          Journal History
-        </Link>
-        {/* Link to the daily check-in page */}
-        <Link href="/checkin" className="text-blue-600 underline">
-          Daily Check-In
-        </Link>
-        {/* Link to the mood tracking page */}
-        <Link href="/mood" className="text-blue-600 underline">
-          Mood Tracker
-        </Link>
-        {/* Link to the mood trends analytics page */}
-        <Link href="/mood/trends" className="text-blue-600 underline">
-          Mood Trends
-        </Link>
-        <Link href="/review" className="text-blue-600 underline">
-          Weekly Review
-        </Link>
-        {/* Link to the weekly summary page */}
-        <Link href="/review/weekly" className="text-blue-600 underline">
-          Review Summary
-        </Link>
-        {/* Link to the new weekly review overview page */}
-        <Link href="/weekly-review" className="text-blue-600 underline">
-          Weekly Overview
-        </Link>
-        {/* Link to the AI goal suggestions page */}
-        <Link href="/suggestions" className="text-blue-600 underline">
-          Suggestions
-        </Link>
-        {/* Link to the new goal suggestions page */}
-        <Link href="/user/goals/suggestions" className="text-blue-600 underline">
-          Goal Suggestions
-        </Link>
-        {/* Link to the coaching session history page */}
-        <Link href="/sessions" className="text-blue-600 underline">
-          Sessions
-        </Link>
-        {/* Link to the profile settings page */}
-        <Link href="/profile" className="text-blue-600 underline">
-          Profile Settings
-        </Link>
-        {/* Link to the subscription and billing management page */}
-        <Link href="/account" className="text-blue-600 underline">
-          Account
-        </Link>
-        {/* Link to subscribe page when no active plan */}
-        {!subscription || subscription.status !== 'Active' ? (
-          <Link href="/subscribe" className="text-blue-600 underline">
-            Subscribe
+      <div className="w-full max-w-6xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+          <Link href="/coach" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">🤖 AI Coach</h3>
+            <p className="text-sm text-gray-600">Chat with your AI coach</p>
           </Link>
-        ) : null}
-        {/* Temporary link to the public landing page */}
-        <Link href="/landing" className="text-blue-600 underline">
-          Landing
-        </Link>
-      </nav>
+          <Link href="/orchestration" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">🎭 Orchestration Demo</h3>
+            <p className="text-sm text-gray-600">Multi-agent coaching demo</p>
+          </Link>
+          <Link href="/user/goals" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">🎯 Goals</h3>
+            <p className="text-sm text-gray-600">Manage your goals</p>
+          </Link>
+          <Link href="/user/goals/progress" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">📈 Goal Progress</h3>
+            <p className="text-sm text-gray-600">Track goal progress</p>
+          </Link>
+          <Link href="/journal/history" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">📖 Journal History</h3>
+            <p className="text-sm text-gray-600">View your journal entries</p>
+          </Link>
+          <Link href="/checkin" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">✅ Daily Check-In</h3>
+            <p className="text-sm text-gray-600">Complete daily check-in</p>
+          </Link>
+          <Link href="/mood" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">😊 Mood Tracker</h3>
+            <p className="text-sm text-gray-600">Track your mood</p>
+          </Link>
+          <Link href="/mood/trends" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">📊 Mood Trends</h3>
+            <p className="text-sm text-gray-600">View mood analytics</p>
+          </Link>
+          <Link href="/review" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">📝 Weekly Review</h3>
+            <p className="text-sm text-gray-600">Review your week</p>
+          </Link>
+          <Link href="/suggestions" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">💡 Suggestions</h3>
+            <p className="text-sm text-gray-600">AI-powered suggestions</p>
+          </Link>
+          <Link href="/sessions" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">💬 Sessions</h3>
+            <p className="text-sm text-gray-600">Coaching session history</p>
+          </Link>
+          <Link href="/profile" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">⚙️ Profile Settings</h3>
+            <p className="text-sm text-gray-600">Manage your profile</p>
+          </Link>
+          <Link href="/account" className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+            <h3 className="font-medium text-gray-900 mb-2">👤 Account</h3>
+            <p className="text-sm text-gray-600">Account & billing</p>
+          </Link>
+          {!subscription || subscription.status !== 'Active' ? (
+            <Link href="/subscribe" className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg shadow hover:shadow-md transition-shadow">
+              <h3 className="font-medium text-blue-700 mb-2">💳 Subscribe</h3>
+              <p className="text-sm text-blue-600">Upgrade your plan</p>
+            </Link>
+          ) : null}
+        </div>
+      </div>
 
       {/* Notes: Show admin links only when the user has admin role */}
       {user.role === 'admin' && (
@@ -251,13 +268,12 @@ export default function DashboardPage() {
       )}
 
       {/* Welcome header */}
-      <h1 className="text-3xl font-bold">Welcome back to Vida Coach!</h1>
-      {/* Notes: Display the logged in user's email */}
-      {user.email && <p className="text-lg">Logged in as {user.email}</p>}
-      {/* Notes: Show the current subscription tier using a colored badge */}
-      <p className="text-lg">
-        Subscription: {badge(tier || 'No Subscription')}
-      </p>
+      <div className="text-center space-y-2">
+        {/* Notes: Show the current subscription tier using a colored badge */}
+        <p className="text-lg">
+          Subscription: {badge(tier || 'No Subscription')}
+        </p>
+      </div>
 
       {/* Card showing current subscription status */}
       <div className="border rounded p-4 w-full max-w-xs text-center space-y-2">
