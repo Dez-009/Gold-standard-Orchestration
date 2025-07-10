@@ -1,4 +1,4 @@
-// File: /Users/mac_d/Documents/project/vida-coach-backend-main/frontend/app/page.tsx
+// File: /Users/mac_d/vidaa/vida-coach-backend/frontend/app/page.tsx
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
