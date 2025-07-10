@@ -1,5 +1,8 @@
 """SQLAlchemy models package."""
 
+# Import base class for all models
+from database.base import Base
+
 from .user import User
 from .session import Session
 from .journal_entry import JournalEntry

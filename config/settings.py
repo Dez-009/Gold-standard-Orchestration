@@ -15,6 +15,22 @@ from pydantic_settings import BaseSettings
 class AppSettings(BaseSettings):
     """Strongly typed settings object."""
 
+    # Database configuration
+    database_url: str = "sqlite:///./vida.db"
+    """Database connection URL."""
+
+    # Authentication configuration
+    secret_key: str = "your-secret-key-change-in-production"
+    """Secret key for JWT token signing."""
+
+    # Application configuration
+    environment: str = "development"
+    """Application environment (development, staging, production)."""
+
+    port: int = 8000
+    """Port for the FastAPI server."""
+
+    # Agent configuration
     AGENT_TIMEOUT_SECONDS: int = 45
     """Controls max seconds an agent is allowed to run before timeout."""
 
@@ -31,6 +47,19 @@ class AppSettings(BaseSettings):
 
     model_pricing: dict[str, float] = {}
     """Mapping of model name to cost per thousand tokens."""
+
+    # Optional API keys
+    openai_api_key: str = ""
+    """OpenAI API key for AI features."""
+
+    stripe_secret_key: str = ""
+    """Stripe secret key for payments."""
+
+    stripe_webhook_secret: str = ""
+    """Stripe webhook secret for payment events."""
+
+    stripe_publishable_key: str = ""
+    """Stripe publishable key for frontend."""
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -56,6 +85,7 @@ class AppSettings(BaseSettings):
     class Config:
         env_file = ".env.test" if os.getenv("TESTING") == "true" else ".env"
         extra = "ignore"
+        protected_namespaces = ('settings_',)  # Fix pydantic warning about model_ prefix
 
 
 # Notes: Provide a cached accessor for settings

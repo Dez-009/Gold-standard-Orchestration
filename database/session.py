@@ -21,5 +21,15 @@ engine = create_engine(settings.database_url, **engine_kwargs)
 # Configure session factory
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
-__all__ = ["engine", "SessionLocal"]
+
+def get_db():
+    """Dependency that provides a database session."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+__all__ = ["engine", "SessionLocal", "get_db"]
 
