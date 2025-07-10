@@ -1,7 +1,7 @@
 # Vida Coach Docker Setup
 
 ## Overview
-This document describes how to run the Vida Coach backend using Docker.
+This document describes how to run the Vida Coach stack (backend and frontend) using Docker.
 
 ## Prerequisites
 - Docker
@@ -11,11 +11,14 @@ This document describes how to run the Vida Coach backend using Docker.
 
 ### Development Environment
 ```bash
-# Start development environment with hot reload
+# Start backend and frontend with hot reload
 docker-compose -f docker-compose.dev.yml up --build
 
-# Run tests in container
+# Run backend tests
 docker-compose -f docker-compose.dev.yml exec web pytest
+
+# Run frontend tests
+docker-compose -f docker-compose.dev.yml exec front npm test || true
 
 # Access API documentation
 open http://localhost:8000/docs
@@ -49,6 +52,10 @@ DATABASE_URL=your_db_url OPENAI_API_KEY=your_key docker-compose up --build
 - **Port**: 8000
 - **Health Check**: http://localhost:8000/health/ping
 - **API Docs**: http://localhost:8000/docs
+
+### Frontend Application
+- **Port**: 3000
+- **Health Check**: http://localhost:3000
 
 ### PostgreSQL Database
 - **Port**: 5432

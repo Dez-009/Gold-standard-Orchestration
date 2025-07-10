@@ -29,7 +29,7 @@ npm install
 # Start development server
 npm run dev
 ```
-Frontend runs on: `http://localhost:3001`
+Frontend runs on: `http://localhost:3000`
 
 ## 🔐 Authentication System
 
@@ -84,7 +84,7 @@ docker build -t vida-coach . # Build image
 ## 🧪 Testing the System
 
 1. **Start both servers** (backend and frontend)
-2. **Open browser** → `http://localhost:3001`
+2. **Open browser** → `http://localhost:3000`
 3. **Test registration**:
    - Try creating a regular user account
    - Try creating an admin account with code `VIDA_ADMIN_2025`
