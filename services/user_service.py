@@ -12,8 +12,12 @@ def create_user(db: Session, user_data: dict) -> User:
     hashed_pw = hash_password(user_data["hashed_password"])
     user_data["hashed_password"] = hashed_pw
 
+    # Filter out any unsupported fields (e.g., access_code)
+    allowed_keys = {c.name for c in User.__table__.columns}
+    filtered = {k: v for k, v in user_data.items() if k in allowed_keys}
+
     # Persist the new user in the database
-    new_user = User(**user_data)
+    new_user = User(**filtered)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
