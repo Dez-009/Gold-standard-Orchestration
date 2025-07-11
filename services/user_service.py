@@ -49,3 +49,12 @@ def delete_user(db: Session, user: User) -> None:
     db.delete(user)
     db.commit()
     return None
+
+def update_user(db: Session, user: User, updates: dict) -> User:
+    """Apply field updates to a user."""
+    for field, value in updates.items():
+        if hasattr(user, field):
+            setattr(user, field, value)
+    db.commit()
+    db.refresh(user)
+    return user
