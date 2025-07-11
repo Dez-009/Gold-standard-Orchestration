@@ -4,8 +4,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchCompletedGoals } from '../../../services/goalHistoryService';
-import { getToken, isTokenExpired } from '../../../services/authUtils';
+import { fetchCompletedGoals } from '../../../../services/goalHistoryService';
+import { getToken, isTokenExpired } from '../../../../services/authUtils';
 import { showError } from '../../../../components/ToastProvider';
 import FusionBackground from '../../../../components/FusionBackground';
 
@@ -35,7 +35,7 @@ export default function GoalHistoryPage() {
       const data = await fetchCompletedGoals();
       // Notes: Sort goals newest first by completion date
       const sorted = data.sort(
-        (a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime()
+        (a: CompletedGoal, b: CompletedGoal) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime()
       );
       setGoals(sorted);
     } catch {

@@ -2099,6 +2099,26 @@ export async function postPromptVersion(
   return response.data;
 }
 
+// Fetch the user's referral code from the API
+// Returns the referral code data object
+export async function getReferralCode(token: string) {
+  const response = await apiClient.get('/referrals/code', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Submit a referral code to the API
+// Used during registration or when applying a code later
+export async function submitReferralCode(code: string, token: string) {
+  const response = await apiClient.post(
+    '/referrals/redeem',
+    { code },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+}
+
 // Exporting the configured client lets other modules import a single instance
 // instead of creating new Axios clients every time.
 export default apiClient;

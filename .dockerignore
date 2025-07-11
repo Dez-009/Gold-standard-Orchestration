@@ -14,7 +14,6 @@ tests/
 *.log
 .DS_Store
 node_modules/
-frontend/
 *.db
 *.sqlite
 *.sqlite3

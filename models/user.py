@@ -50,6 +50,10 @@ class User(Base):
     subscriptions = relationship(
         "Subscription", back_populates="user", cascade="all, delete"
     )
+    # Notes: List of OpenAI assistant threads for the user
+    assistant_threads = relationship(
+        "AssistantThread", back_populates="user", cascade="all, delete"
+    )
     # Notes: Records of AI agents assigned to the user
     agent_assignments = relationship(
         "AgentAssignment", back_populates="user", cascade="all, delete"

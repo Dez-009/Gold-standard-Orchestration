@@ -51,6 +51,16 @@ class AppSettings(BaseSettings):
     # Optional API keys
     openai_api_key: str = ""
     """OpenAI API key for AI features."""
+    
+    # OpenAI Assistant settings
+    openai_assistant_id: str = ""
+    """OpenAI Assistant ID if using a pre-created assistant."""
+    
+    openai_thread_ttl: int = 7
+    """Number of days to keep OpenAI threads before expiring them."""
+    
+    openai_model: str = "gpt-4o"
+    """Default OpenAI model to use for assistant creation."""
 
     stripe_secret_key: str = ""
     """Stripe secret key for payments."""

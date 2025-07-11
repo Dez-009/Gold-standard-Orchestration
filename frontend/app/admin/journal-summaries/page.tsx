@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { getToken, isTokenExpired, isAdmin } from '../../../../services/authUtils';
+import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
 import {
   downloadSummaryPDF,
   retryAgent,
@@ -13,9 +13,9 @@ import {
   getSummaryNotes,
   addSummaryNote,
   getFlagReasons
-} from '../../../../services/apiClient';
-import { fetchSummary, triggerRerun } from '../../../../services/adminJournalSummaryService';
-import { showError, showSuccess } from '../../../../components/ToastProvider';
+} from '../../../services/apiClient';
+import { fetchSummary, triggerRerun } from '../../../services/adminJournalSummaryService';
+import { showError, showSuccess } from '../../../components/ToastProvider';
 import { FiRefreshCw } from 'react-icons/fi';
 
 interface ReasonRow {

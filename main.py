@@ -25,6 +25,8 @@ from routes.task import router as task_router
 from routes.ai_coach import router as ai_coach_router
 # Notes: Import router providing additional AI utilities
 from routes.ai_routes import router as ai_routes_router
+# Notes: Import router for OpenAI Assistant agents
+from routes.agent_routes import router as agent_routes_router
 # Notes: Import router powering multi-agent orchestration
 from routes.orchestration_journal_summary import (
     router as orchestration_journal_summary_router,
@@ -220,6 +222,8 @@ if "agent_feedback" in settings.ENABLED_FEATURES:
 app.include_router(billing_router)
 # Register AI coach router to expose AI-powered coaching endpoints
 app.include_router(ai_coach_router)
+# Register OpenAI Assistant agent routes
+app.include_router(agent_routes_router)
 # Register additional AI routes providing utilities
 app.include_router(ai_routes_router)
 # Register the new journal summary route

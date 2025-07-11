@@ -1,7 +1,7 @@
 // Service wrapper for CRUD operations on user goals
 // Uses authUtils to obtain the JWT token and delegates HTTP calls to apiClient
 
-import { getToken } from './authUtils';
+import { getToken, isTokenExpired } from './authUtils';
 import {
   postGoal,
   getGoals,
