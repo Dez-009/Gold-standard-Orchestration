@@ -53,7 +53,7 @@ def test_login_failure():
 
 def test_admin_register_and_login(unique_user_data):
     """Verify admin user can register via auth endpoint and log in."""
-    user_data = unique_user_data(role="admin")
+    user_data = unique_user_data(role="admin", access_code="VIDA_ADMIN_2025")
     reg_resp = client.post("/auth/register", json=user_data)
     assert reg_resp.status_code in (200, 201)
 
