@@ -1,33 +1,35 @@
 'use client';
-// Admin user management page listing all registered users
-// Fetches user data on mount and displays it in a table with a search bar
+// Admin page for managing users with pagination and role controls
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchAllUsers } from '../../../services/userManagementService';
+import UserTable, { AdminUser } from '../../../components/admin/UserTable';
+import { fetchUsers, changeUserRole, disableUser } from '../../../services/adminUserService';
 import { getToken, isTokenExpired, isAdmin } from '../../../services/authUtils';
-import { showError } from '../../../components/ToastProvider';
+import { showError, showSuccess } from '../../../components/ToastProvider';
 
-// Shape of the user object returned by the backend
-interface AdminUser {
-  id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  created_at: string;
-}
-
-export default function UserManagementPage() {
-  const router = useRouter(); // Notes: Router used for redirects
-  // Notes: Local state for the list of users and page status flags
+export default function AdminUsersPage() {
+  const router = useRouter();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
+  const limit = 20;
 
-  // Notes: Verify admin session and load all users once on mount
+  const load = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const data = (await fetchUsers({ limit, offset: page * limit })) as AdminUser[];
+      setUsers(data);
+    } catch {
+      setError('Failed to load users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const token = getToken();
     if (!token || isTokenExpired(token) || !isAdmin()) {
@@ -36,90 +38,43 @@ export default function UserManagementPage() {
       router.push('/login');
       return;
     }
-    const loadUsers = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        // Notes: Request the full user list using the service wrapper
-        const data = await fetchAllUsers();
-        setUsers(data);
-      } catch {
-        // Notes: Display a generic error message when the request fails
-        setError('Failed to load users');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadUsers();
-  }, [router]);
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router, page]);
 
-  // Notes: Simple case-insensitive filter across common user fields
-  const filtered = users.filter((u) => {
-    const term = search.toLowerCase();
-    return (
-      u.email.toLowerCase().includes(term) ||
-      u.first_name.toLowerCase().includes(term) ||
-      u.last_name.toLowerCase().includes(term)
-    );
-  });
+  const handleRoleChange = async (id: number, role: string) => {
+    try {
+      await changeUserRole(id, role);
+      showSuccess('Role updated');
+      load();
+    } catch {}
+  };
 
-  // Notes: Helper to format dates as locale strings
-  const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
+  const handleDeactivate = async (id: number) => {
+    try {
+      await disableUser(id);
+      showSuccess('User deactivated');
+      load();
+    } catch {}
+  };
 
   return (
     <div className="flex flex-col items-center min-h-screen p-4 space-y-4">
-      {/* Link back to dashboard for convenience */}
       <Link href="/dashboard" className="self-start text-blue-600 underline">
         Back to Dashboard
       </Link>
-
-      {/* Page heading and optional filter input */}
       <h1 className="text-2xl font-bold">User Management</h1>
-      <input
-        type="text"
-        placeholder="Search users..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="border p-2 rounded w-full max-w-md"
-      />
-
-      {/* Conditional rendering of loading, error and empty states */}
-      {loading && (
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-      )}
+      {loading && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />}
       {error && <p className="text-red-600">{error}</p>}
-      {!loading && !error && filtered.length === 0 && <p>No users found.</p>}
-
-      {/* Render the responsive table when data is available */}
-      {!loading && !error && filtered.length > 0 && (
-        <div className="overflow-x-auto w-full">
-          <table className="min-w-full border divide-y divide-gray-200">
-            <thead>
-              <tr>
-                <th className="px-4 py-2">ID</th>
-                <th className="px-4 py-2">Email</th>
-                <th className="px-4 py-2">First Name</th>
-                <th className="px-4 py-2">Last Name</th>
-                <th className="px-4 py-2">Role</th>
-                <th className="px-4 py-2">Created At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((user) => (
-                <tr key={user.id} className="odd:bg-gray-100">
-                  <td className="border px-4 py-2">{user.id}</td>
-                  <td className="border px-4 py-2">{user.email}</td>
-                  <td className="border px-4 py-2">{user.first_name}</td>
-                  <td className="border px-4 py-2">{user.last_name}</td>
-                  <td className="border px-4 py-2 capitalize">{user.role}</td>
-                  <td className="border px-4 py-2">{formatDate(user.created_at)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {!loading && !error && <UserTable users={users} onRoleChange={handleRoleChange} onDeactivate={handleDeactivate} />}
+      <div className="flex space-x-4">
+        <button className="px-4 py-2 bg-gray-200 rounded" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+          Previous
+        </button>
+        <button className="px-4 py-2 bg-gray-200 rounded" onClick={() => setPage((p) => p + 1)}>
+          Next
+        </button>
+      </div>
     </div>
   );
 }
-

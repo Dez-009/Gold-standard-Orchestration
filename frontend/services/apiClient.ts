@@ -850,12 +850,29 @@ export async function getChurnScores(
 
 // Notes: Retrieve the list of all users for the admin user management page
 // Notes: Performs a GET request to the /admin/users endpoint with auth header
-export async function getAllUsers(token: string) {
-  // Notes: Issue the request to the backend admin users route
+export async function getUsers(token: string, filters: Record<string, unknown> = {}) {
+  // Issue GET request with optional query parameters
   const response = await apiClient.get('/admin/users', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters
+  });
+  return response.data;
+}
+
+// Update a user's role via the admin API
+export async function updateUserRole(token: string, userId: string, role: string) {
+  const response = await apiClient.patch(`/admin/users/${userId}`, null, {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { role }
+  });
+  return response.data;
+}
+
+// Deactivate a user account via the admin API
+export async function deactivateUser(token: string, userId: string) {
+  const response = await apiClient.delete(`/admin/users/${userId}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  // Notes: Return the array of user objects provided by the backend
   return response.data;
 }
 
