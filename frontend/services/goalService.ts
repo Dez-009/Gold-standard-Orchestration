@@ -6,6 +6,7 @@ import {
   postGoal,
   getGoals,
   getGoalProgress,
+  updateGoalProgress as apiUpdateGoalProgress,
   refineGoals as apiRefineGoals
 } from './apiClient';
 import { showSuccess, showError } from '../components/ToastProvider';
@@ -56,16 +57,32 @@ export async function fetchGoalProgress() {
   try {
     // Notes: Request progress data from the backend service
     const data = await getGoalProgress(token);
-    showSuccess('Saved successfully');
     return data as Array<{
       id: number;
       title: string;
       target?: number;
       progress?: number;
       updated_at: string;
+      is_completed: boolean;
     }>;
   } catch (err) {
-    showError('Something went wrong');
+    showError('Failed to load goal progress');
+    throw err;
+  }
+}
+
+// Update the progress of a specific goal
+export async function updateGoalProgress(goalId: number, progress: number, target?: number) {
+  const token = getToken();
+  if (!token) {
+    throw new Error('User not authenticated');
+  }
+  try {
+    const data = await apiUpdateGoalProgress(goalId, progress, target, token);
+    showSuccess('Progress updated successfully');
+    return data;
+  } catch (err) {
+    showError('Failed to update progress');
     throw err;
   }
 }

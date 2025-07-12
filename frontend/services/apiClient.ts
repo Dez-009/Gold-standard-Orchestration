@@ -257,6 +257,22 @@ export async function getGoalProgress(token: string) {
   return response.data;
 }
 
+// Update the progress of a specific goal
+// Sends a PATCH request to /goals/{goal_id}/progress with auth header
+export async function updateGoalProgress(
+  goalId: number,
+  progress: number,
+  target?: number,
+  token: string
+) {
+  const payload = { progress, ...(target !== undefined && { target }) };
+  const response = await apiClient.patch(`/goals/${goalId}/progress`, payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  // Return the updated goal progress data
+  return response.data;
+}
+
 // Retrieve AI-powered goal suggestions from the backend
 // Notes: Performs a GET request to /goals/suggestions including the JWT token
 export async function getGoalSuggestions(token: string) {

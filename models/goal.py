@@ -18,6 +18,10 @@ class Goal(Base):
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     is_completed = Column(Boolean, default=False)
+    # Progress tracking fields
+    target = Column(Integer, nullable=True)  # Target value (e.g., 100 for percentage)
+    progress = Column(Integer, default=0)    # Current progress value
+    progress_updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
