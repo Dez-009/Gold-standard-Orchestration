@@ -213,10 +213,10 @@ All required database tables exist and are accessible:
 
 ## 📚 Related Documentation
 
-- [Setup Guide](SETUP.md) - Complete setup instructions
-- [Authentication Guide](AUTH_GUIDE.md) - User account management
-- [API Guide](API_GUIDE.md) - Complete API reference
-- [Troubleshooting](TROUBLESHOOTING.md) - Common issues and solutions
+ - [Setup Guide](../guides/SETUP.md) - Complete setup instructions
+ - [Authentication Guide](../guides/AUTH_GUIDE.md) - User account management
+ - [API Guide](../guides/API_GUIDE.md) - Complete API reference
+ - [Troubleshooting](../guides/TROUBLESHOOTING.md) - Common issues and solutions
 
 ---
 

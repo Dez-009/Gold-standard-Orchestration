@@ -132,16 +132,16 @@ PORT=8000
 ## 📚 Documentation
 
 **Getting Started**:
-- 🚀 **[Setup Guide](SETUP.md)** - Get running in 5 minutes
-- 🔐 **[Authentication Guide](AUTH_GUIDE.md)** - User accounts and login
-- 📡 **[API Guide](API_GUIDE.md)** - Complete API reference
-- 🚨 **[Troubleshooting](TROUBLESHOOTING.md)** - Common issues and fixes
+ - 🚀 **[Setup Guide](docs/guides/SETUP.md)** - Get running in 5 minutes
+ - 🔐 **[Authentication Guide](docs/guides/AUTH_GUIDE.md)** - User accounts and login
+ - 📡 **[API Guide](docs/guides/API_GUIDE.md)** - Complete API reference
+ - 🚨 **[Troubleshooting](docs/guides/TROUBLESHOOTING.md)** - Common issues and fixes
 
 **Advanced**:
-- [🤖 AI Agents Guide](AGENTS.md) - How the coaching agents work
-- [🔐 Authentication Details](FINAL_AUTH_SYSTEM_COMPLETE.md) - Complete auth system info
+ - [🤖 AI Agents Guide](docs/reference/AGENTS.md) - How the coaching agents work
+ - [🔐 Authentication Details](docs/reference/FINAL_AUTH_SYSTEM_COMPLETE.md) - Complete auth system info
 - [📖 Full Docs](docs/README.md) - Comprehensive documentation
-- [📝 Changelog](changelog.md) - Version history
+ - [📝 Changelog](docs/reference/changelog.md) - Version history
 
 ## 🤝 Contributing
 

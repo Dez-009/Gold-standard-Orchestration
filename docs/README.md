@@ -3,10 +3,10 @@
 Welcome! This folder collects all documentation for the AI-powered **Vida Coach** platform. If you're new, start with the quick links below.
 
 ## 📖 Quick Links
-- [Setup Guide](../SETUP.md) – install dependencies and start the app
+- [Setup Guide](guides/SETUP.md) – install dependencies and start the app
 - [Main README](../README.md) – project overview and usage
-- [Authentication Guide](../AUTH_GUIDE.md) – login and accounts
-- [API Guide](../API_GUIDE.md) – list of endpoints
+- [Authentication Guide](guides/AUTH_GUIDE.md) – login and accounts
+- [API Guide](guides/API_GUIDE.md) – list of endpoints
 
 ## 🚀 Quick Start Guides
 
@@ -24,26 +24,26 @@ Understanding how Vida Coach works:
 For developers working on Vida Coach:
 - **[testing_notes.md](testing_notes.md)** - Backend + frontend testing strategies
 - **[model_pricing.md](model_pricing.md)** - Current LLM pricing and usage info
-- **[AGENTS.md](../AGENTS.md)** - Complete guide to AI agents
+ - **[AGENTS.md](reference/AGENTS.md)** - Complete guide to AI agents
 
 ## 📋 Project Management
 
 Sprint planning and progress tracking:
 - **[sprints/](sprints/)** - Weekly planning notes and retrospectives
-- **[Changelog](../changelog.md)** - Version history and updates
+ - **[Changelog](reference/changelog.md)** - Version history and updates
 
 ## 🎯 Feature Documentation
 
 Specific feature guides:
-- **[Role-Based Authentication](../FINAL_AUTH_SYSTEM_COMPLETE.md)** - Complete auth system details
+ - **[Role-Based Authentication](reference/FINAL_AUTH_SYSTEM_COMPLETE.md)** - Complete auth system details
 - **[AI Agent Pipeline](agent.md)** - How the coaching agents work together
 - **[Database Models](../models/)** - Data structure and relationships
 
 ## 💡 Getting Help
 
-- **New User?** → Start with [Setup Guide](../SETUP.md)
-- **API Questions?** → Check [API Guide](../API_GUIDE.md)
-- **Authentication Issues?** → See [Auth Guide](../AUTH_GUIDE.md)
+ - **New User?** → Start with [Setup Guide](guides/SETUP.md)
+ - **API Questions?** → Check [API Guide](guides/API_GUIDE.md)
+ - **Authentication Issues?** → See [Auth Guide](guides/AUTH_GUIDE.md)
 - **Development Questions?** → Browse the architecture docs
 - **Bug Reports?** → Create an issue on GitHub
 
