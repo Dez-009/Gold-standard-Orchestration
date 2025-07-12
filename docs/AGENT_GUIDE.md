@@ -51,4 +51,4 @@ See [agent_design/orchestration_prompt_template.md](agent_design/orchestration_p
 - Admins can override or annotate responses. Details are in [agent.md](agent.md#orchestration-logic).
 
 ## Memory State
-Agent activation and history are tracked in the `AgentState` model. The possible states are outlined in [AGENTS.md](../AGENTS.md#agent-state-management).
+Agent activation and history are tracked in the `AgentState` model. The possible states are outlined in [AGENTS.md](reference/AGENTS.md#agent-state-management).
