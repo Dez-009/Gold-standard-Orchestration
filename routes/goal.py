@@ -3,7 +3,11 @@ from sqlalchemy.orm import Session
 
 from database.utils import get_db
 from services import goal_service, goal_refinement_service, user_service
-from schemas.goal_schemas import GoalCreate, GoalResponse
+from schemas.goal_schemas import (
+    GoalCreate,
+    GoalResponse,
+    GoalProgressUpdate,
+)
 from schemas.goal_refinement_schemas import (
     GoalRefinementRequest,
     GoalRefinementResponse,
@@ -54,3 +58,29 @@ def suggest_refined_goals(
         current_user.id, payload.existing_goals, payload.journal_tags
     )
     return GoalRefinementResponse(refined_goals=refined)
+
+
+@router.get("/progress", response_model=list[GoalResponse])
+def read_goal_progress(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[GoalResponse]:
+    """Return progress details for the authenticated user's goals."""
+    return goal_service.get_goal_progress(db, current_user.id)
+
+
+@router.put("/{goal_id}/progress", response_model=GoalResponse)
+def update_goal_progress(
+    goal_id: int,
+    progress_update: GoalProgressUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> GoalResponse:
+    """Update progress information for a specific goal."""
+    goal = goal_service.get_goal_by_id(db, goal_id)
+    if goal is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Goal not found")
+    if goal.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    updated = goal_service.update_goal_progress(db, goal, progress_update.model_dump())
+    return updated

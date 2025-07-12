@@ -4,7 +4,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { fetchGoalProgress } from '../../../../services/goalService';
+import {
+  fetchGoalProgress,
+  updateGoalProgress as persistProgress
+} from '../../../../services/goalService';
+import { trackEvent } from '../../../../services/analyticsService';
 import { getToken, isTokenExpired } from '../../../../services/authUtils';
 import { showError } from '../../../../components/ToastProvider';
 
@@ -51,19 +55,23 @@ export default function GoalProgressPage() {
   }, [router]);
 
   // Increment progress locally for a goal and mark the update time
-  const incrementProgress = (id: number) => {
-    setProgressList((prev) =>
-      prev.map((g) =>
-        g.id === id
-          ? {
-              ...g,
-              progress: g.progress ? Math.min(g.progress + 10, g.target ?? 100) : 10,
-              updated_at: new Date().toISOString()
-            }
-          : g
-      )
-    );
-    // TODO: Persist update to the backend when API is available
+  const incrementProgress = async (id: number) => {
+    const goal = progressList.find((g) => g.id === id);
+    if (!goal) return;
+    const newProgress = Math.min((goal.progress ?? 0) + 10, goal.target ?? 100);
+    try {
+      await persistProgress(id, newProgress, goal.target);
+      trackEvent('goal_progress_increment', { goalId: id, progress: newProgress });
+      setProgressList((prev) =>
+        prev.map((g) =>
+          g.id === id
+            ? { ...g, progress: newProgress, updated_at: new Date().toISOString() }
+            : g
+        )
+      );
+    } catch {
+      showError('Failed to update progress');
+    }
   };
 
   // Helper to show YYYY-MM-DD from ISO timestamp

@@ -20,3 +20,19 @@ def get_goal_by_id(db: Session, goal_id: int) -> Goal | None:
 def get_goals_by_user(db: Session, user_id: int) -> list[Goal]:
     """Return all goals for a specific user."""
     return db.query(Goal).filter(Goal.user_id == user_id).all()
+
+
+def get_goal_progress(db: Session, user_id: int) -> list[Goal]:
+    """Return progress info for all goals belonging to a user."""
+    return db.query(Goal).filter(Goal.user_id == user_id).all()
+
+
+def update_goal_progress(db: Session, goal: Goal, data: dict) -> Goal:
+    """Update a goal's progress and/or target."""
+    if "progress" in data and data["progress"] is not None:
+        goal.progress = data["progress"]
+    if "target" in data and data["target"] is not None:
+        goal.target = data["target"]
+    db.commit()
+    db.refresh(goal)
+    return goal
