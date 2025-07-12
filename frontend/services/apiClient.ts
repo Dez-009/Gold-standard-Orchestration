@@ -257,6 +257,18 @@ export async function getGoalProgress(token: string) {
   return response.data;
 }
 
+// Update progress metrics for a specific goal
+export async function updateGoalProgress(
+  token: string,
+  goalId: number,
+  data: { progress?: number; target?: number }
+) {
+  const response = await apiClient.put(`/goals/${goalId}/progress`, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
 // Retrieve AI-powered goal suggestions from the backend
 // Notes: Performs a GET request to /goals/suggestions including the JWT token
 export async function getGoalSuggestions(token: string) {
