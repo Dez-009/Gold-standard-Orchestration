@@ -9,14 +9,12 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 
 from main import app
 from auth.auth_utils import create_access_token
-from services import user_service
 from tests.conftest import TestingSessionLocal
 
 client = TestClient(app)
 
 
 def setup_db():
-    """Reset database and return session."""
     from database.base import Base
     from database.session import engine
 
@@ -26,7 +24,6 @@ def setup_db():
 
 
 def register_user(role: str = "user") -> tuple[int, str]:
-    """Create a user via the API and return id and JWT."""
     email = f"u_{uuid.uuid4().hex}@example.com"
     data = {
         "email": email,
@@ -41,30 +38,45 @@ def register_user(role: str = "user") -> tuple[int, str]:
     return user_id, token
 
 
-def test_admin_can_list_and_update_users():
+def test_admin_get_patch_delete_users():
     db = setup_db()
-    # create target user and admin
     target_id, _ = register_user()
     _, admin_token = register_user("admin")
 
-    # list all users
     resp = client.get("/admin/users", headers={"Authorization": f"Bearer {admin_token}"})
     assert resp.status_code == 200
     assert any(u["id"] == target_id for u in resp.json())
 
-    # update user
-    upd = {"full_name": "Updated"}
-    resp = client.put(
+    resp = client.patch(
         f"/admin/users/{target_id}",
-        json=upd,
+        params={"role": "admin"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert resp.status_code == 200
-    assert resp.json()["full_name"] == "Updated"
+    assert resp.json()["role"] == "admin"
+
+    resp = client.delete(
+        f"/admin/users/{target_id}",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "deactivated"
     db.close()
 
 
-def test_non_admin_forbidden():
+def test_patch_invalid_role():
+    setup_db()
+    uid, _ = register_user()
+    _, admin_token = register_user("admin")
+    resp = client.patch(
+        f"/admin/users/{uid}",
+        params={"role": "invalid"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert resp.status_code == 400
+
+
+def test_admin_only_access():
     setup_db()
     _, token = register_user()
     resp = client.get("/admin/users", headers={"Authorization": f"Bearer {token}"})

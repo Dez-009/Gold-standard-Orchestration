@@ -3,36 +3,30 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
 
 from auth.dependencies import get_current_admin_user
 from database.utils import get_db
 from services import user_service
+from services import admin_user_service
 from models.user import User
 from schemas.user_schemas import UserResponse
 
 router = APIRouter(prefix="/admin/users", tags=["admin"])
 
 
-class AdminUserUpdate(BaseModel):
-    """Fields allowed when updating a user."""
 
-    email: str | None = None
-    phone_number: str | None = None
-    full_name: str | None = None
-    age: int | None = None
-    sex: str | None = None
-    role: str | None = None
-    is_active: bool | None = None
 
 
 @router.get("/", response_model=list[UserResponse])
 def list_users(
+    limit: int = 100,
+    offset: int = 0,
+    role: str | None = None,
     _: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db),
 ) -> list[User]:
-    """Return every user account."""
-    return user_service.get_all_users(db)
+    """Return users filtered by role with pagination."""
+    return admin_user_service.list_users(db, limit, offset, role)
 
 
 @router.get("/{user_id}", response_model=UserResponse)
@@ -48,16 +42,30 @@ def get_user_details(
     return user
 
 
-@router.put("/{user_id}", response_model=UserResponse)
-def update_user(
+
+@router.patch("/{user_id}", response_model=UserResponse)
+def update_user_role(
     user_id: int,
-    payload: AdminUserUpdate,
+    role: str,
     _: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db),
 ) -> User:
-    """Modify user attributes."""
-    user = user_service.get_user(db, user_id)
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    updated = user_service.update_user(db, user, payload.model_dump(exclude_none=True))
-    return updated
+    """Update a user's role."""
+    try:
+        return admin_user_service.update_user_role(db, user_id, role)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@router.delete("/{user_id}")
+def deactivate_user(
+    user_id: int,
+    _: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Soft delete a user account."""
+    try:
+        admin_user_service.deactivate_user(db, user_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return {"status": "deactivated"}
