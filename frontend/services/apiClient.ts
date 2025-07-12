@@ -675,12 +675,38 @@ export async function getUserSessions(token: string) {
 
 // Notes: Retrieve captured application error logs from the backend
 // Notes: Sends GET request to the /admin/errors endpoint with auth header
-export async function getErrorLogs(token: string) {
-  // Notes: Perform the request to fetch error log entries
+export async function getErrorLogs(token: string, filters?: Record<string, unknown>) {
+  // Notes: Perform the request to fetch error log entries with optional filters
   const response = await apiClient.get('/admin/errors', {
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
+    params: filters
   });
   // Notes: Return the list of error records provided by the backend
+  return response.data;
+}
+
+// Notes: Retrieve a specific error log by ID
+export async function getErrorLog(token: string, errorId: string) {
+  const response = await apiClient.get(`/admin/errors/${errorId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Notes: Update an error log (e.g., mark as resolved, add notes)
+export async function updateErrorLog(token: string, errorId: string, updateData: Record<string, unknown>) {
+  const response = await apiClient.patch(`/admin/errors/${errorId}`, updateData, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+}
+
+// Notes: Retrieve error statistics for the admin dashboard
+export async function getErrorStats(token: string, days: number = 7) {
+  const response = await apiClient.get('/admin/errors/stats/summary', {
+    headers: { Authorization: `Bearer ${token}` },
+    params: { days }
+  });
   return response.data;
 }
 

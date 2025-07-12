@@ -17,7 +17,6 @@ export async function fetchSystemHealth() {
   try {
     // Request the health status from the backend
     const data = await getSystemHealth(token);
-    showSuccess('Saved successfully');
     // Provide the expected shape of the response object
     return data as {
       database: string;

@@ -95,6 +95,7 @@ from .conflict_flag import router as conflict_flag_router
 from .habit_sync import router as habit_sync_router
 from .user_wearable import router as user_wearable_router
 from .admin_users import router as admin_users_router
+from .admin_health import router as admin_health_router
 
 router = APIRouter()
 # Notes: Load configuration so feature flags can be checked
@@ -174,6 +175,7 @@ router.include_router(admin_persona_token_router)
 router.include_router(admin_persona_preset_router)
 router.include_router(admin_prompt_versions_router)
 router.include_router(admin_users_router)
+router.include_router(admin_health_router)
 # Notes: Include feedback routes only when the feature is active
 if "agent_feedback" in settings.ENABLED_FEATURES:
     router.include_router(feedback_router)

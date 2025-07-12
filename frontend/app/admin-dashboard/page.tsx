@@ -59,8 +59,7 @@ export default function AdminDashboard() {
       title: 'User Management',
       description: 'Manage users, roles, and permissions',
       links: [
-        { label: 'All Users', href: '/admin/users', description: 'View and manage all users' },
-        { label: 'User Roles', href: '/admin/users/roles', description: 'Manage user roles and permissions' },
+        { label: 'All Users', href: '/admin/users', description: 'View and manage all users with role controls' },
         { label: 'User Sessions', href: '/admin/sessions', description: 'Active user sessions' },
       ]
     },
