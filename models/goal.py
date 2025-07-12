@@ -2,7 +2,15 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    ForeignKey,
+    Text,
+    Boolean,
+)
 from sqlalchemy.orm import relationship
 
 from database.base import Base
@@ -17,6 +25,10 @@ class Goal(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
+    # Track incremental progress toward the goal's completion
+    progress = Column(Integer, default=0)
+    # Optional target value for completion percentage
+    target = Column(Integer, nullable=True)
     is_completed = Column(Boolean, default=False)
     # Progress tracking fields
     target = Column(Integer, nullable=True)  # Target value (e.g., 100 for percentage)
