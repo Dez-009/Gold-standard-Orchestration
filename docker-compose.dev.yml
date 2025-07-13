@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5433/vida_coach
+      - DATABASE_URL=postgresql://postgres:password@db:5432/vida_coach
       - OPENAI_API_KEY=${OPENAI_API_KEY:-test}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-sk_test}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-whsec_test}

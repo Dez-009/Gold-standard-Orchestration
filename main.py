@@ -124,6 +124,8 @@ from routes.admin_flag_reason_analytics import (
 
 # Notes: Import router exposing personality CRUD endpoints
 from routes.personality import router as personality_router
+# Notes: Import router for admin health endpoints
+from routes.admin_health import router as admin_health_router
 
 
 from database.base import Base
@@ -286,6 +288,8 @@ app.include_router(admin_feedback_alerts_router)
 app.include_router(admin_flag_reasons_router)
 app.include_router(admin_flag_reason_analytics_router)
 app.include_router(admin_flagged_summaries_router)
+# Notes: Include admin health router
+app.include_router(admin_health_router)
 # Provide endpoint for the frontend to query feature flags
 app.include_router(settings_router)
 # Expose admin feature editing when allowed by config
