@@ -54,6 +54,7 @@ from routes.admin.system_tasks import router as admin_system_router
 from routes.admin_system import router as admin_system_status_router
 from routes.admin.billing_admin import router as admin_billing_router
 from routes.admin.webhooks import router as admin_webhook_router
+from routes.admin_health import router as admin_health_router
 from routes.admin.subscription_history import (
     router as admin_subscription_history_router,
 )
@@ -247,6 +248,7 @@ app.include_router(admin_billing_router)
 app.include_router(admin_system_router)
 app.include_router(admin_system_status_router)
 app.include_router(admin_webhook_router)
+app.include_router(admin_health_router)
 app.include_router(admin_subscription_history_router)
 app.include_router(admin_impersonation_router)
 app.include_router(admin_audit_router)
